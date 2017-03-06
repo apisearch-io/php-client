@@ -60,9 +60,11 @@ class HttpRepository extends Repository
             ->httpClient
             ->get('/index/products', 'post', [
                 'key' => $this->getKey(),
-                'products' => array_map(function (Product $product) {
-                    return $product->toArray();
-                }, $products),
+                'products' => json_encode(
+                    array_map(function (Product $product) {
+                        return $product->toArray();
+                    }, $products)
+                ),
             ]);
     }
 
@@ -77,9 +79,11 @@ class HttpRepository extends Repository
             ->httpClient
             ->get('/index/categories', 'post', [
                 'key' => $this->getKey(),
-                'categories' => array_map(function (Category $category) {
-                    return $category->toArray();
-                }, $categories),
+                'categories' => json_encode(
+                    array_map(function (Category $category) {
+                        return $category->toArray();
+                    }, $categories)
+                ),
             ]);
     }
 
@@ -94,9 +98,11 @@ class HttpRepository extends Repository
             ->httpClient
             ->get('/index/manufacturers', 'post', [
                 'key' => $this->getKey(),
-                'manufacturers' => array_map(function (Manufacturer $manufacturer) {
-                    return $manufacturer->toArray();
-                }, $manufacturers),
+                'manufacturers' => json_encode(
+                    array_map(function (Manufacturer $manufacturer) {
+                        return $manufacturer->toArray();
+                    }, $manufacturers)
+                ),
             ]);
     }
 
@@ -111,9 +117,11 @@ class HttpRepository extends Repository
             ->httpClient
             ->get('/index/brands', 'post', [
                 'key' => $this->getKey(),
-                'brands' => array_map(function (Brand $brand) {
-                    return $brand->toArray();
-                }, $brands),
+                'brands' => json_encode(
+                    array_map(function (Brand $brand) {
+                        return $brand->toArray();
+                    }, $brands)
+                ),
             ]);
     }
 
@@ -128,9 +136,9 @@ class HttpRepository extends Repository
             ->httpClient
             ->get('/index/tags', 'post', [
                 'key' => $this->getKey(),
-                'tags' => array_map(function (Tag $tag) {
+                'tags' => json_encode(array_map(function (Tag $tag) {
                     return $tag->toArray();
-                }, $tags),
+                }, $tags)),
             ]);
     }
 
@@ -147,7 +155,7 @@ class HttpRepository extends Repository
             ->httpClient
             ->get('/query', 'get', [
                 'key' => $this->getKey(),
-                'query' => $query->toArray(),
+                'query' => json_encode($query->toArray()),
             ]);
 
         return Result::createFromArray($response['body']);
