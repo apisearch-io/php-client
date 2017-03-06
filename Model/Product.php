@@ -512,12 +512,18 @@ class Product implements HttpTransportable
             (string) $array['description'],
             $array['long_description'] ?? null,
             (float) $array['price'],
-            $array['reduced_price'] ?? null,
-            $array['stock'] ?? null,
+            isset($array['reduced_price'])
+                ? ((float) $array['reduced_price'])
+                : null,
+            isset($array['stock'])
+                ? ((int) $array['stock'])
+                : null,
             Manufacturer::createFromArray($array['manufacturer']),
             Brand::createFromArray($array['brand']),
             $array['image'] ?? null,
-            $array['rating'] ?? null,
+            isset($array['rating'])
+                ? ((float) $array['rating'])
+                : null,
             isset($array['updated_at'])
                 ? DateTime::createFromFormat(DATE_ATOM, $array['updated_at'])
                 : null
