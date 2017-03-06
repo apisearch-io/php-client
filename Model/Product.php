@@ -518,8 +518,12 @@ class Product implements HttpTransportable
             isset($array['stock'])
                 ? ((int) $array['stock'])
                 : null,
-            Manufacturer::createFromArray($array['manufacturer']),
-            Brand::createFromArray($array['brand']),
+            isset($array['manufacturer'])
+                ? Manufacturer::createFromArray($array['manufacturer'])
+                : null,
+            isset($array['brand'])
+                ? Brand::createFromArray($array['brand'])
+                : null,
             $array['image'] ?? null,
             isset($array['rating'])
                 ? ((float) $array['rating'])
