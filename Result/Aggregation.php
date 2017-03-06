@@ -18,9 +18,10 @@ namespace Puntmig\Search\Result;
 
 use ArrayIterator;
 use IteratorAggregate;
+use Traversable;
+
 use Puntmig\Search\Model\HttpTransportable;
 use Puntmig\Search\Query\Filter;
-use Traversable;
 
 /**
  * Class Aggregation.

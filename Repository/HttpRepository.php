@@ -135,7 +135,7 @@ class HttpRepository extends Repository
     }
 
     /**
-     * Search cross the index types.
+     * Search across the index types.
      *
      * @param Query $query
      *
@@ -151,5 +151,15 @@ class HttpRepository extends Repository
             ]);
 
         return Result::createFromArray($response['body']);
+    }
+
+    /**
+     * Reset the index.
+     */
+    public function reset()
+    {
+        $this
+            ->httpClient
+            ->get('/index', 'delete', []);
     }
 }

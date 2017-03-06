@@ -237,11 +237,16 @@ abstract class Repository
     abstract protected function flushTags(array $tags);
 
     /**
-     * Search cross the index types.
+     * Search across the index types.
      *
      * @param Query $query
      *
      * @return Result
      */
     abstract public function query(Query $query) : Result;
+
+    /**
+     * Reset the index.
+     */
+    abstract public function reset();
 }
