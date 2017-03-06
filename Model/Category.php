@@ -71,7 +71,7 @@ class Category extends IdNameWrapper implements WithLevel
         return new static(
             (string) $array['id'],
             (string) $array['name'],
-            $array['level'] ?? 1
+            (int) $array['level'] ?? 1
         );
     }
 
