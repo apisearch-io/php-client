@@ -160,6 +160,8 @@ class HttpRepository extends Repository
     {
         $this
             ->httpClient
-            ->get('/index', 'delete', []);
+            ->get('/reset', 'delete', [
+                'key' => $this->getKey(),
+            ]);
     }
 }
