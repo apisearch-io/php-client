@@ -204,7 +204,9 @@ class Product implements HttpTransportable
         $this->categories = [];
         $this->tags = [];
         $this->image = ($image ?? '');
-        $this->rating = $rating;
+        $this->rating = !is_null($rating)
+            ? round($rating, 1)
+            : null;
         $this->updatedAt = ($updatedAt ?? new DateTime());
 
         $this->firstLevelSearchableData = "$name {$manufacturer->getName()} {$brand->getName()}";
