@@ -209,7 +209,13 @@ class Product implements HttpTransportable
             : null;
         $this->updatedAt = ($updatedAt ?? new DateTime());
 
-        $this->firstLevelSearchableData = "$name {$manufacturer->getName()} {$brand->getName()}";
+        $this->firstLevelSearchableData = $name;
+        if ($manufacturer instanceof Manufacturer) {
+            $this->firstLevelSearchableData .= " {$manufacturer->getName()}";
+        }
+        if ($brand instanceof Brand) {
+            $this->firstLevelSearchableData .= " {$brand->getName()}";
+        }
         $this->secondLevelSearchableData = "$description $longDescription";
     }
 
