@@ -213,7 +213,7 @@ class Query implements HttpTransportable
      */
     public function filterByManufacturers(
         array $manufacturers,
-        int $applicationType = Filter::MUST_ALL,
+        int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
     ) : self {
         if (!empty($manufacturers)) {
@@ -245,7 +245,7 @@ class Query implements HttpTransportable
      */
     public function filterByBrands(
         array $brands,
-        int $applicationType = Filter::MUST_ALL,
+        int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
     ) : self {
         if (!empty($brands)) {

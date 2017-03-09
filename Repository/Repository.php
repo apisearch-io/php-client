@@ -175,13 +175,8 @@ abstract class Repository
      *
      * @param int $bulkNumber
      */
-    public function flush(int $bulkNumber)
+    public function flush(int $bulkNumber = 500)
     {
-        $this->flushCategories($this->elementsBulk['categories']);
-        $this->flushManufacturers($this->elementsBulk['manufacturers']);
-        $this->flushBrands($this->elementsBulk['brands']);
-        $this->flushTags($this->elementsBulk['tags']);
-
         $offset = 0;
         while (true) {
             $products = array_slice(
@@ -195,6 +190,10 @@ abstract class Repository
             }
 
             $this->flushProducts($products);
+            $this->flushCategories($this->elementsBulk['categories']);
+            $this->flushManufacturers($this->elementsBulk['manufacturers']);
+            $this->flushBrands($this->elementsBulk['brands']);
+            $this->flushTags($this->elementsBulk['tags']);
             $offset += $bulkNumber;
         }
 
