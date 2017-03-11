@@ -125,4 +125,18 @@ class SortBy
      * Sort by rating DESC
      */
     const RATING_DESC = ['rating' => 'desc'];
+
+    /**
+     * @var array
+     *
+     * Sort by location ASC using KM
+     */
+    const LOCATION_KM_ASC = ['_geo_distance' => ['order' => 'asc', 'unit' => 'km']];
+
+    /**
+     * @var array
+     *
+     * Sort by location ASC using Miles
+     */
+    const LOCATION_MI_ASC = ['_geo_distance' => ['order' => 'asc', 'unit' => 'mi']];
 }

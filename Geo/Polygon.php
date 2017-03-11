@@ -49,13 +49,9 @@ class Polygon extends LocationRange
      */
     public function toFilterArray(): array
     {
-        return [
-            'coordinate' => [
-                'points' => array_map(function (Coordinate $coordinate) {
-                    return $coordinate->toArray();
-                }, $this->coordinates),
-            ],
-        ];
+        return array_map(function (Coordinate $coordinate) {
+            return $coordinate->toArray();
+        }, $this->coordinates);
     }
 
     /**
@@ -63,13 +59,13 @@ class Polygon extends LocationRange
      *
      * @param array $array
      *
-     * @return Polygon
+     * @return LocationRange
      */
-    public static function fromFilterArray(array $array)
+    public static function fromFilterArray(array $array) : LocationRange
     {
         $coordinates = array_map(function (array $coordinate) {
             return Coordinate::createFromArray($coordinate);
-        }, $array['coordinate']['points']);
+        }, $array);
 
         $class = new ReflectionClass(static::class);
 

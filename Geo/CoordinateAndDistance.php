@@ -71,9 +71,9 @@ class CoordinateAndDistance extends LocationRange
      *
      * @param array $array
      *
-     * @return CoordinateAndDistance
+     * @return LocationRange
      */
-    public static function fromFilterArray(array $array)
+    public static function fromFilterArray(array $array) : LocationRange
     {
         return new self(
             Coordinate::createFromArray($array['coordinate']),

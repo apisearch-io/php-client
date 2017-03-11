@@ -59,14 +59,12 @@ class Square extends LocationRange
     public function toFilterArray(): array
     {
         return [
-            'coordinate' => [
-                'top_left' => $this
-                    ->topLeftCoordinate
-                    ->toArray(),
-                'bottom_right' => $this
-                    ->bottomRightCoordinate
-                    ->toArray(),
-            ],
+            0 => $this
+                ->topLeftCoordinate
+                ->toArray(),
+            1 => $this
+                ->bottomRightCoordinate
+                ->toArray(),
         ];
     }
 
@@ -75,13 +73,13 @@ class Square extends LocationRange
      *
      * @param array $array
      *
-     * @return Square
+     * @return LocationRange
      */
-    public static function fromFilterArray(array $array)
+    public static function fromFilterArray(array $array) : LocationRange
     {
         return new self(
-            Coordinate::createFromArray($array['coordinate']['top_left']),
-            Coordinate::createFromArray($array['coordinate']['bottom_right'])
+            Coordinate::createFromArray($array[0]),
+            Coordinate::createFromArray($array[1])
         );
     }
 }

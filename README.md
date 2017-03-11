@@ -346,7 +346,7 @@ application. Depending on that value, the filter will cause different values and
 the resulting aggregation (facet) will change, even on your screen. Let's take a
 look at the different filters we can apply.
 
-* Filter by families
+#### Filter by families
 
 Remember that your Product can have a family? This is because your domain
 Product can be a set of different purchasable objects, for example products,
@@ -371,7 +371,7 @@ Query::create('')->filterByFamilies(
 );
 ```
 
-* Filter by Types
+#### Filter by Types
 
 This API works with 5 different object types. Products, Categories,
 Manufacturers, Brands and Tags. Even if the main object type is the Product, and
@@ -387,7 +387,7 @@ That simple. Because all objects have indexed fields you can make searches
 across them all, but only single searches. Applying extra filters would cause
 empty results.
 
-* Filter by Categories.
+#### Filter by Categories.
 
 Let's start by thinking about our app. There are three ways of filtering by
 category, but, and because Category is the only element here that should be
@@ -420,7 +420,7 @@ Query::create('')->filterByCategories(
 );
 ```
 
-* Filter by Manufacturers and Brands
+#### Filter by Manufacturers / Brands
 
 Because both experience is the same, let's explain both at the same time. As
 said with categories, you can filter by manufacturer and by brand. Because a
@@ -449,7 +449,7 @@ Query::create('')->filterByManufacturers(
 );
 ```
 
-* Filter by Tags
+#### Filter by Tags
 
 Your products may contain tags. At first sight, tags are simple tags, and when
 indexing, they don't have meaning at all by themselves, so they are not grouped
@@ -509,7 +509,7 @@ Query::create('')
     );
 ```
 
-* Filter by range
+#### Filter by range
 
 This filter is considerably useful when filtering by price, by rating or by any
 other numeric value (discount percentage...). Let's work with the example of
@@ -558,7 +558,7 @@ As you can see, this last example would return an empty set of elements as we
 don't have any product with a price lower than 60 euros and, at the same time,
 higher than 90. Basics of logic of sets.
 
-* Filter by price range
+##### Filter by price range
 
 This is an implementation of the last filter type. It is applied over the 
 Product field `real_price`. It works the same way that the last filter, but the
@@ -572,7 +572,7 @@ Query::create('')
     );
 ```
 
-* Filter by rating range
+##### Filter by rating range
 
 This is an implementation of the last filter type. It is applied over the 
 Product field `rating`. It works the same way that the last filter, but the
@@ -585,6 +585,92 @@ Query::create('')
         ['1..3', '9..10']
     );
 ```
+
+#### Filter by location
+
+You can filter your results by location as well. Some apps should be able to
+show only the nearest products given a location coordinate, or the products
+located inside an specific zone.
+
+To start using this feature, we must understand what a Coordinate is. Given a
+latitude, specified by a float value, and a longitude, specified as well as a
+simple float value, we can create a new Coordinate instance. This object will be
+important in this filter feature.
+
+```php
+$coordinate = new Coordinate(40.9, -70.0);
+```
+
+We can filter our queries in three different ways.
+
+##### Filter by location, given a center point and a distance
+
+Given a center point, defined as a Coordinate instance, and a distance, defined
+as an integer and a distance unit (km or mi) joined in a string, you can define
+a simple filtering range. You must use an object called `CoordinateAndDistance`.
+
+```php
+$locationRange = new CoordinateAndDistance(
+    new Coordinate(40.9, -70.0),
+    '50km'
+);
+Query::create('')
+    ->filterByLocation(
+        $locationRange
+    );
+```
+
+> This is useful when using, for example, a website with active localization.
+> The browser can request the localization and send the coordinates to us, so we
+> can provide a better experience to the final user
+
+##### Filter by location, given two square sides
+
+If you have the top-left coordinate and the bottom-right coordinate of a square,
+inside of where you want to locate all the products, you can use this filter
+type. In that case, you need both Coordinate instances.
+
+```php
+$locationRange = new Square(
+    new Coordinate(40.9, -70.0),
+    new Coordinate(39.4, -69.1),
+);
+Query::create('')
+    ->filterByLocation(
+        $locationRange
+    );
+```
+
+> This is useful when working with maps. Maps are usually presented in a square
+> visualization mode, so when the final user scrolls, having these two
+> coordinates (top-left, bottom-right) we can look the products we want to show
+
+##### Filter by location, given a finite set of coordinates (polygon)
+
+You can build your own polygon having a set of coordinates. These coordinates
+will draw a polygon, and all products inside the are of this polygon will be
+considered as valid result.
+
+All coordinates must be Coordinate instances.
+
+```php
+$locationRange = new Polygon(
+    new Coordinate(40.9, -70.0),
+    new Coordinate(40.9, -69.1),
+    new Coordinate(39.4, -69.1),
+    //...
+);
+Query::create('')
+    ->filterByLocation(
+        $locationRange
+    );
+```
+
+You can add as many coordinates as you need in order to build the desired area.
+
+> This is useful when the final user has any kind of drawing tool, so an
+> specific polygon can be defined by any user. Useful as well when composing
+> maps, for example, defining country areas as polygons.
 
 ### Aggregations
 
@@ -645,6 +731,43 @@ Query::create('')
 ```
 
 When you define a sort element, you override the existing one.
+
+#### Sorting by location
+
+A set of special sorting types can sort as well by location. In order to make
+this sorting work, we must create our Query instance by using the method
+`createLocated()` instead of `create()`. The only difference between both is
+that the first one's first parameter is a `Coordinate` instance.
+
+```php
+$query = Query::createLocated(
+    new Coordinate(40.0, -70.0),
+    ''
+);
+```
+
+Because the only way that could make sense when sorting by location is
+requesting first of all the elements closer to us, we can only sort them by
+location in an *asc* mode.
+
+```php
+Query::create('')
+    ->sortBy(SortBy::LOCATION_KM_ASC)
+    ->sortBy(SortBy::LOCATION_MI_ASC)
+```
+
+Both sorting types return exactly the same results in the same order, but both
+return the distance of each hit in different units. The first of all in 
+kilometers and the second one in miles.
+
+Using this sort type, we will be able to know the distance of each of the
+Product instances received by using the special Product method `->getDistance()`
+defined and filled only in this scenario. The result of this method is a float
+value.
+
+```php
+$product->getDistance();
+```
 
 ## Result object
 

@@ -34,8 +34,10 @@ abstract class LocationRange implements HttpTransportable
      * From filter array.
      *
      * @param array $array
+     *
+     * @return self
      */
-    abstract public static function fromFilterArray(array $array);
+    abstract public static function fromFilterArray(array $array) : self;
 
     /**
      * To array.

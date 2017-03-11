@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Query;
 
+use Puntmig\Search\Exception\QueryBuildException;
 use Puntmig\Search\Geo\LocationRange;
 use Puntmig\Search\Model\Coordinate;
 use Puntmig\Search\Model\HttpTransportable;
@@ -25,6 +26,13 @@ use Puntmig\Search\Model\HttpTransportable;
  */
 class Query implements HttpTransportable
 {
+    /**
+     * @var Coordinate
+     *
+     * Coordinate
+     */
+    private $coordinate;
+
     /**
      * @var Filter[]
      *
@@ -81,6 +89,33 @@ class Query implements HttpTransportable
             0,
             Filter::TYPE_QUERY
         );
+    }
+
+    /**
+     * Create located Query.
+     *
+     * @param Coordinate $coordinate
+     * @param string     $queryText
+     * @param int        $page
+     * @param int        $size
+     *
+     * @return self
+     */
+    public static function createLocated(
+        Coordinate $coordinate,
+        string $queryText,
+        int $page = 1,
+        int $size = 10
+    ) {
+        $query = self::create(
+            $queryText,
+            $page,
+            $size
+        );
+
+        $query->coordinate = $coordinate;
+
+        return $query;
     }
 
     /**
@@ -402,27 +437,15 @@ class Query implements HttpTransportable
     /**
      * Filter by location.
      *
-     * @param Coordinate    $coordinate
      * @param LocationRange $locationRange
-     * @param array         $options
-     * @param array         $values
-     * @param int           $applicationType
-     * @param bool          $aggregate
      *
      * @return self
      */
-    public function filterByLocation(
-        Coordinate $coordinate,
-        LocationRange $locationRange,
-        array $options,
-        array $values,
-        int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
-    ) : self {
-        $this->filters['location'] = Filter::create(
-            'location',
+    public function filterByLocation(LocationRange $locationRange) : self {
+        $this->filters['coordinate'] = Filter::create(
+            'coordinate',
             $locationRange->toArray(),
-            $applicationType,
+            Filter::AT_LEAST_ONE,
             Filter::TYPE_GEO
         );
 
@@ -438,6 +461,15 @@ class Query implements HttpTransportable
      */
     public function sortBy(array $sort) : self
     {
+        if (isset($sort['_geo_distance'])) {
+            if (!$this->coordinate instanceof Coordinate) {
+                throw new QueryBuildException('In order to be able to sort by coordinates, you need to create a Query by using Query::createLocated() instead of Query::create()');
+            }
+            $sort['_geo_distance']['coordinate'] = $this
+                ->coordinate
+                ->toArray();
+        }
+
         $this->sort = $sort;
 
         return $this;
@@ -663,6 +695,9 @@ class Query implements HttpTransportable
 
         return [
             'q' => $query->getValues()[0],
+            'coordinate' => $this->coordinate instanceof HttpTransportable
+                ? $this->coordinate->toArray()
+                : null,
             'filters' => array_filter(
                 array_map(function (Filter $filter) {
                     return $filter->getFilterType() !== Filter::TYPE_QUERY
@@ -688,11 +723,18 @@ class Query implements HttpTransportable
      */
     public static function createFromArray(array $array) : self
     {
-        $query = self::create(
-            $array['q'],
-            (int) $array['page'],
-            (int) $array['size']
-        );
+        $query = $array['coordinate']
+            ? self::createLocated(
+                Coordinate::createFromArray($array['coordinate']),
+                $array['q'],
+                (int) $array['page'],
+                (int) $array['size']
+            )
+            : self::create(
+                $array['q'],
+                (int) $array['page'],
+                (int) $array['size']
+            );
         $query->aggregations = array_map(function (array $aggregation) {
             return Aggregation::createFromArray($aggregation);
         }, $array['aggregations']);

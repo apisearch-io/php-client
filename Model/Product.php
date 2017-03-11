@@ -157,6 +157,13 @@ class Product implements HttpTransportable
     private $coordinate;
 
     /**
+     * @var float
+     *
+     * Distance
+     */
+    private $distance;
+
+    /**
      * @var string
      *
      * First level searchable data
@@ -496,6 +503,16 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get distance.
+     *
+     * @return float
+     */
+    public function getDistance() : float
+    {
+        return $this->distance;
+    }
+
+    /**
      * Get first level searchable data.
      *
      * @return string
@@ -542,6 +559,7 @@ class Product implements HttpTransportable
             'coordinate' => is_null($this->coordinate)
                 ? null
                 : $this->coordinate->toArray(),
+            'distance' => $this->distance,
             'categories' => array_map(function (Category $category) {
                 return $category->toArray();
             }, $this->categories),
@@ -628,6 +646,10 @@ class Product implements HttpTransportable
                     Tag::createFromArray($tag)
                 );
             }
+        }
+
+        if (isset($array['distance'])) {
+            $product->distance = (float) $array['distance'];
         }
 
         return $product;
