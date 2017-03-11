@@ -270,6 +270,16 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get slug
+     *
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
      * Get description.
      *
      * @return string
