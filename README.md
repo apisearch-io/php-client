@@ -1,5 +1,8 @@
 # SEARCH PHP library
 
+> This repository is part of the project Search of the company Puntmig. To get
+> more information about integrations, APIs and 
+
 This library aims to provide a php developer nicely interface to manage all the
 processes related to the Search API using basic domain objects.
 
@@ -41,6 +44,7 @@ Query api is going to work mainly against it.
 | image  | string | Image for the product  | no  | -  |
 | rating  | string  | Product's rate in a float scale  | no  |   |
 | updated_at  | DateTime  | Last time when the product was updated  | no  |   |
+| coordinate  | Coordinate  | Assign coordinates to your products in order to filter and facet over them  | no  |   |
 
 You can create a new Product instance by using the simple Product's constructor.
 This is an example of how you can create a product with random data.
@@ -62,7 +66,11 @@ $product = new Product(
     null,
     'http://example.com/image/12345.jpg',
     4.5,
-    new DateTime()
+    new DateTime(),
+    new Coordinate(
+        40.12, 
+        -71.34
+    )
 )
 ```
 
@@ -70,7 +78,7 @@ You can build a product as well by using the Product's static factory method
 named `createFromArray`.
 
 ``` php
-$array = new [
+$array = [
     'id' => '12345',
     'family' => 'pack',
     'ean' => '4738947832',
@@ -84,7 +92,11 @@ $array = new [
     'manufacturer' => $myManufacturer,
     'image' => 'http://example.com/image/12345.jpg',
     'rating' => 4.5,
-    'updated_at' => new DateTime()
+    'updated_at' => new DateTime(),
+    'coordinate' => [
+        'lat' => 40.12,
+        'lon' => -71.34,
+    ],
 ];
 $product = Product::createFromArray($array);
 ```
@@ -150,7 +162,7 @@ You can build a category as well by using the Category's static factory method
 named `createFromArray`.
 
 ``` php
-$array = new [
+$array = [
     'id' => '12345',
     'name' => 'Shoes',
     'slug' => 'shoes',
@@ -163,7 +175,7 @@ Given an array of arrays defining several product categories, you can still use
 the Product's `createFromArray` method to hydrate Categories inside a Product.
 
 ``` php
-$array = new [
+$array = [
     'id' => '12345',
     'family' => 'pack',
     // ...
@@ -220,7 +232,7 @@ And the usage inside a Product defined as an array is exactly the same than the
 array of categories
 
 ``` php
-$array = new [
+$array = [
     'id' => '12345',
     'family' => 'pack',
     // ...
@@ -266,7 +278,7 @@ And in product, you can define your tags in the Product's array definition as
 well.
 
 ``` php
-$array = new [
+$array = [
     'id' => '12345',
     'family' => 'pack',
     // ...
@@ -557,6 +569,20 @@ Query::create('')
     ->filterByPriceRange(
         [],
         ['50..60', '90..100']
+    );
+```
+
+* Filter by rating range
+
+This is an implementation of the last filter type. It is applied over the 
+Product field `rating`. It works the same way that the last filter, but the
+first two fields are omitted. Optional parameters can be defined as well.
+
+```php
+Query::create('')
+    ->filterByRatingRange(
+        [],
+        ['1..3', '9..10']
     );
 ```
 

@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Query;
 
+use Puntmig\Search\Geo\LocationRange;
+use Puntmig\Search\Model\Coordinate;
 use Puntmig\Search\Model\HttpTransportable;
 
 /**
@@ -307,7 +309,7 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Filter by range.
+     * Filter by price range.
      *
      * @param array $options
      * @param array $values
@@ -325,6 +327,32 @@ class Query implements HttpTransportable
         return $this->filterByRange(
             'price',
             'real_price',
+            $options,
+            $values,
+            $applicationType,
+            $aggregate
+        );
+    }
+
+    /**
+     * Filter by rating range.
+     *
+     * @param array $options
+     * @param array $values
+     * @param int   $applicationType
+     * @param bool  $aggregate
+     *
+     * @return self
+     */
+    public function filterByRatingRange(
+        array $options,
+        array $values,
+        int $applicationType = Filter::AT_LEAST_ONE,
+        bool $aggregate = true
+    ) : self {
+        return $this->filterByRange(
+            'rating',
+            'rating',
             $options,
             $values,
             $applicationType,
@@ -367,6 +395,36 @@ class Query implements HttpTransportable
                 $applicationType
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Filter by location.
+     *
+     * @param Coordinate    $coordinate
+     * @param LocationRange $locationRange
+     * @param array         $options
+     * @param array         $values
+     * @param int           $applicationType
+     * @param bool          $aggregate
+     *
+     * @return self
+     */
+    public function filterByLocation(
+        Coordinate $coordinate,
+        LocationRange $locationRange,
+        array $options,
+        array $values,
+        int $applicationType = Filter::AT_LEAST_ONE,
+        bool $aggregate = true
+    ) : self {
+        $this->filters['location'] = Filter::create(
+            'location',
+            $locationRange->toArray(),
+            $applicationType,
+            Filter::TYPE_GEO
+        );
 
         return $this;
     }

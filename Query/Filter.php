@@ -68,6 +68,13 @@ class Filter implements HttpTransportable
     /**
      * @var string
      *
+     * Filter type field
+     */
+    const TYPE_GEO = 'geo';
+
+    /**
+     * @var string
+     *
      * Filter type query
      */
     const TYPE_QUERY = 'query';

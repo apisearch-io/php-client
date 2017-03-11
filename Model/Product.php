@@ -150,6 +150,13 @@ class Product implements HttpTransportable
     private $rating;
 
     /**
+     * @var Coordinate
+     *
+     * Coordinate
+     */
+    private $coordinate;
+
+    /**
      * @var string
      *
      * First level searchable data
@@ -206,7 +213,8 @@ class Product implements HttpTransportable
         ? Brand $brand,
         ? string $image,
         ? float $rating,
-        ? DateTime $updatedAt = null
+        ? DateTime $updatedAt = null,
+        ? Coordinate $coordinate = null
     ) {
         $this->id = $id;
         $this->family = $family;
@@ -228,6 +236,7 @@ class Product implements HttpTransportable
             ? round($rating, 1)
             : null;
         $this->updatedAt = ($updatedAt ?? new DateTime());
+        $this->coordinate = $coordinate;
 
         $this->firstLevelSearchableData = $name;
         if ($manufacturer instanceof Manufacturer) {
@@ -479,6 +488,14 @@ class Product implements HttpTransportable
     }
 
     /**
+     * @return Coordinate
+     */
+    public function getCoordinate() : Coordinate
+    {
+        return $this->coordinate;
+    }
+
+    /**
      * Get first level searchable data.
      *
      * @return string
@@ -522,6 +539,9 @@ class Product implements HttpTransportable
             'updated_at' => is_null($this->updatedAt)
                 ? null
                 : $this->updatedAt->format(DATE_ATOM),
+            'coordinate' => is_null($this->coordinate)
+                ? null
+                : $this->coordinate->toArray(),
             'categories' => array_map(function (Category $category) {
                 return $category->toArray();
             }, $this->categories),
@@ -582,6 +602,9 @@ class Product implements HttpTransportable
                 : null,
             isset($array['updated_at'])
                 ? DateTime::createFromFormat(DATE_ATOM, $array['updated_at'])
+                : null,
+            isset($array['coordinate'])
+                ? Coordinate::createFromArray($array['coordinate'])
                 : null
         );
 
