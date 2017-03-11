@@ -203,6 +203,7 @@ class Product implements HttpTransportable
      * @param null|string       $image
      * @param null|float        $rating
      * @param null|DateTime     $updatedAt
+     * @param null|Coordinate   $coordinate
      */
     public function __construct(
         string $id,
@@ -215,11 +216,11 @@ class Product implements HttpTransportable
         float $price,
         ? float $reducedPrice,
         string $currency,
-        ? int $stock,
-        ? Manufacturer $manufacturer,
-        ? Brand $brand,
-        ? string $image,
-        ? float $rating,
+        ? int $stock = null,
+        ? Manufacturer $manufacturer = null,
+        ? Brand $brand = null,
+        ? string $image = null,
+        ? float $rating = null,
         ? DateTime $updatedAt = null,
         ? Coordinate $coordinate = null
     ) {
@@ -495,9 +496,9 @@ class Product implements HttpTransportable
     }
 
     /**
-     * @return Coordinate
+     * @return null|Coordinate
      */
-    public function getCoordinate() : Coordinate
+    public function getCoordinate() : ? Coordinate
     {
         return $this->coordinate;
     }

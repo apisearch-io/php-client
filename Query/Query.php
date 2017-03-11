@@ -441,7 +441,8 @@ class Query implements HttpTransportable
      *
      * @return self
      */
-    public function filterByLocation(LocationRange $locationRange) : self {
+    public function filterByLocation(LocationRange $locationRange) : self
+    {
         $this->filters['coordinate'] = Filter::create(
             'coordinate',
             $locationRange->toArray(),
