@@ -61,6 +61,13 @@ class Product implements HttpTransportable
     /**
      * @var string
      *
+     * Slug
+     */
+    private $slug;
+
+    /**
+     * @var string
+     *
      * Description
      */
     private $description;
@@ -163,6 +170,7 @@ class Product implements HttpTransportable
      * @param string            $family
      * @param string            $ean
      * @param string            $name
+     * @param string            $slug
      * @param string            $description
      * @param null|string       $longDescription
      * @param float             $price
@@ -179,6 +187,7 @@ class Product implements HttpTransportable
         string $family,
         string $ean,
         string $name,
+        string $slug,
         string $description,
         ? string $longDescription,
         float $price,
@@ -194,6 +203,7 @@ class Product implements HttpTransportable
         $this->family = $family;
         $this->ean = $ean;
         $this->name = $name;
+        $this->slug = $slug;
         $this->description = $description;
         $this->longDescription = ($longDescription ?? '');
         $this->price = $price;
@@ -470,6 +480,7 @@ class Product implements HttpTransportable
             'family' => $this->family,
             'ean' => $this->ean,
             'name' => $this->name,
+            'slug' => $this->slug,
             'description' => $this->description,
             'long_description' => $this->longDescription,
             'price' => $this->price,
@@ -517,6 +528,7 @@ class Product implements HttpTransportable
             (string) $array['family'],
             (string) $array['ean'],
             (string) $array['name'],
+            (string) $array['slug'],
             (string) $array['description'],
             $array['long_description'] ?? null,
             (float) $array['price'],

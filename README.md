@@ -29,6 +29,7 @@ Query api is going to work mainly against it.
 | family  | string   | Family of products. Will let you work with several kind of purchasables  | **yes**  |   |
 | ean  | string   | Product EAN. Is not considered unique, even if should be. Some purchasables may have not EAN  | **yes**  |   |
 | name  | string  | Name of the product  | **yes**  |   |
+| slug  | string  | Slug of the product  | **yes**  |   |
 | description  | string  | Product's description  | **yes**  |   |
 | long_description  | string  | Product's long description. By default, main description is used  | no  |   |
 | price  | float   | Main product's price, without possible discount  | **yes**  | -  |
@@ -49,6 +50,7 @@ $product = new Product(
     'pack',
     '4738947832',
     'Christmas pack',
+    'christmas-pack',
     'This is the great Christmas pack',
     null,
     40,50,
@@ -71,6 +73,7 @@ $array = new [
     'family' => 'pack',
     'ean' => '4738947832',
     'name' => 'Christmas pack',
+    'slug' => 'christmas-pack',
     'description' => 'This is the great Christmas pack',
     'price' => 40,50,
     'reduced_price' => 35,90,
@@ -125,6 +128,7 @@ between them, they are organized by levels.
 |---|---|---|---|---|
 | id  | string  | Unique id of the category  | **yes**  | -  |
 | name  | string  | Name of the category  | **yes**  |   |
+| slug  | string  | Slug of the category  | **yes**  |   |
 | level  | string  | Category level. By default 1  | no  |   |
 
 You can create a new Category instance by using the simple Category's constructor.
@@ -134,6 +138,7 @@ This is an example of how you can create a category with random data.
 $category = new Category(
     '12345',
     'Shoes',
+    'shoes',
     2
 )
 ```
@@ -145,6 +150,7 @@ named `createFromArray`.
 $array = new [
     'id' => '12345',
     'name' => 'Shoes',
+    'slug' => 'shoes',
     'level' => 2
 ];
 $category = Category::createFromArray($array);
@@ -162,11 +168,13 @@ $array = new [
         [
             'id' => '12345',
             'name' => 'Shoes',
+            'slug' => 'shoes',
             'level' => 2
         ],
         [
             'id' => '67890',
             'name' => 'Kids Shoes',
+            'slug' => 'kids-shoes',
             'level' => 3
         ]
     ]
@@ -183,13 +191,15 @@ the same basic architecture.
 |---|---|---|---|---|
 | id  | string  | Unique id of the manufacturer/brand  | **yes**  | -  |
 | name  | string  | Name of the manufacturer/brand  | **yes**  |   |
+| slug  | string  | Slug of the manufacturer/brand  | **yes**  |   |
 
 Both entities can be built, as well, using the constructor
 
 ``` php
 $manufacturer = new Manufacturer(
     '12345',
-    'Adidas'
+    'Adidas',
+    'adidas'
 )
 ```
 
@@ -198,7 +208,8 @@ or by using the static factory method `createFromArray`
 ``` php
 $brand = Brand::createFromArray([
     'id' => '12345',
-    'name' => 'Nestle'
+    'name' => 'Nestlé',
+    'slug' => 'nestle',
 ])
 ```
 
@@ -213,10 +224,12 @@ $array = new [
     'manufacturer' => [
         'id' => '12345',
         'name' => 'Adidas',
+        'slug' => 'adidas',
     ],
     'brand' => [
         'id' => '67890',
         'name' => 'Nestle',
+        'slug' => 'nestle',
     ]
 ];
 $product = Product::createFromArray($array);

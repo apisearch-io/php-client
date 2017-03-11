@@ -38,6 +38,13 @@ abstract class IdNameWrapper implements HttpTransportable
     /**
      * @var string
      *
+     * Slug
+     */
+    private $slug;
+
+    /**
+     * @var string
+     *
      * First level searchable data
      */
     private $firstLevelSearchableData;
@@ -47,11 +54,16 @@ abstract class IdNameWrapper implements HttpTransportable
      *
      * @param string $id
      * @param string $name
+     * @param string $slug
      */
-    public function __construct(string $id, string $name)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        string $slug
+    ) {
         $this->id = $id;
         $this->name = $name;
+        $this->slug = $slug;
         $this->firstLevelSearchableData = $name;
     }
 
@@ -76,6 +88,16 @@ abstract class IdNameWrapper implements HttpTransportable
     }
 
     /**
+     * Get slug.
+     *
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
      * Get first level searchable data.
      *
      * @return string
@@ -95,6 +117,7 @@ abstract class IdNameWrapper implements HttpTransportable
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'slug' => $this->slug,
         ];
     }
 
@@ -109,14 +132,16 @@ abstract class IdNameWrapper implements HttpTransportable
     {
         if (
             !isset($array['id']) ||
-            !isset($array['name'])
+            !isset($array['name']) ||
+            !isset($array['slug'])
         ) {
             return null;
         }
 
         return new static(
             (string) $array['id'],
-            (string) $array['name']
+            (string) $array['name'],
+            (string) $array['slug']
         );
     }
 }

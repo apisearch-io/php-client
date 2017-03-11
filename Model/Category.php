@@ -40,14 +40,16 @@ class Category extends IdNameWrapper implements WithLevel
      *
      * @param string $id
      * @param string $name
+     * @param string $slug
      * @param int    $level
      */
     public function __construct(
         string $id,
         string $name,
+        string $slug,
         int $level = 1
     ) {
-        parent::__construct($id, $name);
+        parent::__construct($id, $name, $slug);
 
         $this->level = $level;
     }
@@ -63,7 +65,8 @@ class Category extends IdNameWrapper implements WithLevel
     {
         if (
             !isset($array['id']) ||
-            !isset($array['name'])
+            !isset($array['name']) ||
+            !isset($array['slug'])
         ) {
             return null;
         }
@@ -71,6 +74,7 @@ class Category extends IdNameWrapper implements WithLevel
         return new static(
             (string) $array['id'],
             (string) $array['name'],
+            (string) $array['slug'],
             (int) $array['level'] ?? 1
         );
     }
@@ -95,6 +99,7 @@ class Category extends IdNameWrapper implements WithLevel
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
+            'slug' => $this->getSlug(),
             'level' => $this->level,
         ];
     }
