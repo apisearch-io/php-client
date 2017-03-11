@@ -34,6 +34,7 @@ Query api is going to work mainly against it.
 | long_description  | string  | Product's long description. By default, main description is used  | no  |   |
 | price  | float   | Main product's price, without possible discount  | **yes**  | -  |
 | reduced_price  | float  | Reduced product's price  | no  | -  |
+| currency  | string | Your price currency. Can follow any format  | **yes**  | -  |
 | stock  | int  | Product stock. By default is considered infinite  | no  |   |
 | manufacturer  | Manufacturer  | Product's manufacturer  | no  |   |
 | brand  | Brand  | Product's brand  | no  |   |
@@ -55,6 +56,7 @@ $product = new Product(
     null,
     40,50,
     35,90,
+    'EUR',
     100,
     $myManufacturer,
     null,
@@ -77,6 +79,7 @@ $array = new [
     'description' => 'This is the great Christmas pack',
     'price' => 40,50,
     'reduced_price' => 35,90,
+    'currency' => 'EUR',
     'stock' => 100,
     'manufacturer' => $myManufacturer,
     'image' => 'http://example.com/image/12345.jpg',

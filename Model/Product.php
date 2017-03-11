@@ -94,6 +94,13 @@ class Product implements HttpTransportable
     private $reducedPrice;
 
     /**
+     * @var string
+     *
+     * Currency
+     */
+    private $currency;
+
+    /**
      * @var int
      *
      * Stock
@@ -174,6 +181,7 @@ class Product implements HttpTransportable
      * @param string            $description
      * @param null|string       $longDescription
      * @param float             $price
+     * @param string            $currency
      * @param null|float        $reducedPrice
      * @param null|int          $stock
      * @param null|Manufacturer $manufacturer
@@ -192,6 +200,7 @@ class Product implements HttpTransportable
         ? string $longDescription,
         float $price,
         ? float $reducedPrice,
+        string $currency,
         ? int $stock,
         ? Manufacturer $manufacturer,
         ? Brand $brand,
@@ -208,6 +217,7 @@ class Product implements HttpTransportable
         $this->longDescription = ($longDescription ?? '');
         $this->price = $price;
         $this->reducedPrice = ($reducedPrice ?? $price);
+        $this->currency = $currency;
         $this->stock = $stock;
         $this->manufacturer = $manufacturer;
         $this->brand = $brand;
@@ -270,11 +280,11 @@ class Product implements HttpTransportable
     }
 
     /**
-     * Get slug
+     * Get slug.
      *
      * @return string
      */
-    public function getSlug(): string
+    public function getSlug() : string
     {
         return $this->slug;
     }
@@ -350,6 +360,16 @@ class Product implements HttpTransportable
     public function getDiscountPercentage() : int
     {
         return (int) round(100 * $this->getDiscount() / $this->getPrice());
+    }
+
+    /**
+     * Currency.
+     *
+     * @return mixed
+     */
+    public function getCurrency() : string
+    {
+        return $this->currency;
     }
 
     /**
@@ -495,6 +515,7 @@ class Product implements HttpTransportable
             'long_description' => $this->longDescription,
             'price' => $this->price,
             'reduced_price' => $this->reducedPrice,
+            'currency' => $this->currency,
             'stock' => $this->stock,
             'image' => $this->image,
             'rating' => $this->rating,
@@ -545,6 +566,7 @@ class Product implements HttpTransportable
             isset($array['reduced_price'])
                 ? ((float) $array['reduced_price'])
                 : null,
+            (string) $array['currency'],
             isset($array['stock'])
                 ? ((int) $array['stock'])
                 : null,
