@@ -230,30 +230,56 @@ class Product implements HttpTransportable
         $this->name = $name;
         $this->slug = $slug;
         $this->description = $description;
-        $this->longDescription = ($longDescription ?? '');
+        $this->longDescription = $longDescription;
         $this->price = $price;
-        $this->reducedPrice = ($reducedPrice ?? $price);
+        $this->reducedPrice = $reducedPrice;
         $this->currency = $currency;
         $this->stock = $stock;
         $this->manufacturer = $manufacturer;
         $this->brand = $brand;
         $this->categories = [];
         $this->tags = [];
-        $this->image = ($image ?? '');
-        $this->rating = !is_null($rating)
-            ? round($rating, 1)
-            : null;
-        $this->updatedAt = ($updatedAt ?? new DateTime());
+        $this->image = $image;
+        $this->rating = $rating;
+        $this->updatedAt = $updatedAt;
         $this->coordinate = $coordinate;
 
-        $this->firstLevelSearchableData = $name;
-        if ($manufacturer instanceof Manufacturer) {
-            $this->firstLevelSearchableData .= " {$manufacturer->getName()}";
+        $this->recalculateRelativeValues();
+    }
+
+    /**
+     * Recalculate relative values from current local parameters.
+     *
+     * This method should not have external class effects
+     */
+    public function recalculateRelativeValues()
+    {
+        $this->longDescription = ($this->longDescription ?? '');
+        $this->image = ($this->image ?? '');
+        $this->rating = !is_null($this->rating)
+            ? round($this->rating, 1)
+            : null;
+
+        $this->updatedAt = ($this->updatedAt ?? new DateTime());
+
+        $this->firstLevelSearchableData = $this->name;
+        $this->secondLevelSearchableData = "$this->description $this->longDescription";
+
+        if ($this->manufacturer instanceof Manufacturer) {
+            $this->firstLevelSearchableData .= " {$this->manufacturer->getName()}";
         }
-        if ($brand instanceof Brand) {
-            $this->firstLevelSearchableData .= " {$brand->getName()}";
+
+        if ($this->brand instanceof Brand) {
+            $this->firstLevelSearchableData .= " {$this->brand->getName()}";
         }
-        $this->secondLevelSearchableData = "$description $longDescription";
+
+        foreach ($this->tags as $tag) {
+            $this->firstLevelSearchableData .= " {$tag->getName()}";
+        }
+
+        foreach ($this->categories as $category) {
+            $this->firstLevelSearchableData .= " {$category->getName()}";
+        }
     }
 
     /**
@@ -287,6 +313,16 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Set name.
+     *
+     * @param string $name
+     */
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    /**
      * Get name.
      *
      * @return string
@@ -294,6 +330,17 @@ class Product implements HttpTransportable
     public function getName() : string
     {
         return $this->name;
+    }
+
+    /**
+     * Set slug.
+     *
+     * @param string $slug
+     */
+    public function setSlug(string $slug)
+    {
+        $this->slug = $slug;
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -307,6 +354,17 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Set description.
+     *
+     * @param string $description
+     */
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+        $this->recalculateRelativeValues();
+    }
+
+    /**
      * Get description.
      *
      * @return string
@@ -314,6 +372,17 @@ class Product implements HttpTransportable
     public function getDescription() : string
     {
         return $this->description;
+    }
+
+    /**
+     * Set long description.
+     *
+     * @param null|string $longDescription
+     */
+    public function setLongDescription( ? string $longDescription)
+    {
+        $this->longDescription = $longDescription;
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -327,6 +396,17 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Set price.
+     *
+     * @param float $price
+     */
+    public function setPrice(float $price)
+    {
+        $this->price = $price;
+        $this->recalculateRelativeValues();
+    }
+
+    /**
      * Get price.
      *
      * @return float
@@ -337,11 +417,22 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Set reduced price.
+     *
+     * @param null|float $reducedPrice
+     */
+    public function setReducedPrice( ? float $reducedPrice)
+    {
+        $this->reducedPrice = $reducedPrice;
+        $this->recalculateRelativeValues();
+    }
+
+    /**
      * Get reduced price.
      *
-     * @return float
+     * @return null|float
      */
-    public function getReducedPrice() : float
+    public function getReducedPrice() : ? float
     {
         return $this->reducedPrice;
     }
@@ -355,7 +446,7 @@ class Product implements HttpTransportable
     {
         return min(
             $this->price,
-            $this->reducedPrice
+            $this->reducedPrice ?? $this->price
         );
     }
 
@@ -380,6 +471,17 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Set currency.
+     *
+     * @param string $currency
+     */
+    public function setCurrency(string $currency)
+    {
+        $this->currency = $currency;
+        $this->recalculateRelativeValues();
+    }
+
+    /**
      * Currency.
      *
      * @return mixed
@@ -390,13 +492,35 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Set stock.
+     *
+     * @param null|int $stock
+     */
+    public function setStock( ? int $stock)
+    {
+        $this->stock = $stock;
+        $this->recalculateRelativeValues();
+    }
+
+    /**
      * Get stock.
      *
      * @return null|int
      */
-    public function getStock(): ? int
+    public function getStock() : ? int
     {
         return $this->stock;
+    }
+
+    /**
+     * Set manufacturer.
+     *
+     * @param null|Manufacturer $manufacturer
+     */
+    public function setManufacturer( ? Manufacturer $manufacturer)
+    {
+        $this->manufacturer = $manufacturer;
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -407,6 +531,17 @@ class Product implements HttpTransportable
     public function getManufacturer() : ? Manufacturer
     {
         return $this->manufacturer;
+    }
+
+    /**
+     * Set brand.
+     *
+     * @param null|Brand $brand
+     */
+    public function setBrand( ? Brand $brand)
+    {
+        $this->brand = $brand;
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -426,8 +561,12 @@ class Product implements HttpTransportable
      */
     public function addCategory(Category $category)
     {
-        $this->categories[] = $category;
-        $this->firstLevelSearchableData .= " {$category->getName()}";
+        if (isset($this->categories[$category->getId()])) {
+            return;
+        }
+
+        $this->categories[$category->getId()] = $category;
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -438,6 +577,15 @@ class Product implements HttpTransportable
     public function getCategories() : array
     {
         return $this->categories;
+    }
+
+    /**
+     * Remove categories.
+     */
+    public function removeCategories()
+    {
+        $this->categories = [];
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -452,7 +600,7 @@ class Product implements HttpTransportable
         }
 
         $this->tags[$tag->getName()] = $tag;
-        $this->firstLevelSearchableData .= " {$tag->getName()}";
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -466,13 +614,44 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Remove tags.
+     */
+    public function removeTags()
+    {
+        $this->tags = [];
+        $this->recalculateRelativeValues();
+    }
+
+    /**
+     * Set image.
+     *
+     * @param null|string $image
+     */
+    public function setImage( ? string $image)
+    {
+        $this->image = $image;
+        $this->recalculateRelativeValues();
+    }
+
+    /**
      * Get image.
      *
      * @return null|string
      */
-    public function getImage(): ? string
+    public function getImage() : ? string
     {
         return $this->image;
+    }
+
+    /**
+     * Set rating.
+     *
+     * @param null|float $rating
+     */
+    public function setRating( ? float $rating)
+    {
+        $this->rating = $rating;
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -486,6 +665,17 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Set updated at.
+     *
+     * @param null|DateTime $updatedAt
+     */
+    public function setUpdatedAt( ? DateTime $updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+        $this->recalculateRelativeValues();
+    }
+
+    /**
      * Get Updated at.
      *
      * @return null|DateTime
@@ -493,6 +683,17 @@ class Product implements HttpTransportable
     public function getUpdatedAt() : ? DateTime
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * Set coordinate.
+     *
+     * @param null|Coordinate $coordinate
+     */
+    public function setCoordinate( ? Coordinate $coordinate)
+    {
+        $this->coordinate = $coordinate;
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -528,7 +729,7 @@ class Product implements HttpTransportable
      *
      * @return string
      */
-    public function getSecondLevelSearchableData(): string
+    public function getSecondLevelSearchableData() : string
     {
         return $this->secondLevelSearchableData;
     }
@@ -600,7 +801,9 @@ class Product implements HttpTransportable
             (string) $array['name'],
             (string) $array['slug'],
             (string) $array['description'],
-            $array['long_description'] ?? null,
+            isset($array['long_description'])
+                ? ((string) $array['long_description'])
+                : null,
             (float) $array['price'],
             isset($array['reduced_price'])
                 ? ((float) $array['reduced_price'])
