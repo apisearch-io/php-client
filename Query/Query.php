@@ -160,12 +160,14 @@ class Query implements HttpTransportable
      *
      * @param array $families
      * @param int   $applicationType
+     * @param bool  $aggregate
      *
      * @return self
      */
     public function filterByFamilies(
         array $families,
-        int $applicationType = Filter::MUST_ALL
+        int $applicationType = Filter::MUST_ALL,
+        bool $aggregate = true
     ) : self {
         if (!empty($families)) {
             $this->filters['family'] = Filter::create(
@@ -178,6 +180,10 @@ class Query implements HttpTransportable
             unset($this->filters['family']);
         }
 
+        if ($aggregate) {
+            $this->addFamiliesAggregation($applicationType);
+        }
+
         return $this;
     }
 
@@ -186,12 +192,14 @@ class Query implements HttpTransportable
      *
      * @param array $types
      * @param int   $applicationType
+     * @param bool  $aggregate
      *
      * @return self
      */
     public function filterByTypes(
         array $types,
-        int $applicationType = Filter::MUST_ALL
+        int $applicationType = Filter::MUST_ALL,
+        bool $aggregate = true
     ) : self {
         if (!empty($types)) {
             $this->filters['type'] = Filter::create(
@@ -202,6 +210,10 @@ class Query implements HttpTransportable
             );
         } else {
             unset($this->filters['type']);
+        }
+
+        if ($aggregate) {
+            $this->addTypesAggregation($applicationType);
         }
 
         return $this;
@@ -488,6 +500,44 @@ class Query implements HttpTransportable
         $this->aggregations['manufacturer'] = Aggregation::create(
             'manufacturer',
             'manufacturer.id|manufacturer.name',
+            $applicationType,
+            Filter::TYPE_FIELD
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add Families aggregation.
+     *
+     * @param int $applicationType
+     *
+     * @return self
+     */
+    private function addFamiliesAggregation(int $applicationType) : self
+    {
+        $this->aggregations['family'] = Aggregation::create(
+            'family',
+            'family',
+            $applicationType,
+            Filter::TYPE_FIELD
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add Types aggregation.
+     *
+     * @param int $applicationType
+     *
+     * @return self
+     */
+    private function addTypesAggregation(int $applicationType) : self
+    {
+        $this->aggregations['type'] = Aggregation::create(
+            'type',
+            '_type',
             $applicationType,
             Filter::TYPE_FIELD
         );
