@@ -52,94 +52,164 @@ class HttpRepository extends Repository
     /**
      * Flush products.
      *
-     * @param Product[] $products
+     * @param Product[] $productsToUpdate
+     * @param string[]  $productsToDelete
      */
-    protected function flushProducts(array $products)
-    {
-        $this
-            ->httpClient
-            ->get('/index/products', 'post', [
-                'key' => $this->getKey(),
-                'products' => json_encode(
-                    array_map(function (Product $product) {
-                        return $product->toArray();
-                    }, $products)
-                ),
-            ]);
+    protected function flushProducts(
+        array $productsToUpdate,
+        array $productsToDelete
+    ) {
+        if (!empty($productsToUpdate)) {
+            $this
+                ->httpClient
+                ->get('/products', 'post', [
+                    'key' => $this->getKey(),
+                    'products' => json_encode(
+                        array_map(function (Product $product) {
+                            return $product->toArray();
+                        }, $productsToUpdate)
+                    ),
+                ]);
+        }
+
+        if (!empty($productsToDelete)) {
+            $this
+                ->httpClient
+                ->get('/products', 'delete', [
+                    'key' => $this->getKey(),
+                    'products' => json_encode($productsToDelete),
+                ]);
+        }
     }
 
     /**
      * Flush categories.
      *
-     * @param Category[] $categories
+     * @param Category[] $categoriesToUpdate
+     * @param string[]   $categoriesToDelete
      */
-    protected function flushCategories(array $categories)
-    {
-        $this
-            ->httpClient
-            ->get('/index/categories', 'post', [
-                'key' => $this->getKey(),
-                'categories' => json_encode(
-                    array_map(function (Category $category) {
-                        return $category->toArray();
-                    }, $categories)
-                ),
-            ]);
+    protected function flushCategories(
+        array $categoriesToUpdate,
+        array $categoriesToDelete
+    ) {
+        if (!empty($categoriesToUpdate)) {
+            $this
+                ->httpClient
+                ->get('/categories', 'post', [
+                    'key' => $this->getKey(),
+                    'categories' => json_encode(
+                        array_map(function (Category $category) {
+                            return $category->toArray();
+                        }, $categoriesToUpdate)
+                    ),
+                ]);
+        }
+
+        if (!empty($categoriesToDelete)) {
+            $this
+                ->httpClient
+                ->get('/categories', 'delete', [
+                    'key' => $this->getKey(),
+                    'categories' => json_encode($categoriesToDelete),
+                ]);
+        }
     }
 
     /**
      * Flush manufacturers.
      *
-     * @param Manufacturer[] $manufacturers
+     * @param Manufacturer[] $manufacturersToUpdate
+     * @param string[]       $manufacturersToDelete
      */
-    protected function flushManufacturers(array $manufacturers)
-    {
-        $this
-            ->httpClient
-            ->get('/index/manufacturers', 'post', [
-                'key' => $this->getKey(),
-                'manufacturers' => json_encode(
-                    array_map(function (Manufacturer $manufacturer) {
-                        return $manufacturer->toArray();
-                    }, $manufacturers)
-                ),
-            ]);
+    protected function flushManufacturers(
+        array $manufacturersToUpdate,
+        array $manufacturersToDelete
+    ) {
+        if (!empty($manufacturersToUpdate)) {
+            $this
+                ->httpClient
+                ->get('/manufacturers', 'post', [
+                    'key' => $this->getKey(),
+                    'manufacturers' => json_encode(
+                        array_map(function (Manufacturer $manufacturer) {
+                            return $manufacturer->toArray();
+                        }, $manufacturersToUpdate)
+                    ),
+                ]);
+        }
+
+        if (!empty($manufacturersToDelete)) {
+            $this
+                ->httpClient
+                ->get('/manufacturers', 'delete', [
+                    'key' => $this->getKey(),
+                    'manufacturers' => json_encode($manufacturersToDelete),
+                ]);
+        }
     }
 
     /**
      * Flush brands.
      *
-     * @param Brand[] $brands
+     * @param Brand[]  $brandsToUpdate
+     * @param string[] $brandsToDelete
      */
-    protected function flushBrands(array $brands)
-    {
-        $this
-            ->httpClient
-            ->get('/index/brands', 'post', [
-                'key' => $this->getKey(),
-                'brands' => json_encode(
-                    array_map(function (Brand $brand) {
-                        return $brand->toArray();
-                    }, $brands)
-                ),
-            ]);
+    protected function flushBrands(
+        array $brandsToUpdate,
+        array $brandsToDelete
+    ) {
+        if (!empty($brandsToUpdate)) {
+            $this
+                ->httpClient
+                ->get('/brands', 'post', [
+                    'key' => $this->getKey(),
+                    'brands' => json_encode(
+                        array_map(function (Brand $brand) {
+                            return $brand->toArray();
+                        }, $brandsToUpdate)
+                    ),
+                ]);
+        }
+
+        if (!empty($brandsToDelete)) {
+            $this
+                ->httpClient
+                ->get('/brands', 'delete', [
+                    'key' => $this->getKey(),
+                    'brands' => json_encode($brandsToDelete),
+                ]);
+        }
     }
 
     /**
      * Flush tags.
      *
-     * @param Tag[] $tags
+     * @param Tag[]    $tagsToUpdate
+     * @param string[] $tagsToDelete
      */
-    protected function flushTags(array $tags)
-    {
-        $this
-            ->httpClient
-            ->get('/index/tags', 'post', [
-                'key' => $this->getKey(),
-                'tags' => json_encode(array_map(function (Tag $tag) {
-                    return $tag->toArray();
-                }, $tags)),
-            ]);
+    protected function flushTags(
+        array $tagsToUpdate,
+        array $tagsToDelete
+    ) {
+        if (!empty($tagsToUpdate)) {
+            $this
+                ->httpClient
+                ->get('/tags', 'post', [
+                    'key' => $this->getKey(),
+                    'tags' => json_encode(array_map(function (Tag $tag) {
+                        return $tag->toArray();
+                    }, $tagsToUpdate)),
+                ]);
+        }
+
+        if (!empty($tagsToDelete)) {
+            $this
+                ->httpClient
+                ->get('/tags', 'delete', [
+                    'key' => $this->getKey(),
+                    'tags' => json_encode($tagsToDelete),
+                ]);
+        }
     }
 
     /**

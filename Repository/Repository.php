@@ -32,9 +32,16 @@ abstract class Repository
     /**
      * @var array
      *
-     * Elements
+     * Elements to update
      */
-    private $elementsBulk;
+    private $elementsToUpdate;
+
+    /**
+     * @var array
+     *
+     * Elements to delete
+     */
+    private $elementsToDelete;
 
     /**
      * @var string
@@ -48,7 +55,7 @@ abstract class Repository
      */
     public function __construct()
     {
-        $this->resetElementsBulk();
+        $this->resetCachedElements();
     }
 
     /**
@@ -74,9 +81,17 @@ abstract class Repository
     /**
      * Reset cache.
      */
-    private function resetElementsBulk()
+    private function resetCachedElements()
     {
-        $this->elementsBulk = [
+        $this->elementsToUpdate = [
+            'products' => [],
+            'categories' => [],
+            'manufacturers' => [],
+            'brands' => [],
+            'tags' => [],
+        ];
+
+        $this->elementsToDelete = [
             'products' => [],
             'categories' => [],
             'manufacturers' => [],
@@ -92,27 +107,23 @@ abstract class Repository
      */
     public function addProduct(Product $product)
     {
-        $this->elementsBulk['products'][] = $product;
-
-        if ($product->getManufacturer() instanceof Manufacturer) {
-            $this->addManufacturer(
-                $product->getManufacturer()
-            );
+        $productId = $product->getId();
+        if (isset($this->elementsToUpdate['products'][$productId])) {
+            return;
         }
 
-        if ($product->getBrand() instanceof Brand) {
-            $this->addBrand(
-                $product->getBrand()
-            );
-        }
+        $this->elementsToUpdate['products'][$productId] = $product;
+    }
 
-        foreach ($product->getCategories() as $category) {
-            $this->addCategory($category);
-        }
-
-        foreach ($product->getTags() as $tag) {
-            $this->addTag($tag);
-        }
+    /**
+     * Remove product document by id.
+     *
+     * @param string $productId
+     */
+    public function removeProduct(string $productId)
+    {
+        unset($this->elementsToUpdate['products'][$productId]);
+        $this->elementsToDelete['products'][] = $productId;
     }
 
     /**
@@ -122,7 +133,23 @@ abstract class Repository
      */
     public function addCategory(Category $category)
     {
-        $this->elementsBulk['categories'][$category->getId()] = $category;
+        $categoryId = $category->getId();
+        if (isset($this->elementsToUpdate['categories'][$categoryId])) {
+            return;
+        }
+
+        $this->elementsToUpdate['categories'][$categoryId] = $category;
+    }
+
+    /**
+     * Remove category.
+     *
+     * @param string $categoryId
+     */
+    public function removeCategory(string $categoryId)
+    {
+        unset($this->elementsToUpdate['categories'][$categoryId]);
+        $this->elementsToDelete['categories'][] = $categoryId;
     }
 
     /**
@@ -133,11 +160,22 @@ abstract class Repository
     public function addManufacturer(Manufacturer $manufacturer)
     {
         $manufacturerId = $manufacturer->getId();
-        if (isset($this->elementsBulk['manufacturers'][$manufacturerId])) {
+        if (isset($this->elementsToUpdate['manufacturers'][$manufacturerId])) {
             return;
         }
 
-        $this->elementsBulk['manufacturers'][$manufacturerId] = $manufacturer;
+        $this->elementsToUpdate['manufacturers'][$manufacturerId] = $manufacturer;
+    }
+
+    /**
+     * Remove manufacturer document by id.
+     *
+     * @param string $manufacturerId
+     */
+    public function removeManufacturer(string $manufacturerId)
+    {
+        unset($this->elementsToUpdate['manufacturers'][$manufacturerId]);
+        $this->elementsToDelete['manufacturers'][] = $manufacturerId;
     }
 
     /**
@@ -148,11 +186,22 @@ abstract class Repository
     public function addBrand(Brand $brand)
     {
         $brandId = $brand->getId();
-        if (isset($this->elementsBulk['brands'][$brandId])) {
+        if (isset($this->elementsToUpdate['brands'][$brandId])) {
             return;
         }
 
-        $this->elementsBulk['brands'][$brandId] = $brand;
+        $this->elementsToUpdate['brands'][$brandId] = $brand;
+    }
+
+    /**
+     * Remove brand document by id.
+     *
+     * @param string $brandId
+     */
+    public function removeBrand(string $brandId)
+    {
+        unset($this->elementsToUpdate['brands'][$brandId]);
+        $this->elementsToDelete['brands'][] = $brandId;
     }
 
     /**
@@ -160,14 +209,25 @@ abstract class Repository
      *
      * @param Tag $tag
      */
-    private function addTag(Tag $tag)
+    public function addTag(Tag $tag)
     {
         $tagId = $tag->getName();
-        if (isset($this->elementsBulk['tags'][$tagId])) {
+        if (isset($this->elementsToUpdate['tags'][$tagId])) {
             return;
         }
 
-        $this->elementsBulk['tags'][$tagId] = $tag;
+        $this->elementsToUpdate['tags'][$tagId] = $tag;
+    }
+
+    /**
+     * Remove tag document by id.
+     *
+     * @param string $tagId
+     */
+    public function removeTag(string $tagId)
+    {
+        unset($this->elementsToUpdate['tags'][$tagId]);
+        $this->elementsToDelete['tags'][] = $tagId;
     }
 
     /**
@@ -185,7 +245,7 @@ abstract class Repository
     ) {
         if (
             $skipIfLess &&
-            count($this->elementsBulk['products']) < $bulkNumber
+            count($this->elementsToUpdate['products']) < $bulkNumber
         ) {
             return;
         }
@@ -193,7 +253,7 @@ abstract class Repository
         $offset = 0;
         while (true) {
             $products = array_slice(
-                $this->elementsBulk['products'],
+                $this->elementsToUpdate['products'],
                 $offset,
                 $bulkNumber
             );
@@ -202,51 +262,89 @@ abstract class Repository
                 break;
             }
 
-            $this->flushProducts($products);
-            $this->flushCategories($this->elementsBulk['categories']);
-            $this->flushManufacturers($this->elementsBulk['manufacturers']);
-            $this->flushBrands($this->elementsBulk['brands']);
-            $this->flushTags($this->elementsBulk['tags']);
+            $this->flushProducts($products, []);
             $offset += $bulkNumber;
         }
 
-        $this->resetElementsBulk();
+        $this->flushProducts([], $this->elementsToDelete['products']);
+
+        $this->flushCategories(
+            $this->elementsToUpdate['categories'],
+            $this->elementsToDelete['categories']
+        );
+
+        $this->flushManufacturers(
+            $this->elementsToUpdate['manufacturers'],
+            $this->elementsToDelete['manufacturers']
+        );
+
+        $this->flushBrands(
+            $this->elementsToUpdate['brands'],
+            $this->elementsToDelete['brands']
+        );
+
+        $this->flushTags(
+            $this->elementsToUpdate['tags'],
+            $this->elementsToDelete['tags']
+        );
+
+        $this->resetCachedElements();
     }
 
     /**
      * Flush products.
      *
-     * @param Product[] $products
+     * @param Product[] $productsToUpdate
+     * @param string[]  $productsToDelete
      */
-    abstract protected function flushProducts(array $products);
+    abstract protected function flushProducts(
+        array $productsToUpdate,
+        array $productsToDelete
+    );
 
     /**
      * Flush categories.
      *
-     * @param Category[] $categories
+     * @param Category[] $categoriesToUpdate
+     * @param string[]   $categoriesToDelete
      */
-    abstract protected function flushCategories(array $categories);
+    abstract protected function flushCategories(
+        array $categoriesToUpdate,
+        array $categoriesToDelete
+    );
 
     /**
      * Flush manufacturers.
      *
-     * @param Manufacturer[] $manufacturers
+     * @param Manufacturer[] $manufacturersToUpdate
+     * @param string[]       $manufacturersToDelete
      */
-    abstract protected function flushManufacturers(array $manufacturers);
+    abstract protected function flushManufacturers(
+        array $manufacturersToUpdate,
+        array $manufacturersToDelete
+    );
 
     /**
      * Flush brands.
      *
-     * @param Brand[] $brands
+     * @param Brand[]  $brandsToUpdate
+     * @param string[] $brandsToDelete
      */
-    abstract protected function flushBrands(array $brands);
+    abstract protected function flushBrands(
+        array $brandsToUpdate,
+        array $brandsToDelete
+    );
 
     /**
      * Flush tags.
      *
-     * @param Tag[] $tags
+     * @param Tag[]    $tagsToUpdate
+     * @param string[] $tagsToDelete
      */
-    abstract protected function flushTags(array $tags);
+    abstract protected function flushTags(
+        array $tagsToUpdate,
+        array $tagsToDelete
+    );
 
     /**
      * Search across the index types.
