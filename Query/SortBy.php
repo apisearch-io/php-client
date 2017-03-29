@@ -89,14 +89,22 @@ class SortBy
      *
      * Sort by manufacturer ASC
      */
-    const MANUFACTURER_ASC = ['manufacturer.name' => 'asc'];
+    const MANUFACTURER_ASC = ['manufacturers.name' => [
+        'order' => 'asc',
+        'nested_path' => 'manufacturers',
+        'mode' => 'max',
+    ]];
 
     /**
      * @var array
      *
      * Sort by manufacturer DESC
      */
-    const MANUFACTURER_DESC = ['manufacturer.name' => 'desc'];
+    const MANUFACTURER_DESC = ['manufacturers.name' => [
+        'order' => 'desc',
+        'nested_path' => 'manufacturers',
+        'mode' => 'max',
+    ]];
 
     /**
      * @var array

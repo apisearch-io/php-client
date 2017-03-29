@@ -266,14 +266,14 @@ class Query implements HttpTransportable
         bool $aggregate = true
     ) : self {
         if (!empty($manufacturers)) {
-            $this->filters['manufacturer'] = Filter::create(
-                'manufacturer.id',
+            $this->filters['manufacturers'] = Filter::create(
+                'manufacturers.id',
                 $manufacturers,
                 $applicationType,
-                Filter::TYPE_FIELD
+                Filter::TYPE_NESTED
             );
         } else {
-            unset($this->filters['manufacturer']);
+            unset($this->filters['manufacturers']);
         }
 
         if ($aggregate) {
@@ -466,6 +466,25 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Filter by stores.
+     *
+     * @param string[] $stores
+     *
+     * @return self
+     */
+    public function filterByStores(array $stores) : self
+    {
+        $this->filters['stores'] = Filter::create(
+            'stores',
+            $stores,
+            Filter::AT_LEAST_ONE,
+            Filter::TYPE_FIELD
+        );
+
+        return $this;
+    }
+
+    /**
      * Sort by.
      *
      * @param array $sort
@@ -497,11 +516,11 @@ class Query implements HttpTransportable
      */
     private function addManufacturerAggregation(int $applicationType) : self
     {
-        $this->aggregations['manufacturer'] = Aggregation::create(
-            'manufacturer',
-            'manufacturer.id|manufacturer.name',
+        $this->aggregations['manufacturers'] = Aggregation::create(
+            'manufacturers',
+            'manufacturers.id|manufacturers.name',
             $applicationType,
-            Filter::TYPE_FIELD
+            Filter::TYPE_NESTED
         );
 
         return $this;

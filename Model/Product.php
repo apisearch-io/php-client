@@ -108,11 +108,11 @@ class Product implements HttpTransportable
     private $stock;
 
     /**
-     * @var Manufacturer
+     * @var Manufacturer[]
      *
-     * Manufacturer
+     * ManufacturerS
      */
-    private $manufacturer;
+    private $manufacturers;
 
     /**
      * @var Brand
@@ -126,14 +126,14 @@ class Product implements HttpTransportable
      *
      * Categories
      */
-    private $categories;
+    private $categories = [];
 
     /**
      * @var Tag[]
      *
      * Tags
      */
-    private $tags;
+    private $tags = [];
 
     /**
      * @var string
@@ -164,6 +164,13 @@ class Product implements HttpTransportable
     private $distance;
 
     /**
+     * @var string[]
+     *
+     * Stores
+     */
+    private $stores = [];
+
+    /**
      * @var string
      *
      * First level searchable data
@@ -187,23 +194,23 @@ class Product implements HttpTransportable
     /**
      * Product constructor.
      *
-     * @param string            $id
-     * @param string            $family
-     * @param string            $ean
-     * @param string            $name
-     * @param string            $slug
-     * @param string            $description
-     * @param null|string       $longDescription
-     * @param float             $price
-     * @param string            $currency
-     * @param null|float        $reducedPrice
-     * @param null|int          $stock
-     * @param null|Manufacturer $manufacturer
-     * @param null|Brand        $brand
-     * @param null|string       $image
-     * @param null|float        $rating
-     * @param null|DateTime     $updatedAt
-     * @param null|Coordinate   $coordinate
+     * @param string          $id
+     * @param string          $family
+     * @param string          $ean
+     * @param string          $name
+     * @param string          $slug
+     * @param string          $description
+     * @param null|string     $longDescription
+     * @param float           $price
+     * @param string          $currency
+     * @param null|float      $reducedPrice
+     * @param null|int        $stock
+     * @param null|Brand      $brand
+     * @param null|string     $image
+     * @param null|float      $rating
+     * @param null|DateTime   $updatedAt
+     * @param null|Coordinate $coordinate
+     * @param null|array      $stores
      */
     public function __construct(
         string $id,
@@ -217,12 +224,12 @@ class Product implements HttpTransportable
         ? float $reducedPrice,
         string $currency,
         ? int $stock = null,
-        ? Manufacturer $manufacturer = null,
         ? Brand $brand = null,
         ? string $image = null,
         ? float $rating = null,
         ? DateTime $updatedAt = null,
-        ? Coordinate $coordinate = null
+        ? Coordinate $coordinate = null,
+        array $stores = []
     ) {
         $this->id = $id;
         $this->family = $family;
@@ -235,7 +242,6 @@ class Product implements HttpTransportable
         $this->reducedPrice = $reducedPrice;
         $this->currency = $currency;
         $this->stock = $stock;
-        $this->manufacturer = $manufacturer;
         $this->brand = $brand;
         $this->categories = [];
         $this->tags = [];
@@ -243,6 +249,10 @@ class Product implements HttpTransportable
         $this->rating = $rating;
         $this->updatedAt = $updatedAt;
         $this->coordinate = $coordinate;
+        $this->stores = $stores;
+        $this->categories = [];
+        $this->tags = [];
+        $this->manufacturers = [];
 
         $this->recalculateRelativeValues();
     }
@@ -265,10 +275,6 @@ class Product implements HttpTransportable
         $this->firstLevelSearchableData = $this->name;
         $this->secondLevelSearchableData = "$this->description $this->longDescription";
 
-        if ($this->manufacturer instanceof Manufacturer) {
-            $this->firstLevelSearchableData .= " {$this->manufacturer->getName()}";
-        }
-
         if ($this->brand instanceof Brand) {
             $this->firstLevelSearchableData .= " {$this->brand->getName()}";
         }
@@ -279,6 +285,10 @@ class Product implements HttpTransportable
 
         foreach ($this->categories as $category) {
             $this->firstLevelSearchableData .= " {$category->getName()}";
+        }
+
+        foreach ($this->manufacturers as $manufacturer) {
+            $this->firstLevelSearchableData .= " {$manufacturer->getName()}";
         }
     }
 
@@ -513,24 +523,37 @@ class Product implements HttpTransportable
     }
 
     /**
-     * Set manufacturer.
+     * Add manufacturer.
      *
-     * @param null|Manufacturer $manufacturer
+     * @param Manufacturer $manufacturer
      */
-    public function setManufacturer( ? Manufacturer $manufacturer)
+    public function addManufacturer(Manufacturer $manufacturer)
     {
-        $this->manufacturer = $manufacturer;
+        if (isset($this->manufacturers[$manufacturer->getName()])) {
+            return;
+        }
+
+        $this->manufacturers[$manufacturer->getName()] = $manufacturer;
         $this->recalculateRelativeValues();
     }
 
     /**
-     * Get manufacturer.
+     * Get manufacturers.
      *
-     * @return null|Manufacturer
+     * @return Manufacturer[]
      */
-    public function getManufacturer() : ? Manufacturer
+    public function getManufacturers() : array
     {
-        return $this->manufacturer;
+        return $this->manufacturers;
+    }
+
+    /**
+     * Remove manufacturers.
+     */
+    public function removeManufacturers()
+    {
+        $this->manufacturers = [];
+        $this->recalculateRelativeValues();
     }
 
     /**
@@ -705,6 +728,26 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get stores.
+     *
+     * @return string[]
+     */
+    public function getStores() : array
+    {
+        return $this->stores;
+    }
+
+    /**
+     * Set stores.
+     *
+     * @param array $stores
+     */
+    public function setStores(array $stores)
+    {
+        $this->stores = $stores;
+    }
+
+    /**
      * Get distance.
      *
      * @return float
@@ -762,19 +805,17 @@ class Product implements HttpTransportable
                 ? null
                 : $this->coordinate->toArray(),
             'distance' => $this->distance,
+            'manufacturers' => array_map(function (Manufacturer $manufacturer) {
+                return $manufacturer->toArray();
+            }, $this->manufacturers),
             'categories' => array_map(function (Category $category) {
                 return $category->toArray();
             }, $this->categories),
             'tags' => array_map(function (Tag $tag) {
                 return $tag->toArray();
             }, $this->tags),
+            'stores' => $this->stores,
         ];
-
-        if ($this->manufacturer instanceof Manufacturer) {
-            $array['manufacturer'] = $this
-                ->manufacturer
-                ->toArray();
-        }
 
         if ($this->brand instanceof Brand) {
             $array['brand'] = $this
@@ -812,9 +853,6 @@ class Product implements HttpTransportable
             isset($array['stock'])
                 ? ((int) $array['stock'])
                 : null,
-            isset($array['manufacturer'])
-                ? Manufacturer::createFromArray($array['manufacturer'])
-                : null,
             isset($array['brand'])
                 ? Brand::createFromArray($array['brand'])
                 : null,
@@ -827,8 +865,20 @@ class Product implements HttpTransportable
                 : null,
             isset($array['coordinate'])
                 ? Coordinate::createFromArray($array['coordinate'])
-                : null
+                : null,
+            $array['stores'] ?? []
         );
+
+        if (
+            isset($array['manufacturers']) &&
+            is_array($array['manufacturers'])
+        ) {
+            foreach ($array['manufacturers'] as $manufacturer) {
+                $product->addManufacturer(
+                    Manufacturer::createFromArray($manufacturer)
+                );
+            }
+        }
 
         if (
             isset($array['categories']) &&

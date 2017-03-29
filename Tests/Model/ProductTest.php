@@ -46,7 +46,7 @@ class ProductTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('', $product->getLongDescription());
         $this->assertNull($product->getReducedPrice());
         $this->assertNull($product->getStock());
-        $this->assertNull($product->getManufacturer());
+        $this->assertEmpty($product->getManufacturers());
         $this->assertNull($product->getBrand());
         $this->assertEquals('', $product->getImage());
         $this->assertNull($product->getRating());
