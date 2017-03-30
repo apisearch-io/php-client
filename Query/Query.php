@@ -156,6 +156,62 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Filter by custom field.
+     *
+     * @param string $field
+     * @param array  $values
+     * @param int    $applicationType
+     *
+     * @return self
+     */
+    public function filterBy(
+        string $field,
+        array $values,
+        int $applicationType
+    ) : self {
+        if (!empty($values)) {
+            $this->filters["_$field"] = Filter::create(
+                $field,
+                $values,
+                $applicationType,
+                Filter::TYPE_FIELD
+            );
+        } else {
+            unset($this->filters["_$field"]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Filter by custom meta field.
+     *
+     * @param string $field
+     * @param array  $values
+     * @param int    $applicationType
+     *
+     * @return self
+     */
+    public function filterByMeta(
+        string $field,
+        array $values,
+        int $applicationType
+    ) : self {
+        if (!empty($values)) {
+            $this->filters["_m_$field"] = Filter::create(
+                "metadata.$field",
+                $values,
+                $applicationType,
+                Filter::TYPE_FIELD
+            );
+        } else {
+            unset($this->filters["_m_$field"]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Filter by families.
      *
      * @param array $families

@@ -126,14 +126,14 @@ class Product implements HttpTransportable
      *
      * Categories
      */
-    private $categories = [];
+    private $categories;
 
     /**
      * @var Tag[]
      *
      * Tags
      */
-    private $tags = [];
+    private $tags;
 
     /**
      * @var string
@@ -168,7 +168,7 @@ class Product implements HttpTransportable
      *
      * Stores
      */
-    private $stores = [];
+    private $stores;
 
     /**
      * @var string
@@ -192,6 +192,13 @@ class Product implements HttpTransportable
     private $updatedAt;
 
     /**
+     * @var array
+     *
+     * Metadata
+     */
+    private $metadata;
+
+    /**
      * Product constructor.
      *
      * @param string          $id
@@ -211,6 +218,7 @@ class Product implements HttpTransportable
      * @param null|DateTime   $updatedAt
      * @param null|Coordinate $coordinate
      * @param null|array      $stores
+     * @param null|array      $metadata
      */
     public function __construct(
         string $id,
@@ -229,7 +237,8 @@ class Product implements HttpTransportable
         ? float $rating = null,
         ? DateTime $updatedAt = null,
         ? Coordinate $coordinate = null,
-        array $stores = []
+        array $stores = [],
+        array $metadata = []
     ) {
         $this->id = $id;
         $this->family = $family;
@@ -250,6 +259,7 @@ class Product implements HttpTransportable
         $this->updatedAt = $updatedAt;
         $this->coordinate = $coordinate;
         $this->stores = $stores;
+        $this->metadata = $metadata;
         $this->categories = [];
         $this->tags = [];
         $this->manufacturers = [];
@@ -748,6 +758,37 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get metadata.
+     *
+     * @return array
+     */
+    public function getMetadata() : array
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * Set metadata.
+     *
+     * @param array $metadata
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * Add metadata.
+     *
+     * @param string $field
+     * @param mixed  $value
+     */
+    public function addMetadata(string $field, $value)
+    {
+        $this->metadata[$field] = $value;
+    }
+
+    /**
      * Get distance.
      *
      * @return float
@@ -815,6 +856,7 @@ class Product implements HttpTransportable
                 return $tag->toArray();
             }, $this->tags),
             'stores' => $this->stores,
+            'metadata' => $this->metadata,
         ];
 
         if ($this->brand instanceof Brand) {
@@ -866,7 +908,8 @@ class Product implements HttpTransportable
             isset($array['coordinate'])
                 ? Coordinate::createFromArray($array['coordinate'])
                 : null,
-            $array['stores'] ?? []
+            $array['stores'] ?? [],
+            $array['metadata'] ?? []
         );
 
         if (
