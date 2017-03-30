@@ -31,18 +31,11 @@ class Product implements HttpTransportable
     const TYPE = 'product';
 
     /**
-     * @var string
+     * @var ProductReference
      *
-     * Id
+     * Product reference
      */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * family
-     */
-    private $family;
+    private $productReference;
 
     /**
      * @var string
@@ -240,8 +233,7 @@ class Product implements HttpTransportable
         array $stores = [],
         array $metadata = []
     ) {
-        $this->id = $id;
-        $this->family = $family;
+        $this->productReference = new ProductReference($id, $family);
         $this->ean = $ean;
         $this->name = $name;
         $this->slug = $slug;
@@ -303,13 +295,25 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get product reference.
+     *
+     * @return ProductReference
+     */
+    public function getProductReference()
+    {
+        return $this->productReference;
+    }
+
+    /**
      * Get product id.
      *
      * @return string
      */
     public function getId() : string
     {
-        return $this->id;
+        return $this
+            ->productReference
+            ->getId();
     }
 
     /**
@@ -319,7 +323,9 @@ class Product implements HttpTransportable
      */
     public function getFamily() : string
     {
-        return $this->family;
+        return $this
+            ->productReference
+            ->getFamily();
     }
 
     /**
@@ -826,8 +832,8 @@ class Product implements HttpTransportable
     public function toArray() : array
     {
         $array = [
-            'id' => $this->id,
-            'family' => $this->family,
+            'id' => $this->getId(),
+            'family' => $this->getFamily(),
             'ean' => $this->ean,
             'name' => $this->name,
             'slug' => $this->slug,

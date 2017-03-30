@@ -19,7 +19,7 @@ namespace Puntmig\Search\Model;
 /**
  * Class Category.
  */
-class Category extends IdNameWrapper implements WithLevel
+class Category implements HttpTransportable, WithLevel
 {
     /**
      * @var string
@@ -29,11 +29,39 @@ class Category extends IdNameWrapper implements WithLevel
     const TYPE = 'category';
 
     /**
+     * @var CategoryReference
+     *
+     * Category reference
+     */
+    private $categoryReference;
+
+    /**
+     * @var string
+     *
+     * Name
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
+     * Slug
+     */
+    private $slug;
+
+    /**
      * @var int
      *
      * Level
      */
     private $level;
+
+    /**
+     * @var string
+     *
+     * First level searchable data
+     */
+    private $firstLevelSearchableData;
 
     /**
      * Category constructor.
@@ -47,11 +75,90 @@ class Category extends IdNameWrapper implements WithLevel
         string $id,
         string $name,
         string $slug,
-        int $level = 1
+        int $level
     ) {
-        parent::__construct($id, $name, $slug);
-
+        $this->categoryReference = new CategoryReference($id);
+        $this->name = $name;
+        $this->slug = $slug;
         $this->level = $level;
+        $this->firstLevelSearchableData = $name;
+    }
+
+    /**
+     * Get category reference.
+     *
+     * @return CategoryReference
+     */
+    public function getCategoryReference() : CategoryReference
+    {
+        return $this->categoryReference;
+    }
+
+    /**
+     * Get id.
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this
+            ->categoryReference
+            ->getId();
+    }
+
+    /**
+     * Get name.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get slug.
+     *
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Get level.
+     *
+     * @return int
+     */
+    public function getLevel(): int
+    {
+        return $this->level;
+    }
+
+    /**
+     * Get first level searchable data.
+     *
+     * @return string
+     */
+    public function getFirstLevelSearchableData(): string
+    {
+        return $this->firstLevelSearchableData;
+    }
+
+    /**
+     * To array.
+     *
+     * @return array
+     */
+    public function toArray() : array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'level' => $this->level,
+        ];
     }
 
     /**
@@ -77,30 +184,5 @@ class Category extends IdNameWrapper implements WithLevel
             (string) $array['slug'],
             (int) $array['level'] ?? 1
         );
-    }
-
-    /**
-     * Get level.
-     *
-     * @return int
-     */
-    public function getLevel(): int
-    {
-        return $this->level;
-    }
-
-    /**
-     * To array.
-     *
-     * @return array
-     */
-    public function toArray() : array
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'slug' => $this->getSlug(),
-            'level' => $this->level,
-        ];
     }
 }

@@ -17,10 +17,15 @@ declare(strict_types=1);
 namespace Puntmig\Search\Repository;
 
 use Puntmig\Search\Model\Brand;
+use Puntmig\Search\Model\BrandReference;
 use Puntmig\Search\Model\Category;
+use Puntmig\Search\Model\CategoryReference;
 use Puntmig\Search\Model\Manufacturer;
+use Puntmig\Search\Model\ManufacturerReference;
 use Puntmig\Search\Model\Product;
+use Puntmig\Search\Model\ProductReference;
 use Puntmig\Search\Model\Tag;
+use Puntmig\Search\Model\TagReference;
 use Puntmig\Search\Query\Query;
 use Puntmig\Search\Result\Result;
 
@@ -107,23 +112,24 @@ abstract class Repository
      */
     public function addProduct(Product $product)
     {
-        $productId = $product->getId();
-        if (isset($this->elementsToUpdate['products'][$productId])) {
-            return;
-        }
+        $productUUID = $product
+            ->getProductReference()
+            ->composeUUID();
 
-        $this->elementsToUpdate['products'][$productId] = $product;
+        $this->elementsToUpdate['products'][$productUUID] = $product;
+        unset($this->elementsToDelete['products'][$productUUID]);
     }
 
     /**
-     * Remove product document by id.
+     * Delete product document by id.
      *
-     * @param string $productId
+     * @param ProductReference $productReference
      */
-    public function removeProduct(string $productId)
+    public function deleteProduct(ProductReference $productReference)
     {
-        unset($this->elementsToUpdate['products'][$productId]);
-        $this->elementsToDelete['products'][] = $productId;
+        $productUUID = $productReference->composeUUID();
+        $this->elementsToDelete['products'][$productUUID] = $productReference;
+        unset($this->elementsToUpdate['products'][$productUUID]);
     }
 
     /**
@@ -133,23 +139,24 @@ abstract class Repository
      */
     public function addCategory(Category $category)
     {
-        $categoryId = $category->getId();
-        if (isset($this->elementsToUpdate['categories'][$categoryId])) {
-            return;
-        }
+        $categoryUUID = $category
+            ->getCategoryReference()
+            ->composeUUID();
 
-        $this->elementsToUpdate['categories'][$categoryId] = $category;
+        $this->elementsToUpdate['categories'][$categoryUUID] = $category;
+        unset($this->elementsToDelete['categories'][$categoryUUID]);
     }
 
     /**
-     * Remove category.
+     * Delete category.
      *
-     * @param string $categoryId
+     * @param CategoryReference $categoryReference
      */
-    public function removeCategory(string $categoryId)
+    public function deleteCategory(CategoryReference $categoryReference)
     {
-        unset($this->elementsToUpdate['categories'][$categoryId]);
-        $this->elementsToDelete['categories'][] = $categoryId;
+        $categoryUUID = $categoryReference->composeUUID();
+        $this->elementsToDelete['categories'][$categoryUUID] = $categoryReference;
+        unset($this->elementsToUpdate['categories'][$categoryUUID]);
     }
 
     /**
@@ -159,23 +166,24 @@ abstract class Repository
      */
     public function addManufacturer(Manufacturer $manufacturer)
     {
-        $manufacturerId = $manufacturer->getId();
-        if (isset($this->elementsToUpdate['manufacturers'][$manufacturerId])) {
-            return;
-        }
+        $manufacturerUUID = $manufacturer
+            ->getManufacturerReference()
+            ->composeUUID();
 
-        $this->elementsToUpdate['manufacturers'][$manufacturerId] = $manufacturer;
+        $this->elementsToUpdate['manufacturers'][$manufacturerUUID] = $manufacturer;
+        unset($this->elementsToDelete['manufacturers'][$manufacturerUUID]);
     }
 
     /**
-     * Remove manufacturer document by id.
+     * Delete manufacturer.
      *
-     * @param string $manufacturerId
+     * @param ManufacturerReference $manufacturerReference
      */
-    public function removeManufacturer(string $manufacturerId)
+    public function deleteManufacturer(ManufacturerReference $manufacturerReference)
     {
-        unset($this->elementsToUpdate['manufacturers'][$manufacturerId]);
-        $this->elementsToDelete['manufacturers'][] = $manufacturerId;
+        $manufacturerUUID = $manufacturerReference->composeUUID();
+        $this->elementsToDelete['manufacturers'][$manufacturerUUID] = $manufacturerReference;
+        unset($this->elementsToUpdate['manufacturers'][$manufacturerUUID]);
     }
 
     /**
@@ -185,23 +193,24 @@ abstract class Repository
      */
     public function addBrand(Brand $brand)
     {
-        $brandId = $brand->getId();
-        if (isset($this->elementsToUpdate['brands'][$brandId])) {
-            return;
-        }
+        $brandUUID = $brand
+            ->getBrandReference()
+            ->composeUUID();
 
-        $this->elementsToUpdate['brands'][$brandId] = $brand;
+        $this->elementsToUpdate['brands'][$brandUUID] = $brand;
+        unset($this->elementsToDelete['brands'][$brandUUID]);
     }
 
     /**
-     * Remove brand document by id.
+     * Delete brand.
      *
-     * @param string $brandId
+     * @param BrandReference $brandReference
      */
-    public function removeBrand(string $brandId)
+    public function deleteBrand(BrandReference $brandReference)
     {
-        unset($this->elementsToUpdate['brands'][$brandId]);
-        $this->elementsToDelete['brands'][] = $brandId;
+        $brandUUID = $brandReference->composeUUID();
+        $this->elementsToDelete['brands'][$brandUUID] = $brandReference;
+        unset($this->elementsToUpdate['brands'][$brandUUID]);
     }
 
     /**
@@ -211,23 +220,24 @@ abstract class Repository
      */
     public function addTag(Tag $tag)
     {
-        $tagId = $tag->getName();
-        if (isset($this->elementsToUpdate['tags'][$tagId])) {
-            return;
-        }
+        $tagUUID = $tag
+            ->getTagReference()
+            ->composeUUID();
 
-        $this->elementsToUpdate['tags'][$tagId] = $tag;
+        $this->elementsToUpdate['tags'][$tagUUID] = $tag;
+        unset($this->elementsToDelete['tags'][$tagUUID]);
     }
 
     /**
-     * Remove tag document by id.
+     * Delete tag.
      *
-     * @param string $tagId
+     * @param TagReference $tagReference
      */
-    public function removeTag(string $tagId)
+    public function deleteTag(TagReference $tagReference)
     {
-        unset($this->elementsToUpdate['tags'][$tagId]);
-        $this->elementsToDelete['tags'][] = $tagId;
+        $tagUUID = $tagReference->composeUUID();
+        $this->elementsToDelete['tags'][$tagUUID] = $tagReference;
+        unset($this->elementsToUpdate['tags'][$tagUUID]);
     }
 
     /**
@@ -294,8 +304,8 @@ abstract class Repository
     /**
      * Flush products.
      *
-     * @param Product[] $productsToUpdate
-     * @param string[]  $productsToDelete
+     * @param Product[]          $productsToUpdate
+     * @param ProductReference[] $productsToDelete
      */
     abstract protected function flushProducts(
         array $productsToUpdate,
@@ -305,8 +315,8 @@ abstract class Repository
     /**
      * Flush categories.
      *
-     * @param Category[] $categoriesToUpdate
-     * @param string[]   $categoriesToDelete
+     * @param Category[]          $categoriesToUpdate
+     * @param CategoryReference[] $categoriesToDelete
      */
     abstract protected function flushCategories(
         array $categoriesToUpdate,
@@ -316,8 +326,8 @@ abstract class Repository
     /**
      * Flush manufacturers.
      *
-     * @param Manufacturer[] $manufacturersToUpdate
-     * @param string[]       $manufacturersToDelete
+     * @param Manufacturer[]          $manufacturersToUpdate
+     * @param ManufacturerReference[] $manufacturersToDelete
      */
     abstract protected function flushManufacturers(
         array $manufacturersToUpdate,
@@ -327,8 +337,8 @@ abstract class Repository
     /**
      * Flush brands.
      *
-     * @param Brand[]  $brandsToUpdate
-     * @param string[] $brandsToDelete
+     * @param Brand[]          $brandsToUpdate
+     * @param BrandReference[] $brandsToDelete
      */
     abstract protected function flushBrands(
         array $brandsToUpdate,
@@ -338,8 +348,8 @@ abstract class Repository
     /**
      * Flush tags.
      *
-     * @param Tag[]    $tagsToUpdate
-     * @param string[] $tagsToDelete
+     * @param Tag[]          $tagsToUpdate
+     * @param TagReference[] $tagsToDelete
      */
     abstract protected function flushTags(
         array $tagsToUpdate,

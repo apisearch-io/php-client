@@ -19,7 +19,7 @@ namespace Puntmig\Search\Model;
 /**
  * Class Manufacturer.
  */
-class Manufacturer extends IdNameWrapper
+class Manufacturer implements HttpTransportable
 {
     /**
      * @var string
@@ -27,4 +27,140 @@ class Manufacturer extends IdNameWrapper
      * Name
      */
     const TYPE = 'manufacturer';
+
+    /**
+     * @var ManufacturerReference
+     *
+     * Manufacturer reference
+     */
+    private $manufacturerReference;
+
+    /**
+     * @var string
+     *
+     * Name
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
+     * Slug
+     */
+    private $slug;
+
+    /**
+     * @var string
+     *
+     * First level searchable data
+     */
+    private $firstLevelSearchableData;
+
+    /**
+     * Manufacturer constructor.
+     *
+     * @param string $id
+     * @param string $name
+     * @param string $slug
+     */
+    public function __construct(
+        string $id,
+        string $name,
+        string $slug
+    ) {
+        $this->manufacturerReference = new ManufacturerReference($id);
+        $this->name = $name;
+        $this->slug = $slug;
+        $this->firstLevelSearchableData = $name;
+    }
+
+    /**
+     * Get manufacturer reference.
+     *
+     * @return ManufacturerReference
+     */
+    public function getManufacturerReference() : ManufacturerReference
+    {
+        return $this->manufacturerReference;
+    }
+
+    /**
+     * Get id.
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this
+            ->manufacturerReference
+            ->getId();
+    }
+
+    /**
+     * Get name.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get slug.
+     *
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Get first level searchable data.
+     *
+     * @return string
+     */
+    public function getFirstLevelSearchableData(): string
+    {
+        return $this->firstLevelSearchableData;
+    }
+
+    /**
+     * To array.
+     *
+     * @return array
+     */
+    public function toArray() : array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->name,
+            'slug' => $this->slug,
+        ];
+    }
+
+    /**
+     * Create from array.
+     *
+     * @param array $array
+     *
+     * @return static
+     */
+    public static function createFromArray(array $array)
+    {
+        if (
+            !isset($array['id']) ||
+            !isset($array['name']) ||
+            !isset($array['slug'])
+        ) {
+            return null;
+        }
+
+        return new static(
+            (string) $array['id'],
+            (string) $array['name'],
+            (string) $array['slug']
+        );
+    }
 }

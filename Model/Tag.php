@@ -29,11 +29,11 @@ class Tag implements HttpTransportable
     const TYPE = 'tag';
 
     /**
-     * @var string
+     * @var TagReference
      *
-     * Name
+     * Tag reference
      */
-    private $name;
+    private $tagReference;
 
     /**
      * @var string
@@ -49,8 +49,18 @@ class Tag implements HttpTransportable
      */
     public function __construct(string $name)
     {
-        $this->name = $name;
+        $this->tagReference = new TagReference($name);
         $this->firstLevelSearchableData = $name;
+    }
+
+    /**
+     * Get reference.
+     *
+     * @return TagReference
+     */
+    public function getTagReference()
+    {
+        return $this->tagReference;
     }
 
     /**
@@ -60,7 +70,9 @@ class Tag implements HttpTransportable
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this
+            ->tagReference
+            ->getName();
     }
 
     /**
@@ -99,7 +111,7 @@ class Tag implements HttpTransportable
     public function toArray(): array
     {
         return [
-            'name' => $this->name,
+            'name' => $this->getName(),
         ];
     }
 }

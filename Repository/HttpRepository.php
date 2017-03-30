@@ -18,10 +18,15 @@ namespace Puntmig\Search\Repository;
 
 use Puntmig\Search\Http\HttpClient;
 use Puntmig\Search\Model\Brand;
+use Puntmig\Search\Model\BrandReference;
 use Puntmig\Search\Model\Category;
+use Puntmig\Search\Model\CategoryReference;
 use Puntmig\Search\Model\Manufacturer;
+use Puntmig\Search\Model\ManufacturerReference;
 use Puntmig\Search\Model\Product;
+use Puntmig\Search\Model\ProductReference;
 use Puntmig\Search\Model\Tag;
+use Puntmig\Search\Model\TagReference;
 use Puntmig\Search\Query\Query;
 use Puntmig\Search\Result\Result;
 
@@ -52,8 +57,8 @@ class HttpRepository extends Repository
     /**
      * Flush products.
      *
-     * @param Product[] $productsToUpdate
-     * @param string[]  $productsToDelete
+     * @param Product[]          $productsToUpdate
+     * @param ProductReference[] $productsToDelete
      */
     protected function flushProducts(
         array $productsToUpdate,
@@ -77,7 +82,11 @@ class HttpRepository extends Repository
                 ->httpClient
                 ->get('/products', 'delete', [
                     'key' => $this->getKey(),
-                    'products' => json_encode($productsToDelete),
+                    'products' => json_encode(
+                        array_map(function (ProductReference $product) {
+                            return $product->toArray();
+                        }, $productsToDelete)
+                    ),
                 ]);
         }
     }
@@ -85,8 +94,8 @@ class HttpRepository extends Repository
     /**
      * Flush categories.
      *
-     * @param Category[] $categoriesToUpdate
-     * @param string[]   $categoriesToDelete
+     * @param Category[]          $categoriesToUpdate
+     * @param CategoryReference[] $categoriesToDelete
      */
     protected function flushCategories(
         array $categoriesToUpdate,
@@ -110,7 +119,11 @@ class HttpRepository extends Repository
                 ->httpClient
                 ->get('/categories', 'delete', [
                     'key' => $this->getKey(),
-                    'categories' => json_encode($categoriesToDelete),
+                    'categories' => json_encode(
+                        array_map(function (CategoryReference $category) {
+                            return $category->toArray();
+                        }, $categoriesToDelete)
+                    ),
                 ]);
         }
     }
@@ -118,8 +131,8 @@ class HttpRepository extends Repository
     /**
      * Flush manufacturers.
      *
-     * @param Manufacturer[] $manufacturersToUpdate
-     * @param string[]       $manufacturersToDelete
+     * @param Manufacturer[]          $manufacturersToUpdate
+     * @param ManufacturerReference[] $manufacturersToDelete
      */
     protected function flushManufacturers(
         array $manufacturersToUpdate,
@@ -143,7 +156,11 @@ class HttpRepository extends Repository
                 ->httpClient
                 ->get('/manufacturers', 'delete', [
                     'key' => $this->getKey(),
-                    'manufacturers' => json_encode($manufacturersToDelete),
+                    'manufacturers' => json_encode(
+                        array_map(function (ManufacturerReference $manufacturer) {
+                            return $manufacturer->toArray();
+                        }, $manufacturersToDelete)
+                    ),
                 ]);
         }
     }
@@ -151,8 +168,8 @@ class HttpRepository extends Repository
     /**
      * Flush brands.
      *
-     * @param Brand[]  $brandsToUpdate
-     * @param string[] $brandsToDelete
+     * @param Brand[]          $brandsToUpdate
+     * @param BrandReference[] $brandsToDelete
      */
     protected function flushBrands(
         array $brandsToUpdate,
@@ -176,7 +193,11 @@ class HttpRepository extends Repository
                 ->httpClient
                 ->get('/brands', 'delete', [
                     'key' => $this->getKey(),
-                    'brands' => json_encode($brandsToDelete),
+                    'brands' => json_encode(
+                        array_map(function (BrandReference $brand) {
+                            return $brand->toArray();
+                        }, $brandsToDelete)
+                    ),
                 ]);
         }
     }
@@ -184,8 +205,8 @@ class HttpRepository extends Repository
     /**
      * Flush tags.
      *
-     * @param Tag[]    $tagsToUpdate
-     * @param string[] $tagsToDelete
+     * @param Tag[]          $tagsToUpdate
+     * @param TagReference[] $tagsToDelete
      */
     protected function flushTags(
         array $tagsToUpdate,
@@ -196,9 +217,11 @@ class HttpRepository extends Repository
                 ->httpClient
                 ->get('/tags', 'post', [
                     'key' => $this->getKey(),
-                    'tags' => json_encode(array_map(function (Tag $tag) {
-                        return $tag->toArray();
-                    }, $tagsToUpdate)),
+                    'tags' => json_encode(
+                        array_map(function (Tag $tag) {
+                            return $tag->toArray();
+                        }, $tagsToUpdate)
+                    ),
                 ]);
         }
 
@@ -207,7 +230,11 @@ class HttpRepository extends Repository
                 ->httpClient
                 ->get('/tags', 'delete', [
                     'key' => $this->getKey(),
-                    'tags' => json_encode($tagsToDelete),
+                    'tags' => json_encode(
+                        array_map(function (TagReference $tag) {
+                            return $tag->toArray();
+                        }, $tagsToDelete)
+                    ),
                 ]);
         }
     }
