@@ -29,6 +29,19 @@ use Puntmig\Search\Model\Tag;
 class Result implements HttpTransportable
 {
     /**
+     * @var array
+     *
+     * Abbreviations
+     */
+    private $abbreviations = [
+        'p' => 'products',
+        'c' => 'categories',
+        'm' => 'manufacturers',
+        'b' => 'brands',
+        't' => 'tags',
+    ];
+
+    /**
      * @var Product[]
      *
      * Products
@@ -62,6 +75,13 @@ class Result implements HttpTransportable
      * Tags
      */
     private $tags = [];
+
+    /**
+     * @var array
+     *
+     * Results
+     */
+    private $results = [];
 
     /**
      * @var Aggregations
@@ -135,7 +155,12 @@ class Result implements HttpTransportable
      */
     public function addProduct(Product $product)
     {
-        $this->products[] = $product;
+        $productUUID = $product
+            ->getProductReference()
+            ->composeUUID();
+
+        $this->products[$productUUID] = $product;
+        $this->results[] = ['p', $productUUID];
     }
 
     /**
@@ -145,7 +170,7 @@ class Result implements HttpTransportable
      */
     public function getProducts(): array
     {
-        return $this->products;
+        return array_values($this->products);
     }
 
     /**
@@ -155,7 +180,12 @@ class Result implements HttpTransportable
      */
     public function addCategory(Category $category)
     {
-        $this->categories[] = $category;
+        $categoryUUID = $category
+            ->getCategoryReference()
+            ->composeUUID();
+
+        $this->categories[$categoryUUID] = $category;
+        $this->results[] = ['c', $categoryUUID];
     }
 
     /**
@@ -165,7 +195,7 @@ class Result implements HttpTransportable
      */
     public function getCategories(): array
     {
-        return $this->categories;
+        return array_values($this->categories);
     }
 
     /**
@@ -175,7 +205,12 @@ class Result implements HttpTransportable
      */
     public function addManufacturer(Manufacturer $manufacturer)
     {
-        $this->manufacturers[] = $manufacturer;
+        $manufacturerUUID = $manufacturer
+            ->getManufacturerReference()
+            ->composeUUID();
+
+        $this->manufacturers[$manufacturerUUID] = $manufacturer;
+        $this->results[] = ['m', $manufacturerUUID];
     }
 
     /**
@@ -185,7 +220,7 @@ class Result implements HttpTransportable
      */
     public function getManufacturers(): array
     {
-        return $this->manufacturers;
+        return array_values($this->manufacturers);
     }
 
     /**
@@ -195,7 +230,12 @@ class Result implements HttpTransportable
      */
     public function addBrand(Brand $brand)
     {
-        $this->brands[] = $brand;
+        $brandUUID = $brand
+            ->getBrandReference()
+            ->composeUUID();
+
+        $this->brands[$brandUUID] = $brand;
+        $this->results[] = ['b', $brandUUID];
     }
 
     /**
@@ -205,7 +245,7 @@ class Result implements HttpTransportable
      */
     public function getBrands(): array
     {
-        return $this->brands;
+        return array_values($this->brands);
     }
 
     /**
@@ -215,7 +255,12 @@ class Result implements HttpTransportable
      */
     public function addTag(Tag $tag)
     {
-        $this->tags[] = $tag;
+        $tagUUID = $tag
+            ->getTagReference()
+            ->composeUUID();
+
+        $this->tags[$tagUUID] = $tag;
+        $this->results[] = ['t', $tagUUID];
     }
 
     /**
@@ -225,7 +270,23 @@ class Result implements HttpTransportable
      */
     public function getTags(): array
     {
-        return $this->tags;
+        return array_values($this->tags);
+    }
+
+    /**
+     * Get results.
+     *
+     * @return array
+     */
+    public function getResults() : array
+    {
+        return array_values(
+            array_map(function (array $result) {
+                $container = $this->abbreviations[$result[0]];
+
+                return $this->$container[$result[1]];
+            }, $this->results)
+        );
     }
 
     /**
@@ -340,6 +401,7 @@ class Result implements HttpTransportable
             'tags' => array_map(function (Tag $tag) {
                 return $tag->toArray();
             }, $this->tags),
+            'results' => $this->results,
             'aggregations' => $this->aggregations->toArray(),
         ];
     }
@@ -380,6 +442,8 @@ class Result implements HttpTransportable
         $result->tags = array_map(function (array $tag) {
             return Tag::createFromArray($tag);
         }, $array['tags']);
+
+        $result->results = $array['results'] ?? [];
 
         $result->aggregations = Aggregations::createFromArray($array['aggregations']);
 
