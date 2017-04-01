@@ -954,12 +954,12 @@ class Product implements HttpTransportable
     public static function createFromArray(array $array) : self
     {
         $product = new self(
-            (string) $array['id'] ?? '',
-            (string) $array['family'] ?? '',
-            (string) $array['ean'] ?? '',
-            (string) $array['name'] ?? '',
-            (string) $array['slug'] ?? '',
-            (string) $array['description'] ?? '',
+            (string) ($array['id'] ?? ''),
+            (string) ($array['family'] ?? ''),
+            (string) ($array['ean'] ?? ''),
+            (string) ($array['name'] ?? ''),
+            (string) ($array['slug'] ?? ''),
+            (string) ($array['description'] ?? ''),
             isset($array['long_description'])
                 ? ((string) $array['long_description'])
                 : null,
