@@ -84,7 +84,14 @@ class Result implements HttpTransportable
     private $results = [];
 
     /**
-     * @var Aggregations
+     * @var array
+     *
+     * Suggests
+     */
+    private $suggests = [];
+
+    /**
+     * @var null|Aggregations
      *
      * Aggregations
      */
@@ -302,9 +309,9 @@ class Result implements HttpTransportable
     /**
      * Get aggregations.
      *
-     * @return Aggregations
+     * @return null|Aggregations
      */
-    public function getAggregations(): Aggregations
+    public function getAggregations(): ? Aggregations
     {
         return $this->aggregations;
     }
@@ -318,9 +325,33 @@ class Result implements HttpTransportable
      */
     public function getAggregation(string $name) : ? Aggregation
     {
+        if (is_null($this->aggregations)) {
+            return null;
+        }
+
         return $this
-            ->getAggregations()
+            ->aggregations
             ->getAggregation($name);
+    }
+
+    /**
+     * Add suggest.
+     *
+     * @param string $suggest
+     */
+    public function addSuggest(string $suggest)
+    {
+        $this->suggests[$suggest] = $suggest;
+    }
+
+    /**
+     * Get suggests.
+     *
+     * @return string[]
+     */
+    public function getSuggests() : array
+    {
+        return array_values($this->suggests);
     }
 
     /**
@@ -380,7 +411,7 @@ class Result implements HttpTransportable
      */
     public function toArray() : array
     {
-        return [
+        return array_filter([
             'total_elements' => $this->totalElements,
             'total_products' => $this->totalProducts,
             'total_hits' => $this->totalHits,
@@ -402,8 +433,13 @@ class Result implements HttpTransportable
                 return $tag->toArray();
             }, $this->tags),
             'results' => $this->results,
-            'aggregations' => $this->aggregations->toArray(),
-        ];
+            'aggregations' => $this->aggregations instanceof Aggregations
+                ? $this
+                    ->aggregations
+                    ->toArray()
+                : null,
+            'suggests' => $this->suggests,
+        ]);
     }
 
     /**
@@ -416,36 +452,40 @@ class Result implements HttpTransportable
     public static function createFromArray(array $array) : self
     {
         $result = new self(
-            $array['total_elements'],
-            $array['total_products'],
-            $array['total_hits'],
-            $array['min_price'],
-            $array['max_price']
+            $array['total_elements'] ?? 0,
+            $array['total_products'] ?? 0,
+            $array['total_hits'] ?? 0,
+            $array['min_price'] ?? 0,
+            $array['max_price'] ?? 0
         );
 
         $result->products = array_map(function (array $product) {
             return Product::createFromArray($product);
-        }, $array['products']);
+        }, $array['products'] ?? []);
 
         $result->categories = array_map(function (array $category) {
             return Category::createFromArray($category);
-        }, $array['categories']);
+        }, $array['categories'] ?? []);
 
         $result->manufacturers = array_map(function (array $manufacturer) {
             return Manufacturer::createFromArray($manufacturer);
-        }, $array['manufacturers']);
+        }, $array['manufacturers'] ?? []);
 
         $result->brands = array_map(function (array $brand) {
             return Brand::createFromArray($brand);
-        }, $array['brands']);
+        }, $array['brands'] ?? []);
 
         $result->tags = array_map(function (array $tag) {
             return Tag::createFromArray($tag);
-        }, $array['tags']);
+        }, $array['tags'] ?? []);
 
         $result->results = $array['results'] ?? [];
 
-        $result->aggregations = Aggregations::createFromArray($array['aggregations']);
+        if (isset($array['aggregations'])) {
+            $result->aggregations = Aggregations::createFromArray($array['aggregations']);
+        }
+
+        $result->suggests = $array['suggests'] ?? [];
 
         return $result;
     }

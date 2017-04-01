@@ -76,6 +76,20 @@ class Query implements HttpTransportable
     private $size;
 
     /**
+     * @var bool
+     *
+     * Suggestions enabled
+     */
+    private $suggestionsEnabled = false;
+
+    /**
+     * @var bool
+     *
+     * Aggregations enabled
+     */
+    private $aggregationsEnabled = true;
+
+    /**
      * Construct.
      *
      * @param $queryText
@@ -745,7 +759,7 @@ class Query implements HttpTransportable
     {
         return $this
             ->getFilter('_query')
-            ->getField();
+            ->getValues()[0];
     }
 
     /**
@@ -811,6 +825,74 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Enable suggestions.
+     *
+     * @return self
+     */
+    public function enableSuggestions()
+    {
+        $this->suggestionsEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable suggestions.
+     *
+     * @return self
+     */
+    public function disableSuggestions()
+    {
+        $this->suggestionsEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Are suggestions enabled?
+     *
+     * @return bool
+     */
+    public function areSuggestionsEnabled()
+    {
+        return $this->suggestionsEnabled;
+    }
+
+    /**
+     * Enable aggregations.
+     *
+     * @return self
+     */
+    public function enableAggregations()
+    {
+        $this->aggregationsEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable aggregations.
+     *
+     * @return self
+     */
+    public function disableAggregations()
+    {
+        $this->aggregationsEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Are aggregations enabled?
+     *
+     * @return bool
+     */
+    public function areAggregationsEnabled()
+    {
+        return $this->aggregationsEnabled;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -819,7 +901,7 @@ class Query implements HttpTransportable
     {
         $query = $this->filters['_query'];
 
-        return [
+        return array_filter([
             'q' => $query->getValues()[0],
             'coordinate' => $this->coordinate instanceof HttpTransportable
                 ? $this->coordinate->toArray()
@@ -837,7 +919,9 @@ class Query implements HttpTransportable
             'sort' => $this->sort,
             'page' => $this->page,
             'size' => $this->size,
-        ];
+            'suggestions_enabled' => $this->suggestionsEnabled,
+            'aggregations_enabled' => $this->aggregationsEnabled,
+        ]);
     }
 
     /**
@@ -849,29 +933,31 @@ class Query implements HttpTransportable
      */
     public static function createFromArray(array $array) : self
     {
-        $query = $array['coordinate']
+        $query = isset($array['coordinate'])
             ? self::createLocated(
                 Coordinate::createFromArray($array['coordinate']),
-                $array['q'],
+                $array['q'] ?? '',
                 (int) $array['page'],
                 (int) $array['size']
             )
             : self::create(
-                $array['q'],
+                $array['q'] ?? '',
                 (int) $array['page'],
                 (int) $array['size']
             );
         $query->aggregations = array_map(function (array $aggregation) {
             return Aggregation::createFromArray($aggregation);
-        }, $array['aggregations']);
+        }, $array['aggregations'] ?? []);
 
         $query->sort = $array['sort'];
         $query->filters = array_merge(
             $query->filters,
             array_map(function (array $filter) {
                 return Filter::createFromArray($filter);
-            }, $array['filters'])
+            }, $array['filters'] ?? [])
         );
+        $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
+        $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
 
         return $query;
     }

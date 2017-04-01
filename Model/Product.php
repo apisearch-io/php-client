@@ -831,7 +831,7 @@ class Product implements HttpTransportable
      */
     public function toArray() : array
     {
-        $array = [
+        $array = array_filter([
             'id' => $this->getId(),
             'family' => $this->getFamily(),
             'ean' => $this->ean,
@@ -863,7 +863,7 @@ class Product implements HttpTransportable
             }, $this->tags),
             'stores' => $this->stores,
             'metadata' => $this->metadata,
-        ];
+        ]);
 
         if ($this->brand instanceof Brand) {
             $array['brand'] = $this

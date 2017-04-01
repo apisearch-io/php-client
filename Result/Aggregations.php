@@ -118,12 +118,12 @@ class Aggregations implements IteratorAggregate, HttpTransportable
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'aggregations' => array_map(function (Aggregation $aggregation) {
                 return $aggregation->toArray();
             }, $this->getAggregations()),
             'total_elements' => $this->getTotalElements(),
-        ];
+        ]);
     }
 
     /**
@@ -136,14 +136,16 @@ class Aggregations implements IteratorAggregate, HttpTransportable
     public static function createFromArray(array $array): self
     {
         $aggregations = new self(
-            $array['total_elements']
+            $array['total_elements'] ?? 0
         );
 
-        foreach ($array['aggregations'] as $aggregationName => $aggregation) {
-            $aggregations->addAggregation(
-                $aggregationName,
-                Aggregation::createFromArray($aggregation)
-            );
+        if (isset($array['aggregations'])) {
+            foreach ($array['aggregations'] as $aggregationName => $aggregation) {
+                $aggregations->addAggregation(
+                    $aggregationName,
+                    Aggregation::createFromArray($aggregation)
+                );
+            }
         }
 
         return $aggregations;
