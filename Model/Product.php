@@ -192,6 +192,20 @@ class Product implements HttpTransportable
     private $metadata;
 
     /**
+     * @var array
+     *
+     * Special words
+     */
+    private $specialWords = [];
+
+    /**
+     * @var int
+     *
+     * Extra boost
+     */
+    private $extraBoost;
+
+    /**
      * Product constructor.
      *
      * @param string          $id
@@ -210,8 +224,10 @@ class Product implements HttpTransportable
      * @param null|float      $rating
      * @param null|DateTime   $updatedAt
      * @param null|Coordinate $coordinate
-     * @param null|array      $stores
-     * @param null|array      $metadata
+     * @param array           $stores
+     * @param array           $metadata
+     * @param array           $specialWords
+     * @param int             $extraBoost
      */
     public function __construct(
         string $id,
@@ -231,7 +247,9 @@ class Product implements HttpTransportable
         ? DateTime $updatedAt = null,
         ? Coordinate $coordinate = null,
         array $stores = [],
-        array $metadata = []
+        array $metadata = [],
+        array $specialWords = [],
+        int $extraBoost = 0
     ) {
         $this->productReference = new ProductReference($id, $family);
         $this->ean = $ean;
@@ -243,6 +261,7 @@ class Product implements HttpTransportable
         $this->reducedPrice = $reducedPrice;
         $this->currency = $currency;
         $this->stock = $stock;
+        $this->manufacturers = [];
         $this->brand = $brand;
         $this->categories = [];
         $this->tags = [];
@@ -252,9 +271,8 @@ class Product implements HttpTransportable
         $this->coordinate = $coordinate;
         $this->stores = $stores;
         $this->metadata = $metadata;
-        $this->categories = [];
-        $this->tags = [];
-        $this->manufacturers = [];
+        $this->setSpecialWords($specialWords);
+        $this->extraBoost = $extraBoost;
 
         $this->recalculateRelativeValues();
     }
@@ -795,6 +813,56 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get specialWords.
+     *
+     * @return array
+     */
+    public function getSpecialWords() : array
+    {
+        return array_unique($this->specialWords);
+    }
+
+    /**
+     * Set specialWords.
+     *
+     * @param array $specialWord
+     */
+    public function setSpecialWords(array $specialWord)
+    {
+        $this->specialWords = array_map('strtolower', $specialWord);
+    }
+
+    /**
+     * Add specialWord.
+     *
+     * @param string $specialWord
+     */
+    public function addSpecialWord(string $specialWord)
+    {
+        $this->specialWords[] = strtolower($specialWord);
+    }
+
+    /**
+     * Get extra boost.
+     *
+     * @return int
+     */
+    public function getExtraBoost() : int
+    {
+        return $this->extraBoost;
+    }
+
+    /**
+     * Set extra boost.
+     *
+     * @param int $extraBoost
+     */
+    public function setExtraBoost(int $extraBoost)
+    {
+        $this->extraBoost = $extraBoost;
+    }
+
+    /**
      * Get distance.
      *
      * @return float
@@ -863,6 +931,8 @@ class Product implements HttpTransportable
             }, $this->tags),
             'stores' => $this->stores,
             'metadata' => $this->metadata,
+            'special_words' => $this->specialWords,
+            'extra_boost' => $this->extraBoost,
         ]);
 
         if ($this->brand instanceof Brand) {
@@ -915,7 +985,9 @@ class Product implements HttpTransportable
                 ? Coordinate::createFromArray($array['coordinate'])
                 : null,
             $array['stores'] ?? [],
-            $array['metadata'] ?? []
+            $array['metadata'] ?? [],
+            $array['special_words'] ?? [],
+            $array['extra_boost'] ?? 0
         );
 
         if (
