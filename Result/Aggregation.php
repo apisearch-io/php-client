@@ -113,6 +113,10 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             $this->activeElements
         );
 
+        if (!$counter instanceof Counter) {
+            return;
+        }
+
         /**
          * The entry is used.
          * This block should take in account when the filter is of type

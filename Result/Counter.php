@@ -132,24 +132,27 @@ class Counter implements HttpTransportable
     }
 
     /**
-     * Create.
+     * Create or return null if the used element is not valid.
      *
      * @param string $name
      * @param int    $n
      * @param array  $activeElements
      *
-     * @return self
+     * @return null|self
      */
     public static function createByActiveElements(
         string $name,
         int $n,
         array $activeElements
-    ) : self {
+    ) : ? self {
         $id = $name;
         $level = null;
         $splittedParts = explode('~~', $name);
         if (count($splittedParts) > 1) {
             $id = $splittedParts[0];
+            if ($id == 'null') {
+                return null;
+            }
             $name = $splittedParts[1];
         }
 
@@ -171,7 +174,7 @@ class Counter implements HttpTransportable
      *
      * @return array
      */
-    public function toArray(): array
+    public function toArray() : array
     {
         return [
             'id' => $this->id,
