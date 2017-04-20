@@ -11,6 +11,7 @@ processes related to the Search API using basic domain objects.
 - [Result object](#result-object)
 - [Index API](#index-api)
 - [Query API](#query-api)
+- [Delete API](#delete-api)
 - [Integrations](#integrations)
 - [Examples](#examples)
 
@@ -39,12 +40,14 @@ Query api is going to work mainly against it.
 | reduced_price  | float  | Reduced product's price  | no  | -  |
 | currency  | string | Your price currency. Can follow any format  | **yes**  | -  |
 | stock  | int  | Product stock. By default is considered infinite  | no  |   |
-| manufacturer  | Manufacturer  | Product's manufacturer  | no  |   |
-| brand  | Brand  | Product's brand  | no  |   |
+| brand  | Brand  | Product's brand. Product has as well many Manufacturers, explained later. | no  |   |
 | image  | string | Image for the product  | no  | -  |
 | rating  | string  | Product's rate in a float scale  | no  |   |
 | updated_at  | DateTime  | Last time when the product was updated  | no  |   |
 | coordinate  | Coordinate  | Assign coordinates to your products in order to filter and facet over them  | no  |   |
+| stores | string[] | Stores where this product is available. A store is represented by a string | no |   |
+| metadata | array | Product metadata. This data will be saved and indexed for filtering | no |   |
+| special_words | string[] | Special words with which to match the product | no |   |
 
 You can create a new Product instance by using the simple Product's constructor.
 This is an example of how you can create a product with random data.
@@ -62,15 +65,26 @@ $product = new Product(
     35,90,
     'EUR',
     100,
-    $myManufacturer,
-    null,
+    $brand,
     'http://example.com/image/12345.jpg',
     4.5,
     new DateTime(),
     new Coordinate(
         40.12, 
         -71.34
-    )
+    ),
+    [
+        'my_store', 
+        'my_other_store'
+    ],
+    [
+        'field1' => 'value1',
+        'field2' => 100,
+    ],
+    [
+        'christmas',
+        'non_existing_word',
+    ]
 )
 ```
 
@@ -89,7 +103,7 @@ $array = [
     'reduced_price' => 35,90,
     'currency' => 'EUR',
     'stock' => 100,
-    'manufacturer' => $myManufacturer,
+    'brand' => $brand,
     'image' => 'http://example.com/image/12345.jpg',
     'rating' => 4.5,
     'updated_at' => new DateTime(),
@@ -97,19 +111,41 @@ $array = [
         'lat' => 40.12,
         'lon' => -71.34,
     ],
+    'stores' => [
+        'my_store', 
+        'my_other_store'
+    ],
+    'metadata' => [
+        'field1' => 'value1',
+        'field2' => 100,
+    ],
+    'special_words' => [
+        'christmas',
+        'non_existing_word',
+    ]
 ];
 $product = Product::createFromArray($array);
 ```
 
 Both ways will cause the same result.
-A product can have categories and tags as well. Because the relation with both
-are of many to many, we will use the add methods to make it work.
+A product can have manufacturers, categories and tags as well. Because the
+relations with these fields are of many to many, we will use the add methods to
+make it work.
 
 ``` php
+$product->addManufacturer($manufacturer1);
+$product->addManufacturer($manufacturer2);
 $product->addCategory($category1);
 $product->addCategory($category2);
 $product->addTag($tag1);
 $product->addTag($tag2);
+```
+
+Both metadata and special words can be modified once the entity is created.
+
+``` php
+$product->addMetadata($field, $value);
+$product->addSpecialWord($word);
 ```
 
 The product object have some extra methods a part of the properties getters.
@@ -346,6 +382,35 @@ application. Depending on that value, the filter will cause different values and
 the resulting aggregation (facet) will change, even on your screen. Let's take a
 look at the different filters we can apply.
 
+#### Filter by
+
+Generic filter action.
+
+```php
+Query::create('')
+    ->filterBy(
+        'id',
+        ['1', '2', '3'],
+        Filter::AT_LEAST_ONE
+    );
+```
+
+Common filters are already wrapped by specific methods.
+
+#### Filter by meta
+
+Remember that a product can have some metadata? This metadata is stored and
+indexed properly so you can filter by these values using this method.
+
+```php
+Query::create('')
+    ->filterByMeta(
+        'field1',
+        ['value1', 'value2'],
+        Filter::AT_LEAST_ONE
+    );
+```
+
 #### Filter by families
 
 Remember that your Product can have a family? This is because your domain
@@ -358,17 +423,21 @@ this project.
 You can , then, filter your results by using these values.
 
 ```php
-Query::create('')->filterByFamilies(['products', 'packs']);
+Query::create('')
+    ->filterByFamilies(
+        ['products', 'packs']
+    );
 ```
 
 By default, this filter is defined as *MUST_ALL* but you can change this 
 behavior by adding a second method parameter.
 
 ```php
-Query::create('')->filterByFamilies(
-    ['products', 'packs'],
-    Filter::AT_LEAST_ONE
-);
+Query::create('')
+    ->filterByFamilies(
+        ['products', 'packs'],
+        Filter::AT_LEAST_ONE
+    );
 ```
 
 #### Filter by Types
@@ -380,7 +449,10 @@ the need of searching across one single type by search string. Lets look for all
 manufacturers matching "Adidas".
 
 ```php
-Query::create('adidas')->filterByTypes(['manufacturer']);
+Query::create('adidas')
+    ->filterByTypes(
+        ['manufacturer']
+    );
 ```
 
 That simple. Because all objects have indexed fields you can make searches
@@ -401,11 +473,16 @@ Using it in that way, we create the experience of navigation with levels. Of
 course you can change the behavior of the filter by using the second parameter.
 
 ```php
-Query::create('')->filterByCategories(['Shoes']);
-Query::create('')->filterByCategories(
-    ['Shoes'],
-    Filter::MUST_ALL_WITH_LEVELS
-);
+Query::create('')
+    ->filterByCategories(
+        ['Shoes']
+    );
+
+Query::create('')
+    ->filterByCategories(
+        ['Shoes'],
+        Filter::MUST_ALL_WITH_LEVELS
+    );
 ```
 
 This method will automatically create an aggregation called categories. Please,
@@ -413,24 +490,34 @@ go to the aggregations part to know a little bit about that. You can disable it
 by using a third parameter.
 
 ```php
-Query::create('')->filterByCategories(
-    ['Shoes'],
-    Filter::MUST_ALL_WITH_LEVELS,
-    false
-);
+Query::create('')
+    ->filterByCategories(
+        ['Shoes'],
+        Filter::MUST_ALL_WITH_LEVELS,
+        false
+    );
 ```
 
 #### Filter by Manufacturers / Brands
 
 Because both experience is the same, let's explain both at the same time. As
-said with categories, you can filter by manufacturer and by brand. Because a
-product can have only of each one, it doesn't make sense to work with exclusive
-filters (MUST_ALL*), so in that case we will treat this filter as the default
-behavior: Filter::AT_LEAST_ONE
+said with categories, you can filter by manufacturers and by brands. Both
+methods will have a default *AT_LEAST_ONE* application type. The only difference
+between both is that a Product can have multiple Manufacturers at the same time,
+so in that case it would make sense switch this behavior to *MUST_ALL_*.
+Because a Product can have only one Brand at the same time, filtering by Brands
+with a *MUST_ALL_* application type would not make sense at all.
 
 ```php
-Query::create('')->filterByManufacturers(['Adidas', 'Nike']);
-Query::create('')->filterByBrands(['Nestlé']);
+Query::create('')
+    ->filterByManufacturers(
+        ['Adidas', 'Nike']
+    );
+
+Query::create('')
+    ->filterByBrands(
+        ['Nestlé']
+    );
 ```
 
 In the first case, we will only take products with manufacturer *Adidas* OR
@@ -442,11 +529,12 @@ parameter, and disable the aggregation generation by using a third parameter.
 This works for both filters.
 
 ```php
-Query::create('')->filterByManufacturers(
-    ['Adidas', 'Nike'],
-    Filter::MUST_ALL,
-    false
-);
+Query::create('')
+    ->filterByManufacturers(
+        ['Adidas', 'Nike'],
+        Filter::MUST_ALL,
+        false
+    );
 ```
 
 #### Filter by Tags
@@ -614,6 +702,7 @@ $locationRange = new CoordinateAndDistance(
     new Coordinate(40.9, -70.0),
     '50km'
 );
+
 Query::create('')
     ->filterByLocation(
         $locationRange
@@ -635,6 +724,7 @@ $locationRange = new Square(
     new Coordinate(40.9, -70.0),
     new Coordinate(39.4, -69.1),
 );
+
 Query::create('')
     ->filterByLocation(
         $locationRange
@@ -660,6 +750,7 @@ $locationRange = new Polygon(
     new Coordinate(39.4, -69.1),
     //...
 );
+
 Query::create('')
     ->filterByLocation(
         $locationRange
@@ -671,6 +762,22 @@ You can add as many coordinates as you need in order to build the desired area.
 > This is useful when the final user has any kind of drawing tool, so an
 > specific polygon can be defined by any user. Useful as well when composing
 > maps, for example, defining country areas as polygons.
+
+#### Filter by stores
+
+> This part is only useful when working with multi-store or multi-site.
+> Otherwise this part is not important
+
+When a product has different stores associated, you may filter by them (for
+example, having 5 differents stores, filtering by the current one).
+
+```php
+Query::create('')
+    ->filterByStores(
+        'main',
+        FILTER::AT_LEAST_ONE
+    );
+```
 
 ### Aggregations
 
@@ -701,9 +808,20 @@ this, and the SortBy object defines a prebuilt set of sorting types ready to be
 used by you. You can define the sorting field and the type by yourself.
 
 ```php
-Query::create('')->sortBy(['manufacturer.name', 'asc']);
-Query::create('')->sortBy(['name', 'desc']);
-Query::create('')->sortBy(['updated_at', 'desc']);
+Query::create('')
+    ->sortBy(
+        ['manufacturer.name', 'asc']
+    );
+
+Query::create('')
+    ->sortBy(
+        ['name', 'desc']
+    );
+
+Query::create('')
+    ->sortBy(
+        ['updated_at', 'desc']
+    );
 ```
 
 We can use prebuilt sorts. The first one is the one applied by default when no
@@ -727,6 +845,8 @@ Query::create('')
     ->sortBy(SortBy::BRAND_DESC)
     ->sortBy(SortBy::RATING_ASC)
     ->sortBy(SortBy::RATING_DESC)
+    ->sortBy(SortBy::LOCATION_KM_ASC)
+    ->sortBy(SortBy::LOCATION_KM_DESC)
 ;
 ```
 
@@ -754,6 +874,7 @@ location in an *asc* mode.
 Query::create('')
     ->sortBy(SortBy::LOCATION_KM_ASC)
     ->sortBy(SortBy::LOCATION_MI_ASC)
+;
 ```
 
 Both sorting types return exactly the same results in the same order, but both
@@ -767,6 +888,47 @@ value.
 
 ```php
 $product->getDistance();
+```
+
+### Enabling / disabling suggestions
+
+Suggestions can be enabled or disabled by using these flag methods.
+
+```php
+Query::create('')
+    ->enableSuggestions()
+    ->disableSuggestions()
+;
+```
+
+### Enabling / disabling aggregations
+
+Aggregations can be enabled or disabled by using these flag methods. This flag
+will override all behaviors from all filter methods (remember that when
+filtering by some fields, for example Categories, you can enabled or disable
+specific aggregation). If aggregations are enabled, then the behavior will not
+change and each field specific behavior will be used. If disable, all field
+specific behaviors will be disabled.
+
+```php
+Query::create('')
+    ->enableAggregations()
+    ->disableAggregations()
+;
+```
+
+In this case, aggregations are specifically enabled by Categories, but disabled
+by flag, so no aggregations will be requested.
+
+```php
+Query::create('')
+    ->filterByCategories(
+        ['Shoes'],
+        Filter::MUST_ALL_WITH_LEVELS,
+        true
+    )
+    ->disabledAggregations()
+;
 ```
 
 ## Result object
@@ -862,6 +1024,17 @@ commonly printed in your app.
 This is all you need to know about the Result objects. This objects architecture
 will allow you to print all the final information for your final user.
 
+### Suggests
+
+If your query had the suggests enabled, then you will find some suggestions in
+your Result instance by using the getter method.
+
+```php
+$suggests = $result->getSuggests();
+```
+
+Each suggest is defined as an array of non unique strings.
+
 ## Index API
 
 Let's dig into the first available API, the index one.
@@ -951,6 +1124,96 @@ $result = $repository->query(Query $query) : Result
 
 That's it. The result of the query method is a Result instance. To know a little
 bit more about this object, check the documentation chapter.
+
+## Delete API
+
+The third API is the deletion one. In order to understand better this API, you
+need to know about the Reference model. This model is mainly a simplification of
+the main model (Product, Manufacturer, Brand, Category, Tag), but designed only
+to define each one's class primary key.
+
+For example, what's the primary key for a Product? Saying the id field would
+make sense, right? But that answer is wrong. Remember that a Product must have
+an ID but as well a family? Imagine you work with Books and Objects at the same
+time. Both elements are Products, possibly persisted in different tables in your
+database and with a non-shared ID generator, for example, with separated
+auto-increment strategy.
+
+Then, this means that you could have in your database a book with ID 10, and
+an object with ID 10. If only the ID is the primary key, then this means that
+both elements are the same for the API.
+
+Composed keys is what this API uses, so there is a class for each model class
+that define each primary key composition.
+
+```php
+$bookReference = new ProductReference('10', 'book');
+$objectReference = new ProductReference('10', 'object');
+```
+
+Both instances reference different products, even with different IDs.
+
+In order to work with the Delete API we need to work with the same Repository
+than used in the Index API. A key must be defined the same way we did before.
+
+```php
+$repository->setKey(string $key);
+```
+
+### Delete Product
+
+A product is referenced by its ID and family.
+
+```php
+$bookReference = new ProductReference('10', 'book');
+```
+
+And to delete the Product
+
+```php
+$repository->deleteProduct(ProductReference $bookReference);
+```
+
+### Delete Category, Manufacturer, Brand
+
+These three entities are referenced the same way. In all cases, same ID means,
+always, same instance, so only ID will be used here.
+
+```php
+$categoryReference = new CategoryReference('10');
+$manufacturerReference = new ManufacturerReference('10');
+$brandReference = new BrandReference('10');
+```
+
+To delete each reference
+
+```php
+$repository->deleteCategory(CategoryReference $categoryReference);
+$repository->deleteManufacturer(ManufacturerReference $manufacturerReference);
+$repository->deleteBrand(BrandReference $brandReference);
+```
+
+### Delete Tags
+
+The Tag Reference is defined only by the tag name
+
+```php
+$tagReference = new TagReference('kids');
+```
+
+To delete references
+
+```php
+$repository->deleteTag(TagReference $tagReference);
+```
+
+In order to flush all changes, remember to use the flush method.
+
+```php
+$repository->flush();
+```
+
+> The bulkNumber value will not affect when flushing deletions
 
 ## Integrations
 

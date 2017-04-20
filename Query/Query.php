@@ -539,15 +539,18 @@ class Query implements HttpTransportable
      * Filter by stores.
      *
      * @param string[] $stores
+     * @param int      $applicationType
      *
      * @return self
      */
-    public function filterByStores(array $stores) : self
-    {
+    public function filterByStores(
+        array $stores,
+        int $applicationType = Filter::AT_LEAST_ONE
+    ) : self {
         $this->filters['stores'] = Filter::create(
             'stores',
             $stores,
-            Filter::AT_LEAST_ONE,
+            $applicationType,
             Filter::TYPE_FIELD
         );
 
