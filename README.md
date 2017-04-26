@@ -511,12 +511,12 @@ with a *MUST_ALL_* application type would not make sense at all.
 ```php
 Query::create('')
     ->filterByManufacturers(
-        ['Adidas', 'Nike']
+        [1, 2]
     );
 
 Query::create('')
     ->filterByBrands(
-        ['Nestlé']
+        [1]
     );
 ```
 
@@ -531,7 +531,7 @@ This works for both filters.
 ```php
 Query::create('')
     ->filterByManufacturers(
-        ['Adidas', 'Nike'],
+        [1, 2],
         Filter::MUST_ALL,
         false
     );

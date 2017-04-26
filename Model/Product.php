@@ -963,7 +963,7 @@ class Product implements HttpTransportable
             isset($array['long_description'])
                 ? ((string) $array['long_description'])
                 : null,
-            (float) $array['price'],
+            (float) ($array['price'] ?? 0),
             isset($array['reduced_price'])
                 ? ((float) $array['reduced_price'])
                 : null,
