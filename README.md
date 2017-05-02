@@ -931,6 +931,48 @@ Query::create('')
 ;
 ```
 
+### Excluding some elements
+
+Having some kind of black list would be useful as well. For example, when
+printing a related carousel given a product, and filtering by the manufacturer,
+would be useful to exclude the current element from the list.
+
+In order to do that we will use references, so we can filter by any kind of
+element (not only products) only having the reference.
+
+```php
+Query::create('')
+    ->filterByManufacturers(
+        ['4'],
+        Filter::MUST_ALL
+    )
+    ->excludeReference(new ProductReference('10', 'product'))
+;
+```
+
+In this example we are excluding the Product with ID 10 and 'product' as family.
+Remember that a product is always referenced not only by the id but with a
+composition between the ID and the family.
+
+We can filter by several references as well, mixing different type of references
+at the same time.
+
+```php
+Query::create('')
+    ->filterByManufacturers(
+        ['4'],
+        Filter::MUST_ALL
+    )
+    ->excludeReferences([
+        new ProductReference('10', 'product'),
+        new ManufacturerReference('5'),
+        new BrandReference('100'),
+        new CategoryReference('21'),
+        new TagReference('with-discount'),
+    ])
+;
+```
+
 ## Result object
 
 A Query instance creates a Result instance. A Result is not only a set of basic
