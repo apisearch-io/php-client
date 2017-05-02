@@ -19,14 +19,14 @@ namespace Puntmig\Search\Model;
 /**
  * Class IdReference.
  */
-class IdReference implements HttpTransportable, UUIDReference
+abstract class IdReference implements HttpTransportable, UUIDReference
 {
     /**
      * @var string
      *
      * Id
      */
-    private $id;
+    protected $id;
 
     /**
      * IdReference constructor.
@@ -76,15 +76,5 @@ class IdReference implements HttpTransportable, UUIDReference
         return new static(
             (string) $array['id']
         );
-    }
-
-    /**
-     * Compose unique id.
-     *
-     * @return string
-     */
-    public function composeUUID()
-    {
-        return $this->id;
     }
 }

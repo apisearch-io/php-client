@@ -26,21 +26,28 @@ class Filter implements HttpTransportable
     /**
      * @var int
      *
-     * Filter
+     * Filter by all of them
      */
     const MUST_ALL = 1;
 
     /**
      * @var int
      *
-     * Accumulative
+     * Filter by, at least, one
      */
     const AT_LEAST_ONE = 2;
 
     /**
      * @var int
      *
-     * Filter
+     * Exclude all of them
+     */
+    const EXCLUDE = 4;
+
+    /**
+     * @var int
+     *
+     * Filter by all of them, with levels
      */
     const MUST_ALL_WITH_LEVELS = 5;
 

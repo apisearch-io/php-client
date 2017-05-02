@@ -21,4 +21,13 @@ namespace Puntmig\Search\Model;
  */
 class ManufacturerReference extends IdReference
 {
+    /**
+     * Compose unique id.
+     *
+     * @return string
+     */
+    public function composeUUID() : string
+    {
+        return "m~{$this->id}";
+    }
 }

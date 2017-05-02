@@ -107,8 +107,8 @@ class ProductReference implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function composeUUID()
+    public function composeUUID() : string
     {
-        return $this->family . '~' . $this->id;
+        return "p~{$this->family}~{$this->id}";
     }
 }

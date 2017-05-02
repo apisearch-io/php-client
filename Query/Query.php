@@ -20,6 +20,7 @@ use Puntmig\Search\Exception\QueryBuildException;
 use Puntmig\Search\Geo\LocationRange;
 use Puntmig\Search\Model\Coordinate;
 use Puntmig\Search\Model\HttpTransportable;
+use Puntmig\Search\Model\UUIDReference;
 
 /**
  * Class Query.
@@ -832,7 +833,7 @@ class Query implements HttpTransportable
      *
      * @return self
      */
-    public function enableSuggestions()
+    public function enableSuggestions() : self
     {
         $this->suggestionsEnabled = true;
 
@@ -844,7 +845,7 @@ class Query implements HttpTransportable
      *
      * @return self
      */
-    public function disableSuggestions()
+    public function disableSuggestions() : self
     {
         $this->suggestionsEnabled = false;
 
@@ -856,7 +857,7 @@ class Query implements HttpTransportable
      *
      * @return bool
      */
-    public function areSuggestionsEnabled()
+    public function areSuggestionsEnabled() : bool
     {
         return $this->suggestionsEnabled;
     }
@@ -866,7 +867,7 @@ class Query implements HttpTransportable
      *
      * @return self
      */
-    public function enableAggregations()
+    public function enableAggregations() : self
     {
         $this->aggregationsEnabled = true;
 
@@ -878,7 +879,7 @@ class Query implements HttpTransportable
      *
      * @return self
      */
-    public function disableAggregations()
+    public function disableAggregations() : self
     {
         $this->aggregationsEnabled = false;
 
@@ -890,9 +891,39 @@ class Query implements HttpTransportable
      *
      * @return bool
      */
-    public function areAggregationsEnabled()
+    public function areAggregationsEnabled() : bool
     {
         return $this->aggregationsEnabled;
+    }
+
+    /**
+     * Exclude reference.
+     *
+     * @param UUIDReference[] $uuidReferences
+     *
+     * @return self
+     */
+    public function excludeReferences(array $uuidReferences) : self
+    {
+        $this->filterBy('_id', array_map(function (UUIDReference $uuidReference) {
+            return $uuidReference->composeUUID();
+        }, $uuidReferences), Filter::EXCLUDE);
+
+        return $this;
+    }
+
+    /**
+     * Exclude reference.
+     *
+     * @param UUIDReference $uuidReference
+     *
+     * @return self
+     */
+    public function excludeReference(UUIDReference $referenceReference) : self
+    {
+        $this->excludeReferences([$referenceReference]);
+
+        return $this;
     }
 
     /**

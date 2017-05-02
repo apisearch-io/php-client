@@ -83,8 +83,8 @@ class TagReference implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function composeUUID()
+    public function composeUUID() : string
     {
-        return $this->name;
+        return "t~{$this->name}";
     }
 }

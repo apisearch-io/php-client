@@ -21,4 +21,13 @@ namespace Puntmig\Search\Model;
  */
 class CategoryReference extends IdReference
 {
+    /**
+     * Compose unique id.
+     *
+     * @return string
+     */
+    public function composeUUID() : string
+    {
+        return "c~{$this->id}";
+    }
 }
