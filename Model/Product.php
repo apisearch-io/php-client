@@ -194,6 +194,13 @@ class Product implements HttpTransportable
     /**
      * @var array
      *
+     * Indexed Metadata
+     */
+    private $indexedMetadata;
+
+    /**
+     * @var array
+     *
      * Special words
      */
     private $specialWords = [];
@@ -226,6 +233,7 @@ class Product implements HttpTransportable
      * @param null|Coordinate $coordinate
      * @param array           $stores
      * @param array           $metadata
+     * @param array           $indexedMetadata
      * @param array           $specialWords
      * @param int             $extraBoost
      */
@@ -247,6 +255,7 @@ class Product implements HttpTransportable
         ? DateTime $updatedAt = null,
         ? Coordinate $coordinate = null,
         array $stores = [],
+        array $indexedMetadata = [],
         array $metadata = [],
         array $specialWords = [],
         int $extraBoost = 0
@@ -270,6 +279,7 @@ class Product implements HttpTransportable
         $this->updatedAt = $updatedAt;
         $this->coordinate = $coordinate;
         $this->stores = $stores;
+        $this->indexedMetadata = $indexedMetadata;
         $this->metadata = $metadata;
         $this->setSpecialWords($specialWords);
         $this->extraBoost = $extraBoost;
@@ -782,6 +792,37 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get indexedMetadata.
+     *
+     * @return array
+     */
+    public function getIndexedMetadata() : array
+    {
+        return $this->indexedMetadata;
+    }
+
+    /**
+     * Set indexedMetadata.
+     *
+     * @param array $indexedMetadata
+     */
+    public function setIndexedMetadata(array $indexedMetadata)
+    {
+        $this->indexedMetadata = $indexedMetadata;
+    }
+
+    /**
+     * Add indexedMetadata.
+     *
+     * @param string $field
+     * @param mixed  $value
+     */
+    public function addIndexedMetadata(string $field, $value)
+    {
+        $this->indexedMetadata[$field] = $value;
+    }
+
+    /**
      * Get metadata.
      *
      * @return array
@@ -930,6 +971,7 @@ class Product implements HttpTransportable
                 return $tag->toArray();
             }, $this->tags),
             'stores' => $this->stores,
+            'indexed_metadata' => $this->indexedMetadata,
             'metadata' => $this->metadata,
             'special_words' => $this->specialWords,
             'extra_boost' => $this->extraBoost,
@@ -985,6 +1027,7 @@ class Product implements HttpTransportable
                 ? Coordinate::createFromArray($array['coordinate'])
                 : null,
             $array['stores'] ?? [],
+            $array['indexed_metadata'] ?? [],
             $array['metadata'] ?? [],
             $array['special_words'] ?? [],
             $array['extra_boost'] ?? 0

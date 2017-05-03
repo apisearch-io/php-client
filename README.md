@@ -27,27 +27,28 @@ A simple view of what a purchasable object is. A product can be anything you
 want, but take in account that this is the object in the middle, and the main
 Query api is going to work mainly against it.
 
-| Field  | Type  | What is that  | Mandatory?  | Boost  |
+| Field  | Type  | What is that  | Mandatory?  |
 |---|---|---|---|---|
-| id  | string  | Unique id of the product  | **yes**  | -  |
-| family  | string   | Family of products. Will let you work with several kind of purchasables  | **yes**  |   |
-| ean  | string   | Product EAN. Is not considered unique, even if should be. Some purchasables may have not EAN  | **yes**  |   |
-| name  | string  | Name of the product  | **yes**  |   |
-| slug  | string  | Slug of the product  | **yes**  |   |
+| id  | string  | Unique id of the product  | **yes**  |
+| family  | string   | Family of products. Will let you work with several kind of purchasables  | **yes**  |
+| ean  | string   | Product EAN. Is not considered unique, even if should be. Some purchasables may have not EAN  | **yes**  |
+| name  | string  | Name of the product  | **yes**  |
+| slug  | string  | Slug of the product  | **yes**  |
 | description  | string  | Product's description  | **yes**  |   |
-| long_description  | string  | Product's long description. By default, main description is used  | no  |   |
-| price  | float   | Main product's price, without possible discount  | **yes**  | -  |
-| reduced_price  | float  | Reduced product's price  | no  | -  |
-| currency  | string | Your price currency. Can follow any format  | **yes**  | -  |
-| stock  | int  | Product stock. By default is considered infinite  | no  |   |
-| brand  | Brand  | Product's brand. Product has as well many Manufacturers, explained later. | no  |   |
-| image  | string | Image for the product  | no  | -  |
-| rating  | string  | Product's rate in a float scale  | no  |   |
-| updated_at  | DateTime  | Last time when the product was updated  | no  |   |
-| coordinate  | Coordinate  | Assign coordinates to your products in order to filter and facet over them  | no  |   |
-| stores | string[] | Stores where this product is available. A store is represented by a string | no |   |
-| metadata | array | Product metadata. This data will be saved and indexed for filtering | no |   |
-| special_words | string[] | Special words with which to match the product | no |   |
+| long_description  | string  | Product's long description. By default, main description is used  | no  |
+| price  | float   | Main product's price, without possible discount  | **yes**  |
+| reduced_price  | float  | Reduced product's price  | no  |
+| currency  | string | Your price currency. Can follow any format  | **yes**  |
+| stock  | int  | Product stock. By default is considered infinite  | no  |
+| brand  | Brand  | Product's brand. Product has as well many Manufacturers, explained later. | no  |
+| image  | string | Image for the product  | no  |
+| rating  | string  | Product's rate in a float scale  | no  |
+| updated_at  | DateTime  | Last time when the product was updated  | no  |
+| coordinate  | Coordinate  | Assign coordinates to your products in order to filter and facet over them  | no  |
+| stores | string[] | Stores where this product is available. A store is represented by a string | no |
+| indexed_metadata | array | Product metadata. This data will be saved and indexed for filtering | no |
+| metadata | array | Saved but not indexed product metadata | no |
+| special_words | string[] | Special words with which to match the product | no |
 
 You can create a new Product instance by using the simple Product's constructor.
 This is an example of how you can create a product with random data.
@@ -76,6 +77,10 @@ $product = new Product(
     [
         'my_store', 
         'my_other_store'
+    ],
+    [
+        'indexable_field1' => 'value1',
+        'indexable_field2' => 100,
     ],
     [
         'field1' => 'value1',
@@ -114,6 +119,10 @@ $array = [
     'stores' => [
         'my_store', 
         'my_other_store'
+    ],
+    'indexable_metadata' => [
+        'indexable_field1' => 'value1',
+        'indexable_field2' => 100,
     ],
     'metadata' => [
         'field1' => 'value1',
@@ -410,6 +419,9 @@ Query::create('')
         Filter::AT_LEAST_ONE
     );
 ```
+
+> This filter works with the indexed_metadata field. Remember that the metadata
+> field stores non-indexable data
 
 #### Filter by families
 

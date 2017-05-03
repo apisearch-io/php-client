@@ -214,7 +214,7 @@ class Query implements HttpTransportable
     ) : self {
         if (!empty($values)) {
             $this->filters["_m_$field"] = Filter::create(
-                "metadata.$field",
+                "indexed_metadata.$field",
                 $values,
                 $applicationType,
                 Filter::TYPE_FIELD
