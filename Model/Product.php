@@ -854,6 +854,19 @@ class Product implements HttpTransportable
     }
 
     /**
+     * Get all metadata.
+     *
+     * @return array
+     */
+    public function getAllMetadata() : array
+    {
+        return array_merge(
+            $this->metadata,
+            $this->indexedMetadata
+        );
+    }
+
+    /**
      * Get specialWords.
      *
      * @return array
