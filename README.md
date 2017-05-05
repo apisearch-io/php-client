@@ -178,6 +178,34 @@ then the difference will be considered as the discount. The percentage applied
 between the price and the real price is the value returned when the method
 `getDiscountPercentage` is called. This last value will always be between 0 and 100.
 
+#### Referencing a Product
+
+To make a specific product reference you must use the ProductReference object.
+This part of the model is mainly a simplification of the main model (Product, 
+Manufacturer, Brand, Category, Tag), but designed only to define each one's 
+class primary key.
+
+For example, what's the primary key for a Product? Saying the id field would
+make sense, right? But that answer is wrong. Remember that a Product must have
+an ID but as well a family? Imagine you work with Books and Objects at the same
+time. Both elements are Products, possibly persisted in different tables in your
+database and with a non-shared ID generator, for example, with separated
+auto-increment strategy.
+
+Then, this means that you could have in your database a book with ID 10, and
+an object with ID 10. If only the ID is the primary key, then this means that
+both elements are the same for the API.
+
+Composed keys is what this API uses, so there is a class for each model class
+that define each primary key composition.
+
+```php
+$bookReference = new ProductReference('10', 'book');
+$objectReference = new ProductReference('10', 'object');
+```
+
+Both instances reference different products, even with different IDs.
+
 ### Category
 
 The way we have to categorize what a purchasable is. The category model is
@@ -242,6 +270,15 @@ $array = [
 $product = Product::createFromArray($array);
 ```
 
+#### Referencing a Category
+
+In this case, a category reference is much more simpler than the product one, so
+any category id will always be unique.
+
+```php
+$categoryReference = new CategoryReference('10');
+```
+
 ### Manufacturer & Brand
 
 Both entities are explained the same way because both entities are built with
@@ -295,6 +332,16 @@ $array = [
 $product = Product::createFromArray($array);
 ```
 
+#### Referencing a Manufacturer & Brand
+
+Both Manufacturer and Brand references are exactly the same than a category
+reference.
+
+```php
+$manufacturerReference = new ManufacturerReference('10');
+$brandReference = new BrandReference('23');
+```
+
 ### Tags
 
 A even simpler entity, so a Tag can have only a name. This name will work as a
@@ -335,6 +382,15 @@ $array = [
 $product = Product::createFromArray($array);
 ```
 
+#### Referencing a Tag
+
+Because tag is the simplest element in this model, and because a Tag name is, at
+the same time, its own identifier, we can reference any tag with its name.
+
+```php
+$tagReference = new TagReference('heavy');
+```
+
 ## Query object
 
 Knowing how our model is defined, let's start by knowing how to make a simple
@@ -351,18 +407,40 @@ this word and returning them all by scoring, the best the first.
 Let's make something a little bit harder. Let's take only the first 100 elements
 of the second page (from the result 101 to the 200).
 
-```
+``` php
 $query = Query::create("something", 2, 100);
 ```
 
 That's it, that easy :)
 
 If you want to match all elements, you can just pass an empty string as the
-first parameter.
+first parameter or use the search-everything static factory method. In this
+second method you will query the first 1000 elements.
 
-```
+``` php
 $query = Query::create('');
+$query = Query::createMatchAll();
 ```
+
+Finally, you can create a query to find one ore more specific elements from your
+database. For this reason, there are two special static factory methods
+specifically create to make these two scenarios so easy.
+
+We will use References here in both cases.
+
+``` php
+$query = Query::createByReference(new ProductReference('12', 'book'));
+$query = Query::createByReferences([
+    new ProductReference('12', 'book'),
+    new CategoryReference('123'),
+    new ManufacturerReference('332'),
+    new BrandReference('555'),
+    new TagReference('heavy'),
+]);
+```
+
+The order is not important here, and the result format will be exactly the same
+than any other type of queries.
 
 ### Filters
 
@@ -1180,32 +1258,6 @@ That's it. The result of the query method is a Result instance. To know a little
 bit more about this object, check the documentation chapter.
 
 ## Delete API
-
-The third API is the deletion one. In order to understand better this API, you
-need to know about the Reference model. This model is mainly a simplification of
-the main model (Product, Manufacturer, Brand, Category, Tag), but designed only
-to define each one's class primary key.
-
-For example, what's the primary key for a Product? Saying the id field would
-make sense, right? But that answer is wrong. Remember that a Product must have
-an ID but as well a family? Imagine you work with Books and Objects at the same
-time. Both elements are Products, possibly persisted in different tables in your
-database and with a non-shared ID generator, for example, with separated
-auto-increment strategy.
-
-Then, this means that you could have in your database a book with ID 10, and
-an object with ID 10. If only the ID is the primary key, then this means that
-both elements are the same for the API.
-
-Composed keys is what this API uses, so there is a class for each model class
-that define each primary key composition.
-
-```php
-$bookReference = new ProductReference('10', 'book');
-$objectReference = new ProductReference('10', 'object');
-```
-
-Both instances reference different products, even with different IDs.
 
 In order to work with the Delete API we need to work with the same Repository
 than used in the Index API. A key must be defined the same way we did before.

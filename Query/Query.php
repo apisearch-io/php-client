@@ -171,6 +171,39 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Create by reference.
+     *
+     * @param UUIDReference $reference
+     *
+     * @return self
+     */
+    public static function createByReference(UUIDReference $reference) : self
+    {
+        return self::createByReferences([$reference]);
+    }
+
+    /**
+     * Create by references.
+     *
+     * @param UUIDReference[] $references
+     *
+     * @return self
+     */
+    public static function createByReferences(array $references) : self
+    {
+        $ids = array_map(function (UUIDReference $reference) {
+            return $reference->composeUUID();
+        }, $references);
+
+        $ids = array_unique($ids);
+
+        return self::create('', 1, count($references))
+            ->filterBy('_id', $ids, Filter::AT_LEAST_ONE)
+            ->disableAggregations()
+            ->disableSuggestions();
+    }
+
+    /**
      * Filter by custom field.
      *
      * @param string $field
