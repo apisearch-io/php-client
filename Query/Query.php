@@ -237,23 +237,30 @@ class Query implements HttpTransportable
      * @param string $field
      * @param array  $values
      * @param int    $applicationType
+     * @param bool   $aggregate
      *
      * @return self
      */
     public function filterByMeta(
         string $field,
         array $values,
-        int $applicationType
+        int $applicationType = Filter::AT_LEAST_ONE,
+        bool $aggregate = true
     ) : self {
+        $internalField = "indexed_metadata.$field";
         if (!empty($values)) {
-            $this->filters["_m_$field"] = Filter::create(
-                "indexed_metadata.$field",
+            $this->filters[$internalField] = Filter::create(
+                $internalField,
                 $values,
                 $applicationType,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->filters["_m_$field"]);
+            unset($this->filters[$internalField]);
+        }
+
+        if ($aggregate) {
+            $this->addMetaAggregation($field, $applicationType);
         }
 
         return $this;
@@ -766,6 +773,29 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Add Families aggregation.
+     *
+     * @param string $field
+     * @param int    $applicationType
+     *
+     * @return self
+     */
+    private function addMetaAggregation(
+        string $field,
+        int $applicationType
+    ) : self {
+        $internalField = "indexed_metadata.$field";
+        $this->aggregations[$internalField] = Aggregation::create(
+            $internalField,
+            $internalField,
+            $applicationType,
+            Filter::TYPE_FIELD
+        );
+
+        return $this;
+    }
+
+    /**
      * Get aggregations.
      *
      * @return Aggregation[]
@@ -780,7 +810,7 @@ class Query implements HttpTransportable
      *
      * @param string $aggregationName
      *
-     * @return Aggregation
+     * @return null|Aggregation
      */
     public function getAggregation(string $aggregationName) : ? Aggregation
     {

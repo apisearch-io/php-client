@@ -150,10 +150,13 @@ $product->addTag($tag1);
 $product->addTag($tag2);
 ```
 
-Both metadata and special words can be modified once the entity is created.
+Metadata, IndexedMetadata and special words can be modified once the entity is
+created. The case of IndexedMetadata is a little bit different, so all values
+injected inside this array will be converted to string.
 
 ``` php
 $product->addMetadata($field, $value);
+$product->addIndexedMetadata($field, $value);
 $product->addSpecialWord($word);
 ```
 
@@ -177,6 +180,39 @@ The discount applied between the price and the real price. If both are different
 then the difference will be considered as the discount. The percentage applied
 between the price and the real price is the value returned when the method
 `getDiscountPercentage` is called. This last value will always be between 0 and 100.
+
+#### Metadata and Indexable metadata
+
+In order to make this entity more abstract and to allow you to use not only as
+a purchasable product but as the way you really need, the model allow some extra
+fields to be added in a very dynamic way.
+
+Treat metadata as a simple key-value bucket without any impact while indexing.
+You will receive this data hydrated once you retrieve results from the index,
+but will not be searchable.
+
+``` php
+$product->addMetadata('field', 'not-filtrable-data');
+```
+
+Treat indexable metadata as an extension of the searchable model. You can add as
+many fields and values as you need. Each one of them will be stored like the
+previous one, and indexed ready to be filtered and aggregated.
+
+``` php
+$product->addIndexableMetadata('field', 'filtrable-data');
+```
+
+By default, some elements are stored as dynamic calculations. These new
+indexable metadata fields will allow you to filter by some values that could be
+so helpful for your use.
+
+* with_image - Does your product have any non-empty image?
+* with_discount - Does your product have any valid discount?
+* with_stock - Does your product have stock?
+
+Revise the [filter](#filter-by-meta) documentation in order to know how to
+filter by these values.
 
 #### Referencing a Product
 
@@ -493,13 +529,37 @@ indexed properly so you can filter by these values using this method.
 Query::create('')
     ->filterByMeta(
         'field1',
+        ['value1', 'value2']
+    );
+```
+
+By default, this filter is defined as *AT_LEAST_ONE* but you can change this 
+behavior by adding a third method parameter.
+
+```php
+Query::create('')
+    ->filterByMeta(
+        'field1',
         ['value1', 'value2'],
-        Filter::AT_LEAST_ONE
+        Filter::MUST_ALL
     );
 ```
 
 > This filter works with the indexed_metadata field. Remember that the metadata
 > field stores non-indexable data
+
+By default, when you filter by meta, specific metadata field aggregation will be
+enabled. Disable this aggregation by adding a fourth and last parameter.
+
+```php
+Query::create('')
+    ->filterByMeta(
+        'field1',
+        ['value1', 'value2'],
+        Filter::AT_LEAST_ONE,
+        false
+    );
+```
 
 #### Filter by families
 
@@ -1087,6 +1147,21 @@ $brands = $result->getBrands();
 $tags = $result->getTags();
 ```
 
+You can retrieve as well all elements in a single array, respecting the order
+defined by the Query.
+
+```php
+$results = $result->getResults();
+```
+
+If you queried by a reference, for example, or even in any query, you can easily
+retrieve the first (and more useful when is the only expected) result by using
+this method
+
+```php
+$results = $result->getFirstResult();
+```
+
 Each of these methods will return an array of hydrated instances of our model (
 not yours. If you want your model instances, you need to create manual
 transformers, but in that case it won't be probably necessary, so even if are
@@ -1109,6 +1184,9 @@ to iterate over all Aggregations you can make a simple foreach over the result
 of the `->getAggregations()` result (returns an implementation of the PHP
 interface Traversable). You can access directly to an aggregation by using the
 `->getAggregation($name)` method and the aggregation assigned name.
+
+If you want to retrieve a metadata aggregation, you can use as well the shortcut
+method `->getMetaAggregation($field)`
 
 ### Result Aggregation
 

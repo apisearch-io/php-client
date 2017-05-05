@@ -296,6 +296,14 @@ class Product implements HttpTransportable
     {
         $this->longDescription = ($this->longDescription ?? '');
         $this->image = ($this->image ?? '');
+
+        /**
+         * Predefined indexed metadata.
+         */
+        $this->indexedMetadata['with_image'] = (empty($this->image)) ? '0' : '1';
+        $this->indexedMetadata['with_discount'] = ($this->getDiscountPercentage() > 0) ? '1' : '0';
+        $this->indexedMetadata['with_stock'] = ($this->getStock() > 0) ? '1' : '0';
+
         $this->rating = !is_null($this->rating)
             ? round($this->rating, 1)
             : null;
@@ -808,18 +816,20 @@ class Product implements HttpTransportable
      */
     public function setIndexedMetadata(array $indexedMetadata)
     {
-        $this->indexedMetadata = $indexedMetadata;
+        $this->indexedMetadata = array_map('strval', $indexedMetadata);
     }
 
     /**
      * Add indexedMetadata.
      *
      * @param string $field
-     * @param mixed  $value
+     * @param string $value
      */
-    public function addIndexedMetadata(string $field, $value)
-    {
-        $this->indexedMetadata[$field] = $value;
+    public function addIndexedMetadata(
+        string $field,
+        string $value
+    ) {
+        $this->indexedMetadata[$field] = (string) $value;
     }
 
     /**
@@ -1040,7 +1050,9 @@ class Product implements HttpTransportable
                 ? Coordinate::createFromArray($array['coordinate'])
                 : null,
             $array['stores'] ?? [],
-            $array['indexed_metadata'] ?? [],
+            isset($array['indexed_metadata'])
+                ? array_map('strval', $array['indexed_metadata'])
+                : [],
             $array['metadata'] ?? [],
             $array['special_words'] ?? [],
             $array['extra_boost'] ?? 0

@@ -297,6 +297,24 @@ class Result implements HttpTransportable
     }
 
     /**
+     * Get first result.
+     *
+     * @return null|mixed
+     */
+    public function getFirstResult()
+    {
+        $results = $this->getResults();
+
+        if (empty($results)) {
+            return null;
+        }
+
+        $firstResult = reset($results);
+
+        return $firstResult;
+    }
+
+    /**
      * Set aggregations.
      *
      * @param Aggregations $aggregations
@@ -332,6 +350,18 @@ class Result implements HttpTransportable
         return $this
             ->aggregations
             ->getAggregation($name);
+    }
+
+    /**
+     * Get metadata aggregation.
+     *
+     * @param string $field
+     *
+     * @return null|Aggregation
+     */
+    public function getMetaAggregation(string $field) : ? Aggregation
+    {
+        return $this->getAggregation("indexed_metadata.$field");
     }
 
     /**
