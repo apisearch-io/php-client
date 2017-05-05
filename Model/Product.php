@@ -529,6 +529,10 @@ class Product implements HttpTransportable
      */
     public function getDiscountPercentage() : int
     {
+        if ($this->getPrice() == 0) {
+            return 0;
+        }
+
         return (int) round(100 * $this->getDiscount() / $this->getPrice());
     }
 
