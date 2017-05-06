@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Puntmig\Search\Model;
 
 use DateTime;
+
 use Puntmig\Search\Exception\ModelException;
 
 /**
@@ -452,7 +453,7 @@ class Product implements HttpTransportable
      *
      * @param null|string $longDescription
      */
-    public function setLongDescription(? string $longDescription)
+    public function setLongDescription( ? string $longDescription)
     {
         $this->longDescription = $longDescription;
         $this->recalculateRelativeValues();
@@ -494,7 +495,7 @@ class Product implements HttpTransportable
      *
      * @param null|float $reducedPrice
      */
-    public function setReducedPrice(? float $reducedPrice)
+    public function setReducedPrice( ? float $reducedPrice)
     {
         $this->reducedPrice = $reducedPrice;
         $this->recalculateRelativeValues();
@@ -573,7 +574,7 @@ class Product implements HttpTransportable
      *
      * @param null|int $stock
      */
-    public function setStock(? int $stock)
+    public function setStock( ? int $stock)
     {
         $this->stock = $stock;
         $this->recalculateRelativeValues();
@@ -628,7 +629,7 @@ class Product implements HttpTransportable
      *
      * @param null|Brand $brand
      */
-    public function setBrand(? Brand $brand)
+    public function setBrand( ? Brand $brand)
     {
         $this->brand = $brand;
         $this->recalculateRelativeValues();
@@ -717,7 +718,7 @@ class Product implements HttpTransportable
      *
      * @param null|string $image
      */
-    public function setImage(? string $image)
+    public function setImage( ? string $image)
     {
         $this->image = $image;
         $this->recalculateRelativeValues();
@@ -738,7 +739,7 @@ class Product implements HttpTransportable
      *
      * @param null|float $rating
      */
-    public function setRating(? float $rating)
+    public function setRating( ? float $rating)
     {
         $this->rating = $rating;
         $this->recalculateRelativeValues();
@@ -759,7 +760,7 @@ class Product implements HttpTransportable
      *
      * @param null|DateTime $updatedAt
      */
-    public function setUpdatedAt(? DateTime $updatedAt)
+    public function setUpdatedAt( ? DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
         $this->recalculateRelativeValues();
@@ -780,7 +781,7 @@ class Product implements HttpTransportable
      *
      * @param null|Coordinate $coordinate
      */
-    public function setCoordinate(? Coordinate $coordinate)
+    public function setCoordinate( ? Coordinate $coordinate)
     {
         $this->coordinate = $coordinate;
         $this->recalculateRelativeValues();

@@ -87,7 +87,7 @@ class Aggregations implements IteratorAggregate, HttpTransportable
     }
 
     /**
-     * Return if the needed aggregation exists and if is not empty
+     * Return if the needed aggregation exists and if is not empty.
      *
      * @param string $name
      *

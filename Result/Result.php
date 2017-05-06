@@ -133,26 +133,46 @@ class Result implements HttpTransportable
     private $maxPrice;
 
     /**
+     * @var float
+     *
+     * Price average
+     */
+    private $priceAverage;
+
+    /**
+     * @var float
+     *
+     * Rating average
+     */
+    private $ratingAverage;
+
+    /**
      * Result constructor.
      *
-     * @param int $totalElements
-     * @param int $totalProducts
-     * @param int $totalHits
-     * @param int $minPrice
-     * @param int $maxPrice
+     * @param int   $totalElements
+     * @param int   $totalProducts
+     * @param int   $totalHits
+     * @param int   $minPrice
+     * @param int   $maxPrice
+     * @param float $priceAverage
+     * @param float $ratingAverage
      */
     public function __construct(
         int $totalElements,
         int $totalProducts,
         int $totalHits,
         int $minPrice,
-        int $maxPrice
+        int $maxPrice,
+        float $priceAverage,
+        float $ratingAverage
     ) {
         $this->totalElements = $totalElements;
         $this->totalProducts = $totalProducts;
         $this->totalHits = $totalHits;
         $this->minPrice = $minPrice;
         $this->maxPrice = $maxPrice;
+        $this->priceAverage = $priceAverage;
+        $this->ratingAverage = $ratingAverage;
     }
 
     /**
@@ -353,7 +373,7 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Has not empty aggregation
+     * Has not empty aggregation.
      *
      * @param string $name
      *
@@ -451,6 +471,26 @@ class Result implements HttpTransportable
     }
 
     /**
+     * Get price average.
+     *
+     * @return float
+     */
+    public function getPriceAverage(): float
+    {
+        return $this->priceAverage;
+    }
+
+    /**
+     * Get rating average.
+     *
+     * @return float
+     */
+    public function getRatingAverage(): float
+    {
+        return $this->ratingAverage;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -463,6 +503,8 @@ class Result implements HttpTransportable
             'total_hits' => $this->totalHits,
             'min_price' => $this->minPrice,
             'max_price' => $this->maxPrice,
+            'price_average' => $this->priceAverage,
+            'rating_average' => $this->ratingAverage,
             'products' => array_map(function (Product $product) {
                 return $product->toArray();
             }, $this->products),
@@ -502,7 +544,9 @@ class Result implements HttpTransportable
             $array['total_products'] ?? 0,
             $array['total_hits'] ?? 0,
             $array['min_price'] ?? 0,
-            $array['max_price'] ?? 0
+            $array['max_price'] ?? 0,
+            $array['price_average'] ?? 0,
+            $array['rating_average'] ?? 0
         );
 
         $result->products = array_map(function (array $product) {

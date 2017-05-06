@@ -277,7 +277,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     }
 
     /**
-     * Aggregation is empty
+     * Aggregation is empty.
      *
      * @return bool
      */
