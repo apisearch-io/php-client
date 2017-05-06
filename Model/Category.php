@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Model;
 
+use Puntmig\Search\Exception\ModelException;
+
 /**
  * Class Category.
  */
@@ -70,6 +72,8 @@ class Category implements HttpTransportable, WithLevel
      * @param string $name
      * @param string $slug
      * @param int    $level
+     *
+     * @throws ModelException
      */
     public function __construct(
         string $id,
@@ -77,6 +81,13 @@ class Category implements HttpTransportable, WithLevel
         string $slug,
         int $level
     ) {
+        if (
+            empty($id) ||
+            empty($name)
+        ) {
+            throw new ModelException('A category should always have, at least, and ID and a name');
+        }
+
         $this->categoryReference = new CategoryReference($id);
         $this->name = $name;
         $this->slug = $slug;
@@ -182,7 +193,7 @@ class Category implements HttpTransportable, WithLevel
             (string) $array['id'],
             (string) $array['name'],
             (string) $array['slug'],
-            (int) $array['level'] ?? 1
+            (int) ($array['level'] ?? 1)
         );
     }
 }

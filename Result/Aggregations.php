@@ -87,6 +87,22 @@ class Aggregations implements IteratorAggregate, HttpTransportable
     }
 
     /**
+     * Return if the needed aggregation exists and if is not empty
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasNotEmptyAggregation(string $name) : bool
+    {
+        return
+            !is_null($this->getAggregation($name)) &&
+            !$this
+                ->getAggregation($name)
+                ->isEmpty();
+    }
+
+    /**
      * Get total elements.
      *
      * @return int

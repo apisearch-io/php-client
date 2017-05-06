@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Puntmig\Search\Model;
 
 use DateTime;
+use Puntmig\Search\Exception\ModelException;
 
 /**
  * Class Product.
@@ -236,6 +237,8 @@ class Product implements HttpTransportable
      * @param array           $indexedMetadata
      * @param array           $specialWords
      * @param int             $extraBoost
+     *
+     * @throws ModelException
      */
     public function __construct(
         string $id,
@@ -260,6 +263,14 @@ class Product implements HttpTransportable
         array $specialWords = [],
         int $extraBoost = 0
     ) {
+        if (
+            empty($id) ||
+            empty($family) ||
+            empty($name)
+        ) {
+            throw new ModelException('A category should always have, at least, and ID, a family and a name');
+        }
+
         $this->productReference = new ProductReference($id, $family);
         $this->ean = $ean;
         $this->name = $name;

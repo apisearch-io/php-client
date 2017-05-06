@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Model;
 
+use Puntmig\Search\Exception\ModelException;
+
 /**
  * Class Tag.
  */
@@ -46,9 +48,17 @@ class Tag implements HttpTransportable
      * Category constructor.
      *
      * @param string $name
+     *
+     * @throws ModelException
      */
     public function __construct(string $name)
     {
+        if (
+            empty($name)
+        ) {
+            throw new ModelException('A tag should always have, at least, a name');
+        }
+
         $this->tagReference = new TagReference($name);
         $this->firstLevelSearchableData = $name;
     }

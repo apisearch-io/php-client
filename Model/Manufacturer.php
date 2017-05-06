@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Model;
 
+use Puntmig\Search\Exception\ModelException;
+
 /**
  * Class Manufacturer.
  */
@@ -62,12 +64,21 @@ class Manufacturer implements HttpTransportable
      * @param string $id
      * @param string $name
      * @param string $slug
+     *
+     * @throws ModelException
      */
     public function __construct(
         string $id,
         string $name,
         string $slug
     ) {
+        if (
+            empty($id) ||
+            empty($name)
+        ) {
+            throw new ModelException('A manufacturer should always have, at least, and ID and a name');
+        }
+
         $this->manufacturerReference = new ManufacturerReference($id);
         $this->name = $name;
         $this->slug = $slug;

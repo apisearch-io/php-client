@@ -277,6 +277,18 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     }
 
     /**
+     * Aggregation is empty
+     *
+     * @return bool
+     */
+    public function isEmpty() : bool
+    {
+        return
+            empty($this->activeElements) &&
+            empty($this->counters);
+    }
+
+    /**
      * To array.
      *
      * @return array

@@ -353,6 +353,22 @@ class Result implements HttpTransportable
     }
 
     /**
+     * Has not empty aggregation
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasNotEmptyAggregation(string $name) : bool
+    {
+        return
+            !is_null($this->getAggregation($name)) &&
+            !$this
+                ->getAggregation($name)
+                ->isEmpty();
+    }
+
+    /**
      * Get metadata aggregation.
      *
      * @param string $field
