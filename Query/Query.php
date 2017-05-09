@@ -1018,7 +1018,9 @@ class Query implements HttpTransportable
             'size' => $this->size,
             'suggestions_enabled' => $this->suggestionsEnabled,
             'aggregations_enabled' => $this->aggregationsEnabled,
-        ]);
+        ], function ($element) {
+            return !is_null($element);
+        });
     }
 
     /**

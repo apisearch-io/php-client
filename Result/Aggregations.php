@@ -103,6 +103,18 @@ class Aggregations implements IteratorAggregate, HttpTransportable
     }
 
     /**
+     * Get metadata aggregation.
+     *
+     * @param string $field
+     *
+     * @return null|Aggregation
+     */
+    public function getMetaAggregation(string $field) : ? Aggregation
+    {
+        return $this->getAggregation("indexed_metadata.$field");
+    }
+
+    /**
      * Get total elements.
      *
      * @return int

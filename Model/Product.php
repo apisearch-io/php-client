@@ -291,7 +291,7 @@ class Product implements HttpTransportable
         $this->updatedAt = $updatedAt;
         $this->coordinate = $coordinate;
         $this->stores = $stores;
-        $this->indexedMetadata = $indexedMetadata;
+        $this->setIndexedMetadata($indexedMetadata);
         $this->metadata = $metadata;
         $this->setSpecialWords($specialWords);
         $this->extraBoost = $extraBoost;
@@ -453,7 +453,7 @@ class Product implements HttpTransportable
      *
      * @param null|string $longDescription
      */
-    public function setLongDescription( ? string $longDescription)
+    public function setLongDescription(? string $longDescription)
     {
         $this->longDescription = $longDescription;
         $this->recalculateRelativeValues();
@@ -495,7 +495,7 @@ class Product implements HttpTransportable
      *
      * @param null|float $reducedPrice
      */
-    public function setReducedPrice( ? float $reducedPrice)
+    public function setReducedPrice(? float $reducedPrice)
     {
         $this->reducedPrice = $reducedPrice;
         $this->recalculateRelativeValues();
@@ -574,7 +574,7 @@ class Product implements HttpTransportable
      *
      * @param null|int $stock
      */
-    public function setStock( ? int $stock)
+    public function setStock(? int $stock)
     {
         $this->stock = $stock;
         $this->recalculateRelativeValues();
@@ -629,7 +629,7 @@ class Product implements HttpTransportable
      *
      * @param null|Brand $brand
      */
-    public function setBrand( ? Brand $brand)
+    public function setBrand(? Brand $brand)
     {
         $this->brand = $brand;
         $this->recalculateRelativeValues();
@@ -718,7 +718,7 @@ class Product implements HttpTransportable
      *
      * @param null|string $image
      */
-    public function setImage( ? string $image)
+    public function setImage(? string $image)
     {
         $this->image = $image;
         $this->recalculateRelativeValues();
@@ -739,7 +739,7 @@ class Product implements HttpTransportable
      *
      * @param null|float $rating
      */
-    public function setRating( ? float $rating)
+    public function setRating(? float $rating)
     {
         $this->rating = $rating;
         $this->recalculateRelativeValues();
@@ -760,7 +760,7 @@ class Product implements HttpTransportable
      *
      * @param null|DateTime $updatedAt
      */
-    public function setUpdatedAt( ? DateTime $updatedAt)
+    public function setUpdatedAt(? DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
         $this->recalculateRelativeValues();
@@ -781,7 +781,7 @@ class Product implements HttpTransportable
      *
      * @param null|Coordinate $coordinate
      */
-    public function setCoordinate( ? Coordinate $coordinate)
+    public function setCoordinate(? Coordinate $coordinate)
     {
         $this->coordinate = $coordinate;
         $this->recalculateRelativeValues();
@@ -832,20 +832,40 @@ class Product implements HttpTransportable
      */
     public function setIndexedMetadata(array $indexedMetadata)
     {
-        $this->indexedMetadata = array_map('strval', $indexedMetadata);
+        $this->indexedMetadata = [];
+        foreach ($indexedMetadata as $field => $value) {
+            $this->addIndexedMetadata(
+                $field,
+                $value
+            );
+        }
     }
 
     /**
      * Add indexedMetadata.
      *
      * @param string $field
-     * @param string $value
+     * @param mixed  $value
      */
     public function addIndexedMetadata(
         string $field,
-        string $value
+        $value
     ) {
-        $this->indexedMetadata[$field] = (string) $value;
+        $this->indexedMetadata[$field] = is_array($value)
+            ? array_map('strval', $value)
+            : strval($value);
+    }
+
+    /**
+     * Get indexed metadata element by the field name.
+     *
+     * @param string $field
+     *
+     * @return null|string|string[]
+     */
+    public function getIndexedMetadataValue(string $field)
+    {
+        return $this->indexedMetadata[$field] ?? null;
     }
 
     /**
@@ -874,9 +894,23 @@ class Product implements HttpTransportable
      * @param string $field
      * @param mixed  $value
      */
-    public function addMetadata(string $field, $value)
-    {
+    public function addMetadata(
+        string $field,
+        $value
+    ) {
         $this->metadata[$field] = $value;
+    }
+
+    /**
+     * Get metadata element by the field name.
+     *
+     * @param string $field
+     *
+     * @return mixed
+     */
+    public function getMetadataValue(string $field)
+    {
+        return $this->metadata[$field] ?? null;
     }
 
     /**
@@ -890,6 +924,20 @@ class Product implements HttpTransportable
             $this->metadata,
             $this->indexedMetadata
         );
+    }
+
+    /**
+     * Get all metadata element by the field name.
+     *
+     * @param string $field
+     *
+     * @return mixed
+     */
+    public function getAllMetadataValue(string $field)
+    {
+        $allMetadata = $this->getAllMetadata();
+
+        return $allMetadata[$field] ?? null;
     }
 
     /**
@@ -1014,7 +1062,9 @@ class Product implements HttpTransportable
             'metadata' => $this->metadata,
             'special_words' => $this->specialWords,
             'extra_boost' => $this->extraBoost,
-        ]);
+        ], function ($element) {
+            return !is_null($element);
+        });
 
         if ($this->brand instanceof Brand) {
             $array['brand'] = $this
@@ -1066,9 +1116,7 @@ class Product implements HttpTransportable
                 ? Coordinate::createFromArray($array['coordinate'])
                 : null,
             $array['stores'] ?? [],
-            isset($array['indexed_metadata'])
-                ? array_map('strval', $array['indexed_metadata'])
-                : [],
+            $array['indexed_metadata'] ?? [],
             $array['metadata'] ?? [],
             $array['special_words'] ?? [],
             $array['extra_boost'] ?? 0

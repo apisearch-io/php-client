@@ -381,11 +381,13 @@ class Result implements HttpTransportable
      */
     public function hasNotEmptyAggregation(string $name) : bool
     {
-        return
-            !is_null($this->getAggregation($name)) &&
-            !$this
-                ->getAggregation($name)
-                ->isEmpty();
+        if (is_null($this->aggregations)) {
+            return false;
+        }
+
+        return $this
+            ->aggregations
+            ->hasNotEmptyAggregation($name);
     }
 
     /**
@@ -397,7 +399,13 @@ class Result implements HttpTransportable
      */
     public function getMetaAggregation(string $field) : ? Aggregation
     {
-        return $this->getAggregation("indexed_metadata.$field");
+        if (is_null($this->aggregations)) {
+            return null;
+        }
+
+        return $this
+            ->aggregations
+            ->getMetaAggregation($field);
     }
 
     /**
