@@ -632,7 +632,7 @@ class Query implements HttpTransportable
     {
         $this->aggregations['manufacturers'] = Aggregation::create(
             'manufacturers',
-            'manufacturers.id|manufacturers.name',
+            'manufacturers.id|manufacturers.name|manufacturers.slug|manufacturers.slug',
             $applicationType,
             Filter::TYPE_NESTED
         );
@@ -689,7 +689,7 @@ class Query implements HttpTransportable
     {
         $this->aggregations['brand'] = Aggregation::create(
             'brand',
-            'brand.id|brand.name',
+            'brand.id|brand.name|brand.slug|brand.slug',
             $applicationType,
             Filter::TYPE_FIELD
         );
@@ -708,7 +708,7 @@ class Query implements HttpTransportable
     {
         $this->aggregations['categories'] = Aggregation::create(
             'categories',
-            'categories.id|categories.name|categories.level',
+            'categories.id|categories.slug|categories.name|categories.level',
             $applicationType,
             Filter::TYPE_NESTED
         );

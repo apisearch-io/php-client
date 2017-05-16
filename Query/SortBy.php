@@ -31,6 +31,20 @@ class SortBy
     /**
      * @var array
      *
+     * Sort by name ASC
+     */
+    const AZ = ['sortable_name' => 'asc'];
+
+    /**
+     * @var array
+     *
+     * Sort by name DESC
+     */
+    const ZA = ['sortable_name' => 'desc'];
+
+    /**
+     * @var array
+     *
      * Sort by price ASC
      */
     const PRICE_ASC = ['real_price' => 'asc'];

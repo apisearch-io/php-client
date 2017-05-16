@@ -191,6 +191,16 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     }
 
     /**
+     * Get all elements.
+     *
+     * @return Counter[]
+     */
+    public function getAllElements() : array
+    {
+        return $this->counters + $this->activeElements;
+    }
+
+    /**
      * Get total elements.
      *
      * @return int
@@ -241,7 +251,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      */
     public function sortByName()
     {
-        usort($this->counters, function (Counter $a, Counter $b) {
+        uasort($this->counters, function (Counter $a, Counter $b) {
             return $a->getName() > $b->getName();
         });
     }
@@ -333,7 +343,6 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             $array['total_elements'],
             []
         );
-
         $aggregation->activeElements = $activeElements;
         $aggregation->counters = array_map(function (array $counter) {
             return Counter::createFromArray($counter);

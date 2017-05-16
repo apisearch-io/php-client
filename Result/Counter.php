@@ -24,25 +24,11 @@ use Puntmig\Search\Model\HttpTransportable;
 class Counter implements HttpTransportable
 {
     /**
-     * @var string
+     * @var string[]
      *
-     * Id
+     * Values
      */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * Name
-     */
-    private $name;
-
-    /**
-     * @var null|string
-     *
-     * Level
-     */
-    private $level;
+    private $values;
 
     /**
      * @var bool
@@ -61,22 +47,16 @@ class Counter implements HttpTransportable
     /**
      * Counter constructor.
      *
-     * @param string   $id
-     * @param string   $name
-     * @param null|int $level
+     * @param string[] $values
      * @param bool     $used
      * @param int      $n
      */
     private function __construct(
-        string $id,
-        string $name,
-        ? int $level,
+        array $values,
         bool $used,
         int $n
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->level = $level;
+        $this->values = $values;
         $this->used = $used;
         $this->n = $n;
     }
@@ -84,21 +64,31 @@ class Counter implements HttpTransportable
     /**
      * Get id.
      *
-     * @return string
+     * @return null|string
      */
-    public function getId() : string
+    public function getId() : ? string
     {
-        return $this->id;
+        return $this->values['id'] ?? null;
     }
 
     /**
      * Get name.
      *
-     * @return string
+     * @return null|string
      */
-    public function getName(): string
+    public function getName() : ? string
     {
-        return $this->name;
+        return $this->values['name'] ?? null;
+    }
+
+    /**
+     * Get slug.
+     *
+     * @return null|string
+     */
+    public function getSlug() : ? string
+    {
+        return $this->values['slug'] ?? null;
     }
 
     /**
@@ -108,7 +98,17 @@ class Counter implements HttpTransportable
      */
     public function getLevel() : ? int
     {
-        return $this->level;
+        return (int) ($this->values['level'] ?? 0);
+    }
+
+    /**
+     * Get values.
+     *
+     * @return string[]
+     */
+    public function getValues() : array
+    {
+        return $this->values;
     }
 
     /**
@@ -138,33 +138,42 @@ class Counter implements HttpTransportable
      * @param int    $n
      * @param array  $activeElements
      *
-     * @return null|self
+     * @return null|Counter
      */
     public static function createByActiveElements(
         string $name,
         int $n,
         array $activeElements
-    ) : ? self {
-        $id = $name;
-        $level = null;
+    ) : ? Counter {
+        $values = [];
         $splittedParts = explode('~~', $name);
-        if (count($splittedParts) > 1) {
-            $id = $splittedParts[0];
-            if ($id == 'null') {
-                return null;
+        foreach ($splittedParts as $part) {
+            $parts = explode('##', $part);
+            if (count($parts) === 2) {
+                $values[$parts[0]] = $parts[1];
+            } else {
+                $values[] = $parts[0];
             }
-            $name = $splittedParts[1];
         }
 
-        if (count($splittedParts) > 2) {
-            $level = (int) $splittedParts[2];
+        if (count($values) == 1) {
+            $firstAndUniqueElement = reset($values);
+            $values = [
+                'id' => $firstAndUniqueElement,
+                'name' => $firstAndUniqueElement,
+            ];
+        }
+
+        if (
+            !isset($values['id']) ||
+            $values['id'] === 'null'
+        ) {
+            return null;
         }
 
         return new self(
-            $id,
-            $name,
-            $level,
-            in_array($id, $activeElements),
+            $values,
+            in_array($values['id'], $activeElements),
             $n
         );
     }
@@ -177,9 +186,7 @@ class Counter implements HttpTransportable
     public function toArray() : array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'level' => $this->level,
+            'values' => $this->values,
             'used' => $this->used,
             'n' => $this->n,
         ];
@@ -195,9 +202,7 @@ class Counter implements HttpTransportable
     public static function createFromArray(array $array)
     {
         return new self(
-            $array['id'],
-            $array['name'],
-            $array['level'],
+            $array['values'],
             $array['used'],
             $array['n']
         );

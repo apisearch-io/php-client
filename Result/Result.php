@@ -22,6 +22,7 @@ use Puntmig\Search\Model\HttpTransportable;
 use Puntmig\Search\Model\Manufacturer;
 use Puntmig\Search\Model\Product;
 use Puntmig\Search\Model\Tag;
+use Puntmig\Search\Query\Query;
 
 /**
  * Class Result.
@@ -40,6 +41,13 @@ class Result implements HttpTransportable
         'b' => 'brands',
         't' => 'tags',
     ];
+
+    /**
+     * @var Query
+     *
+     * Query associated
+     */
+    private $query;
 
     /**
      * @var Product[]
@@ -149,6 +157,7 @@ class Result implements HttpTransportable
     /**
      * Result constructor.
      *
+     * @param Query $query
      * @param int   $totalElements
      * @param int   $totalProducts
      * @param int   $totalHits
@@ -158,6 +167,7 @@ class Result implements HttpTransportable
      * @param float $ratingAverage
      */
     public function __construct(
+        Query $query,
         int $totalElements,
         int $totalProducts,
         int $totalHits,
@@ -166,6 +176,7 @@ class Result implements HttpTransportable
         float $priceAverage,
         float $ratingAverage
     ) {
+        $this->query = $query;
         $this->totalElements = $totalElements;
         $this->totalProducts = $totalProducts;
         $this->totalHits = $totalHits;
@@ -429,6 +440,16 @@ class Result implements HttpTransportable
     }
 
     /**
+     * Get query.
+     *
+     * @return Query
+     */
+    public function getQuery() : Query
+    {
+        return $this->query;
+    }
+
+    /**
      * Total elements.
      *
      * @return int
@@ -506,6 +527,7 @@ class Result implements HttpTransportable
     public function toArray() : array
     {
         return array_filter([
+            'query' => $this->query->toArray(),
             'total_elements' => $this->totalElements,
             'total_products' => $this->totalProducts,
             'total_hits' => $this->totalHits,
@@ -548,6 +570,7 @@ class Result implements HttpTransportable
     public static function createFromArray(array $array) : self
     {
         $result = new self(
+            Query::createFromArray($array['query']),
             $array['total_elements'] ?? 0,
             $array['total_products'] ?? 0,
             $array['total_hits'] ?? 0,
