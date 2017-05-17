@@ -30,11 +30,7 @@ class UrlBuilder
     /**
      * Routes dictionary.
      */
-    private $routesDictionary = [
-        'main' => 'shop',
-        'categories' => 'category',
-        'manufacturers' => 'manufacturer',
-    ];
+    private $routesDictionary = [];
 
     /**
      * @var RouterInterface
@@ -51,6 +47,16 @@ class UrlBuilder
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
+    }
+
+    /**
+     * Set routes dictionary.
+     *
+     * @param array $routesDictionary
+     */
+    public function setRoutesDictionary(array $routesDictionary)
+    {
+        $this->routesDictionary = $routesDictionary;
     }
 
     /**
