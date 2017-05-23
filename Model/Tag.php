@@ -21,7 +21,7 @@ use Puntmig\Search\Exception\ModelException;
 /**
  * Class Tag.
  */
-class Tag implements HttpTransportable
+class Tag implements HttpTransportable, UUIDReference
 {
     /**
      * @var string
@@ -123,5 +123,17 @@ class Tag implements HttpTransportable
         return [
             'name' => $this->getName(),
         ];
+    }
+
+    /**
+     * Compose unique id.
+     *
+     * @return string
+     */
+    public function composeUUID() : string
+    {
+        return $this
+            ->tagReference
+            ->composeUUID();
     }
 }

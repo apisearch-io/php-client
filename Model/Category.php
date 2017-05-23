@@ -21,7 +21,7 @@ use Puntmig\Search\Exception\ModelException;
 /**
  * Class Category.
  */
-class Category implements HttpTransportable, WithLevel
+class Category implements HttpTransportable, WithLevel, UUIDReference
 {
     /**
      * @var string
@@ -195,5 +195,17 @@ class Category implements HttpTransportable, WithLevel
             (string) $array['slug'],
             (int) ($array['level'] ?? 1)
         );
+    }
+
+    /**
+     * Compose unique id.
+     *
+     * @return string
+     */
+    public function composeUUID() : string
+    {
+        return $this
+            ->categoryReference
+            ->composeUUID();
     }
 }

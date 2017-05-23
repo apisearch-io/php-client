@@ -21,7 +21,7 @@ use Puntmig\Search\Exception\ModelException;
 /**
  * Class Manufacturer.
  */
-class Manufacturer implements HttpTransportable
+class Manufacturer implements HttpTransportable, UUIDReference
 {
     /**
      * @var string
@@ -173,5 +173,17 @@ class Manufacturer implements HttpTransportable
             (string) $array['name'],
             (string) $array['slug']
         );
+    }
+
+    /**
+     * Compose unique id.
+     *
+     * @return string
+     */
+    public function composeUUID() : string
+    {
+        return $this
+            ->manufacturerReference
+            ->composeUUID();
     }
 }
