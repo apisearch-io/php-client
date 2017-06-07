@@ -22,410 +22,111 @@ The library provides you a set of model objects. Both the Index and the Query
 Apis will understand these objects and will work with them in both sides (the
 client and the server side), so make sure you know how these objects are built.
 
-### Product
+### Item
 
-A simple view of what a purchasable object is. A product can be anything you
+A simple view of what a item object is. A item can be anything you
 want, but take in account that this is the object in the middle, and the main
 Query api is going to work mainly against it.
 
 | Field  | Type  | What is that  | Mandatory?  |
-|---|---|---|---|---|
-| id  | string  | Unique id of the product  | **yes**  |
-| family  | string   | Family of products. Will let you work with several kind of purchasables  | **yes**  |
-| ean  | string   | Product EAN. Is not considered unique, even if should be. Some purchasables may have not EAN  | **yes**  |
-| name  | string  | Name of the product  | **yes**  |
-| slug  | string  | Slug of the product  | **yes**  |
-| description  | string  | Product's description  | **yes**  |   |
-| long_description  | string  | Product's long description. By default, main description is used  | no  |
-| price  | float   | Main product's price, without possible discount  | **yes**  |
-| reduced_price  | float  | Reduced product's price  | no  |
-| currency  | string | Your price currency. Can follow any format  | **yes**  |
-| stock  | int  | Product stock. By default is considered infinite  | no  |
-| brand  | Brand  | Product's brand. Product has as well many Manufacturers, explained later. | no  |
-| image  | string | Image for the product  | no  |
-| rating  | string  | Product's rate in a float scale  | no  |
-| updated_at  | DateTime  | Last time when the product was updated  | no  |
-| coordinate  | Coordinate  | Assign coordinates to your products in order to filter and facet over them  | no  |
-| stores | string[] | Stores where this product is available. A store is represented by a string | no |
-| indexed_metadata | array | Product metadata. This data will be saved and indexed for filtering | no |
-| metadata | array | Saved but not indexed product metadata | no |
-| special_words | string[] | Special words with which to match the product | no |
+|---|---|---|---|
+| id  | string  | Unique id of the item  | **yes**  |
+| type  | string   | Type of types  | **yes**  |
+| metadata | array | Saved but not indexed item metadata | no |
+| indexed_metadata | array | This data will be saved and indexed for filtering | no |
+| searchable_metadata | string[] | Your item will be searchable by this data with a transformation. See searchable transformation chapter | no |
+| exact_matching_metadata | string[] | Your item will be searchable by this data without transformation | no |
+| suggest | string[] | This item will suggest these strings when this option is enabled | no |
+| coordinate  | Coordinate  | Assign a coordinate to your item in order to filter and facet over location | no  |
 
-You can create a new Product instance by using the simple Product's constructor.
-This is an example of how you can create a product with random data.
+Item's constructor is a private method, so in order to create a new Item
+instance youb can use any of the available static constructor methods.
+This is an example of how you can create a non located item with random data.
+As you can see, both id and type fields are part of a value object called
+ItemUUID.
 
 ``` php
-$product = new Product(
-    '12345',
-    'pack',
-    '4738947832',
-    'Christmas pack',
-    'christmas-pack',
-    'This is the great Christmas pack',
-    null,
-    40,50,
-    35,90,
-    'EUR',
-    100,
-    $brand,
-    'http://example.com/image/12345.jpg',
-    4.5,
-    new DateTime(),
-    new Coordinate(
-        40.12, 
-        -71.34
-    ),
-    [
-        'my_store', 
-        'my_other_store'
-    ],
-    [
-        'indexable_field1' => 'value1',
-        'indexable_field2' => 100,
-    ],
-    [
-        'field1' => 'value1',
-        'field2' => 100,
-    ],
-    [
-        'christmas',
-        'non_existing_word',
-    ]
-)
+$itemUUID = new ItemUUID('12345', 'product');
+$item = Item::create($itemUUID);
 ```
 
-You can build a product as well by using the Product's static factory method
-named `createFromArray`.
+If you want to create a located Item, then you can use the static construct
+method `createLocated`.
 
 ``` php
-$array = [
-    'id' => '12345',
-    'family' => 'pack',
-    'ean' => '4738947832',
-    'name' => 'Christmas pack',
-    'slug' => 'christmas-pack',
-    'description' => 'This is the great Christmas pack',
-    'price' => 40,50,
-    'reduced_price' => 35,90,
-    'currency' => 'EUR',
-    'stock' => 100,
-    'brand' => $brand,
-    'image' => 'http://example.com/image/12345.jpg',
-    'rating' => 4.5,
-    'updated_at' => new DateTime(),
-    'coordinate' => [
-        'lat' => 40.12,
-        'lon' => -71.34,
-    ],
-    'stores' => [
-        'my_store', 
-        'my_other_store'
-    ],
-    'indexable_metadata' => [
-        'indexable_field1' => 'value1',
-        'indexable_field2' => 100,
-    ],
-    'metadata' => [
-        'field1' => 'value1',
-        'field2' => 100,
-    ],
-    'special_words' => [
-        'christmas',
-        'non_existing_word',
-    ]
-];
-$product = Product::createFromArray($array);
+$itemUUID = new ItemUUID('12345', 'product');
+$itemCoordinate = new Coordinate(
+    40.12, 
+    -71.34
+);
+$item = Item::createLocated(
+    $itemUUID,
+    $itemCoordinate
+);
 ```
 
-Both ways will cause the same result.
-A product can have manufacturers, categories and tags as well. Because the
-relations with these fields are of many to many, we will use the add methods to
-make it work.
+By default, an empty Item is created. You can set any of the desired metadata
+values and suggest data. This example works as well with `createLocated` method.
 
 ``` php
-$product->addManufacturer($manufacturer1);
-$product->addManufacturer($manufacturer2);
-$product->addCategory($category1);
-$product->addCategory($category2);
-$product->addTag($tag1);
-$product->addTag($tag2);
+$itemUUID = new ItemUUID('12345', 'product');
+$item = Item::create(
+    $itemUUID,
+    [], // Metadata
+    [], // Indexed Metadata
+    [], // Searchable Metadata
+    [], // Exact Matching Metadata
+    []  // Suggest elements
+);
 ```
 
-Metadata, IndexedMetadata and special words can be modified once the entity is
-created. The case of IndexedMetadata is a little bit different, so all values
-injected inside this array will be converted to string.
-
-``` php
-$product->addMetadata($field, $value);
-$product->addIndexedMetadata($field, $value);
-$product->addSpecialWord($word);
-```
-
-The product object have some extra methods a part of the properties getters.
-Some of them are internal operations, mainly related to the pricing part.
-
-``` php
-$product->getRealPrice();
-```
-
-The real price will return the minimum price between the price and the reduced
-price. If the reduced price is null, then the price is considered as the real
-price.
-
-``` php
-$product->getDiscount();
-$product->getDiscountPercentage();
-```
-
-The discount applied between the price and the real price. If both are different
-then the difference will be considered as the discount. The percentage applied
-between the price and the real price is the value returned when the method
-`getDiscountPercentage` is called. This last value will always be between 0 and 100.
-
-#### Metadata and Indexable metadata
-
-In order to make this entity more abstract and to allow you to use not only as
-a purchasable product but as the way you really need, the model allow some extra
-fields to be added in a very dynamic way.
-
-Treat metadata as a simple key-value bucket without any impact while indexing.
-You will receive this data hydrated once you retrieve results from the index,
-but will not be searchable.
-
-``` php
-$product->addMetadata('field', 'not-filtrable-data');
-```
-
-Treat indexable metadata as an extension of the searchable model. You can add as
-many fields and values as you need. Each one of them will be stored like the
-previous one, and indexed ready to be filtered and aggregated.
-
-``` php
-$product->addIndexableMetadata('field', 'filtrable-data');
-```
-
-By default, some elements are stored as dynamic calculations. These new
-indexable metadata fields will allow you to filter by some values that could be
-so helpful for your use.
-
-* with_image - Does your product have any non-empty image?
-* with_discount - Does your product have any valid discount?
-* with_stock - Does your product have stock?
-
-Revise the [filter](#filter-by-meta) documentation in order to know how to
-filter by these values.
-
-#### Referencing a Product
-
-To make a specific product reference you must use the ProductReference object.
-This part of the model is mainly a simplification of the main model (Product, 
-Manufacturer, Brand, Category, Tag), but designed only to define each one's 
-class primary key.
-
-For example, what's the primary key for a Product? Saying the id field would
-make sense, right? But that answer is wrong. Remember that a Product must have
-an ID but as well a family? Imagine you work with Books and Objects at the same
-time. Both elements are Products, possibly persisted in different tables in your
-database and with a non-shared ID generator, for example, with separated
-auto-increment strategy.
-
-Then, this means that you could have in your database a book with ID 10, and
-an object with ID 10. If only the ID is the primary key, then this means that
-both elements are the same for the API.
-
-Composed keys is what this API uses, so there is a class for each model class
-that define each primary key composition.
+After the creation of an Item instance, or even after its retrieval from the
+repository, you can manage all metadata items by using the getters and the
+setters of the class.
 
 ```php
-$bookReference = new ProductReference('10', 'book');
-$objectReference = new ProductReference('10', 'object');
+$metadata = $item->getMetadata();
+$metadata['something'] = 'value';
+$item->setMetadata($metadata);
+$item->addMetadata('another_thing', 'another_value');
 ```
 
-Both instances reference different products, even with different IDs.
+This works with any of the metadata arrays.
 
-### Category
-
-The way we have to categorize what a purchasable is. The category model is
-configured always by levels. This means that even if they are not related
-between them, they are organized by levels.
-
-| Field  | Type  | What is that  | Mandatory?  | Boost  |
-|---|---|---|---|---|
-| id  | string  | Unique id of the category  | **yes**  | -  |
-| name  | string  | Name of the category  | **yes**  |   |
-| slug  | string  | Slug of the category  | **yes**  |   |
-| level  | string  | Category level. By default 1  | no  |   |
-
-You can create a new Category instance by using the simple Category's constructor.
-This is an example of how you can create a category with random data.
-
-``` php
-$category = new Category(
-    '12345',
-    'Shoes',
-    'shoes',
-    2
-)
-```
-
-You can build a category as well by using the Category's static factory method
-named `createFromArray`.
-
-``` php
-$array = [
-    'id' => '12345',
-    'name' => 'Shoes',
-    'slug' => 'shoes',
-    'level' => 2
-];
-$category = Category::createFromArray($array);
-```
-
-Given an array of arrays defining several product categories, you can still use
-the Product's `createFromArray` method to hydrate Categories inside a Product.
-
-``` php
-$array = [
-    'id' => '12345',
-    'family' => 'pack',
-    // ...
-    'categories' => [
-        [
-            'id' => '12345',
-            'name' => 'Shoes',
-            'slug' => 'shoes',
-            'level' => 2
-        ],
-        [
-            'id' => '67890',
-            'name' => 'Kids Shoes',
-            'slug' => 'kids-shoes',
-            'level' => 3
-        ]
-    ]
-];
-$product = Product::createFromArray($array);
-```
-
-#### Referencing a Category
-
-In this case, a category reference is much more simpler than the product one, so
-any category id will always be unique.
+In order to provide an object as much resistant as possible in front of changes,
+you can consider the metadata package as a unique package, even if internally
+you have divided it in four different arrays. For example, if you have a field
+called *price* and at the beginning of your project this value is not going to
+be indexed, then you should store it inside metadata. Then, in your project, you
+will access to this value by using the `getMetadata` getter, and accessing to
+the desired position.
 
 ```php
-$categoryReference = new CategoryReference('10');
+$item->getMetadata()['price'];
 ```
 
-### Manufacturer & Brand
-
-Both entities are explained the same way because both entities are built with
-the same basic architecture.
-
-| Field  | Type  | What is that  | Mandatory?  | Boost  |
-|---|---|---|---|---|
-| id  | string  | Unique id of the manufacturer/brand  | **yes**  | -  |
-| name  | string  | Name of the manufacturer/brand  | **yes**  |   |
-| slug  | string  | Slug of the manufacturer/brand  | **yes**  |   |
-
-Both entities can be built, as well, using the constructor
-
-``` php
-$manufacturer = new Manufacturer(
-    '12345',
-    'Adidas',
-    'adidas'
-)
-```
-
-or by using the static factory method `createFromArray`
-
-``` php
-$brand = Brand::createFromArray([
-    'id' => '12345',
-    'name' => 'Nestlé',
-    'slug' => 'nestle',
-])
-```
-
-And the usage inside a Product defined as an array is exactly the same than the
-array of categories
-
-``` php
-$array = [
-    'id' => '12345',
-    'family' => 'pack',
-    // ...
-    'manufacturer' => [
-        'id' => '12345',
-        'name' => 'Adidas',
-        'slug' => 'adidas',
-    ],
-    'brand' => [
-        'id' => '67890',
-        'name' => 'Nestle',
-        'slug' => 'nestle',
-    ]
-];
-$product = Product::createFromArray($array);
-```
-
-#### Referencing a Manufacturer & Brand
-
-Both Manufacturer and Brand references are exactly the same than a category
-reference.
+But what happens if your price needs to be indexed? Then you should change your
+indexing point, and instead of placing the element as a simple metadata, you
+should place it as an indexed metadata. So, what happens with all the code
+points where you've been requiring the price value? You should change it
+well, right?
 
 ```php
-$manufacturerReference = new ManufacturerReference('10');
-$brandReference = new BrandReference('23');
+$item->getIndexedMetadata()['price'];
 ```
 
-### Tags
+Well, this would be something that may cause you too many code changes, where
+should be something insignificant.
 
-A even simpler entity, so a Tag can have only a name. This name will work as a
-unique id, so make sure that you use it as such.
+In order to avoid this, you should take some decisions in your model.
 
-
-| Field  | Type  | What is that  | Mandatory?  | Boost  |
-|---|---|---|---|---|
-| name  | string  | Name of the tag  | **yes**  |   |
-
-Built your tags using, again, both the constructor method
-
-```
-$tag = new Tag('heavy');
-```
-
-or by using the static factory method `createFromArray` 
-
-```
-$tag = Tag::createFromArray([
-    'name' => 'heavy'
-]);
-```
-
-And in product, you can define your tags in the Product's array definition as
-well.
-
-``` php
-$array = [
-    'id' => '12345',
-    'family' => 'pack',
-    // ...
-    'tags' => [
-        ['name' => 'heavy'],
-        ['name' => 'crazy'],
-    ],
-];
-$product = Product::createFromArray($array);
-```
-
-#### Referencing a Tag
-
-Because tag is the simplest element in this model, and because a Tag name is, at
-the same time, its own identifier, we can reference any tag with its name.
+* When you index metadata in your Item, even if you place them in different
+metadata packages, don't repeat metadata field names.
+* When you request a metadata value, use the `->get($fieldName)` method. This
+will return the metadata value accessing all metadata packages at the same time.
 
 ```php
-$tagReference = new TagReference('heavy');
+$item->get('price');
 ```
 
 ## Query object
@@ -463,16 +164,16 @@ Finally, you can create a query to find one ore more specific elements from your
 database. For this reason, there are two special static factory methods
 specifically create to make these two scenarios so easy.
 
-We will use References here in both cases.
+We will use UUIDs here in both cases.
 
 ``` php
-$query = Query::createByReference(new ProductReference('12', 'book'));
+$query = Query::createByUUIDs(new ItemUUID('12', 'book'));
 $query = Query::createByReferences([
-    new ProductReference('12', 'book'),
-    new CategoryReference('123'),
-    new ManufacturerReference('332'),
-    new BrandReference('555'),
-    new TagReference('heavy'),
+    new ItemUUID('12', 'book'),
+    new ItemUUID('123', 'book'),
+    new ItemUUID('332', 'book'),
+    new ItemUUID('555', 'book'),
+    new ItemUUID('heavy', 'book'),
 ]);
 ```
 
@@ -513,7 +214,7 @@ Generic filter action.
 ```php
 Query::create('')
     ->filterBy(
-        'id',
+        'uuid.id',
         ['1', '2', '3'],
         Filter::AT_LEAST_ONE
     );
@@ -523,8 +224,8 @@ Common filters are already wrapped by specific methods.
 
 #### Filter by meta
 
-Remember that a product can have some metadata? This metadata is stored and
-indexed properly so you can filter by these values using this method.
+Remember that a item can have some indexed metadata? This metadata is stored
+and indexed properly so you can filter by these values using this method.
 
 ```php
 Query::create('')
@@ -562,189 +263,17 @@ Query::create('')
     );
 ```
 
-#### Filter by families
-
-Remember that your Product can have a family? This is because your domain
-Product can be a set of different purchasable objects, for example products,
-variants of these products or products packs. All of them may be purchasable in
-your domain model and should be treated like that in this API. Having different
-kind of product families is the way you can manage different type of products in
-this project.
-
-You can , then, filter your results by using these values.
-
-```php
-Query::create('')
-    ->filterByFamilies(
-        ['products', 'packs']
-    );
-```
-
-By default, this filter is defined as *MUST_ALL* but you can change this 
-behavior by adding a second method parameter.
-
-```php
-Query::create('')
-    ->filterByFamilies(
-        ['products', 'packs'],
-        Filter::AT_LEAST_ONE
-    );
-```
-
 #### Filter by Types
 
-This API works with 5 different object types. Products, Categories,
-Manufacturers, Brands and Tags. Even if the main object type is the Product, and
-when we apply all filters, they all are applied only to Product, we could have
-the need of searching across one single type by search string. Lets look for all
-manufacturers matching "Adidas".
+You can filter by item types. Because the type value is part of the UUID, and
+considering that this value will define your different type of entities inside
+a unique repository, this filter will allow you to work with one or several
+object types.
 
 ```php
-Query::create('adidas')
+Query::create('quijote')
     ->filterByTypes(
-        ['manufacturer']
-    );
-```
-
-That simple. Because all objects have indexed fields you can make searches
-across them all, but only single searches. Applying extra filters would cause
-empty results.
-
-#### Filter by Categories.
-
-Let's start by thinking about our app. There are three ways of filtering by
-category, but, and because Category is the only element here that should be
-considered as tree-architectured, the most common way of using it is by using
-Filter::MUST_ALL_WITH_LEVELS. The application of this filter is exactly the same
-that the Filter::MUST_ALL but, when we show the results to the final user, if in
-our aggregations we have different categories with different levels, we want
-only the categories with lowest level to be shown.
-
-Using it in that way, we create the experience of navigation with levels. Of
-course you can change the behavior of the filter by using the second parameter.
-
-```php
-Query::create('')
-    ->filterByCategories(
-        ['Shoes']
-    );
-
-Query::create('')
-    ->filterByCategories(
-        ['Shoes'],
-        Filter::MUST_ALL_WITH_LEVELS
-    );
-```
-
-This method will automatically create an aggregation called categories. Please,
-go to the aggregations part to know a little bit about that. You can disable it
-by using a third parameter.
-
-```php
-Query::create('')
-    ->filterByCategories(
-        ['Shoes'],
-        Filter::MUST_ALL_WITH_LEVELS,
-        false
-    );
-```
-
-#### Filter by Manufacturers / Brands
-
-Because both experience is the same, let's explain both at the same time. As
-said with categories, you can filter by manufacturers and by brands. Both
-methods will have a default *AT_LEAST_ONE* application type. The only difference
-between both is that a Product can have multiple Manufacturers at the same time,
-so in that case it would make sense switch this behavior to *MUST_ALL_*.
-Because a Product can have only one Brand at the same time, filtering by Brands
-with a *MUST_ALL_* application type would not make sense at all.
-
-```php
-Query::create('')
-    ->filterByManufacturers(
-        [1, 2]
-    );
-
-Query::create('')
-    ->filterByBrands(
-        [1]
-    );
-```
-
-In the first case, we will only take products with manufacturer *Adidas* OR
-*Nike*. Is important to know that using *AT_LEAST_ONE* filters, the more options
-we have, the bigger result set we have.
-
-Of course, again, you can change the behavior of the filter by using a second
-parameter, and disable the aggregation generation by using a third parameter.
-This works for both filters.
-
-```php
-Query::create('')
-    ->filterByManufacturers(
-        [1, 2],
-        Filter::MUST_ALL,
-        false
-    );
-```
-
-#### Filter by Tags
-
-Your products may contain tags. At first sight, tags are simple tags, and when
-indexing, they don't have meaning at all by themselves, so they are not grouped
-by families and related with others.
-
-When filtering, these relations are made, so changing the way they are related
-should not change your dataset at all.
-
-Let's work with the example where we have these tags available in our products.
-
-- Express
-- Two hours delivery
-- Bio
-- Regular delivery
-- Vegan
-
-They are tags and we must treat this way, but when filtering we can group them.
-As you can see, we can see two different groups here. The first one related to
-the shipping and the second to food properties. OK, lets filter by two groups,
-and let's name each one of them.
-
-```php
-Query::create('')
-    ->filterByTags(
-        'shipping',
-        ['Express', 'Two hours delivery', 'Regular delivery'],
-        ['Express']
-    )
-    ->filterByTags(
-        'food_type',
-        ['Bio', 'Vegan'],
-        ['Vegan']
-    );
-```
-
-We have created two groups, each one defining the set of tags that compound the
-group, and the set of tags that we want to apply (this last one will come from
-the browser, are the tags selected by the user). By default, tags are selected
-as *Filter::MUST_ALL*. It make sense because a product can have as many tags as
-desired.
-
-Across all different group filters, they are applied with an *AND* philosophy.
-This means that applying two or more filters, results must satisfy all of them.
-
-Again, you can change the filter behavior by using a fourth parameter. Defining
-a tag group filter, you are creating as well an aggregation for each one of
-them, by you can still disable it by using a fifth parameter.
-
-```php
-Query::create('')
-    ->filterByTags(
-        'shipping',
-        ['Express', 'Two hours delivery', 'Regular delivery'],
-        ['Express'],
-        Filter::AT_LEAST_ONE,
-        false
+        ['book']
     );
 ```
 
@@ -754,14 +283,15 @@ This filter is considerably useful when filtering by price, by rating or by any
 other numeric value (discount percentage...). Let's work with the example of
 price.
 
-Let's consider that we want all products from 50 to 60 euros, and the products
-from 90 to 100 euros. Let's build the filter.
+Let's consider that we want all items with a price value from 50 to 60, and 
+from 90 to 100 euros. Let's consider as well that this price value is part of
+the indexed metadata. Let's build the filter.
 
 ```php
 Query::create('')
     ->filterByRange(
         'price',
-        'real_price',
+        'price',
         [],
         ['50..60', '90..100']
     );
@@ -769,8 +299,11 @@ Query::create('')
 
 Let's analyze what we created here. First of all, the name of the filter.
 Because this is an open filter, we must define the filter field by hand. In our
-case the range will be applied over the `real_price` field, but could be applied
-over the `price` or the `price_discount` as well.
+case the range will be applied over the `price` field, but could be applied
+over the `real_price` field, after some discount appliance, or the 
+`price_discount` as well.
+
+This will allow you to define several range filters over the same field.
 
 The third option is for faceting, we will check it later.
 The fourth option is the important one. Is an array of ranges, and each range is
@@ -794,41 +327,13 @@ Query::create('')
 ```
 
 As you can see, this last example would return an empty set of elements as we
-don't have any product with a price lower than 60 euros and, at the same time,
+don't have any item with a price lower than 60 euros and, at the same time,
 higher than 90. Basics of logic of sets.
-
-##### Filter by price range
-
-This is an implementation of the last filter type. It is applied over the 
-Product field `real_price`. It works the same way that the last filter, but the
-first two fields are omitted. Optional parameters can be defined as well.
-
-```php
-Query::create('')
-    ->filterByPriceRange(
-        [],
-        ['50..60', '90..100']
-    );
-```
-
-##### Filter by rating range
-
-This is an implementation of the last filter type. It is applied over the 
-Product field `rating`. It works the same way that the last filter, but the
-first two fields are omitted. Optional parameters can be defined as well.
-
-```php
-Query::create('')
-    ->filterByRatingRange(
-        [],
-        ['1..3', '9..10']
-    );
-```
 
 #### Filter by location
 
 You can filter your results by location as well. Some apps should be able to
-show only the nearest products given a location coordinate, or the products
+show only the nearest items given a location coordinate, or the items
 located inside an specific zone.
 
 To start using this feature, we must understand what a Coordinate is. Given a
@@ -867,7 +372,7 @@ Query::create('')
 ##### Filter by location, given two square sides
 
 If you have the top-left coordinate and the bottom-right coordinate of a square,
-inside of where you want to locate all the products, you can use this filter
+inside of where you want to locate all the items, you can use this filter
 type. In that case, you need both Coordinate instances.
 
 ```php
@@ -884,12 +389,12 @@ Query::create('')
 
 > This is useful when working with maps. Maps are usually presented in a square
 > visualization mode, so when the final user scrolls, having these two
-> coordinates (top-left, bottom-right) we can look the products we want to show
+> coordinates (top-left, bottom-right) we can look the items we want to show
 
 ##### Filter by location, given a finite set of coordinates (polygon)
 
 You can build your own polygon having a set of coordinates. These coordinates
-will draw a polygon, and all products inside the are of this polygon will be
+will draw a polygon, and all items inside the are of this polygon will be
 considered as valid result.
 
 All coordinates must be Coordinate instances.
@@ -914,22 +419,6 @@ You can add as many coordinates as you need in order to build the desired area.
 > specific polygon can be defined by any user. Useful as well when composing
 > maps, for example, defining country areas as polygons.
 
-#### Filter by stores
-
-> This part is only useful when working with multi-store or multi-site.
-> Otherwise this part is not important
-
-When a product has different stores associated, you may filter by them (for
-example, having 5 differents stores, filtering by the current one).
-
-```php
-Query::create('')
-    ->filterByStores(
-        'main',
-        FILTER::AT_LEAST_ONE
-    );
-```
-
 ### Aggregations
 
 Once we have applied our filters, part of the result set is what we call
@@ -937,15 +426,15 @@ aggregations. This concept is usually understood as well as facets and is the
 part of your application where filters are dynamically generated by using the
 total number of results in the data set.
 
-For example, if we can filter by the manufacturer 'Nike', but with the current
-set of filters, there is not Nike elements available, Nike should'nt be
-available. Otherwise, if it is, then we should have the capability of showing
-the final user the real number of Nike elements available.
+For example, if we can filter by the item's manufacturer 'Nike', but with the 
+current set of filters, there is not elements manufactured by Nike available, 
+Nike should'nt be available. Otherwise, if it is, then we should have the 
+capability of showing the final user the real number of Nike elements available.
 
-This is whan we call aggregations.
+This is what we call aggregations.
 
 Each filter applied creates, unless you say otherwise, an aggregation group with
-all available options for this filter. If you filter by the manufacturer Nike,
+all available options for this filter. If you filter by the item Nike,
 your result will come with a group called *manufacturers* and with all
 other manufacturers available to be filtered, each one with the elements total
 in your database.
@@ -961,17 +450,17 @@ used by you. You can define the sorting field and the type by yourself.
 ```php
 Query::create('')
     ->sortBy(
-        ['manufacturer.name', 'asc']
+        ['indexed_metadata.manufacturer', 'asc']
     );
 
 Query::create('')
     ->sortBy(
-        ['name', 'desc']
+        ['indexed_metadata.name', 'desc']
     );
 
 Query::create('')
     ->sortBy(
-        ['updated_at', 'desc']
+        ['indexed_metadata.updated_at', 'desc']
     );
 ```
 
@@ -982,22 +471,10 @@ This is the list of all of them.
 ```php
 Query::create('')
     ->sortBy(SortBy::SCORE)
-    ->sortBy(SortBy::PRICE_ASC)
-    ->sortBy(SortBy::PRICE_DESC)
-    ->sortBy(SortBy::DISCOUNT_ASC)
-    ->sortBy(SortBy::DISCOUNT_DESC)
-    ->sortBy(SortBy::DISCOUNT_PERCENTAGE_ASC)
-    ->sortBy(SortBy::DISCOUNT_PERCENTAGE_DESC)
-    ->sortBy(SortBy::UPDATED_AT_ASC)
-    ->sortBy(SortBy::UPDATED_AT_DESC)
-    ->sortBy(SortBy::MANUFACTURER_ASC)
-    ->sortBy(SortBy::MANUFACTURER_DESC)
-    ->sortBy(SortBy::BRAND_ASC)
-    ->sortBy(SortBy::BRAND_DESC)
-    ->sortBy(SortBy::RATING_ASC)
-    ->sortBy(SortBy::RATING_DESC)
-    ->sortBy(SortBy::LOCATION_KM_ASC)
-    ->sortBy(SortBy::LOCATION_KM_DESC)
+    ->sortBy(SortBy::ID_ASC)
+    ->sortBy(SortBy::ID_DESC)
+    ->sortBy(SortBy::TYPE_ASC)
+    ->sortBy(SortBy::TYPE_DESC)
 ;
 ```
 
@@ -1038,7 +515,7 @@ defined and filled only in this scenario. The result of this method is a float
 value.
 
 ```php
-$product->getDistance();
+$item->getDistance();
 ```
 
 ### Enabling / disabling suggestions
@@ -1073,9 +550,8 @@ by flag, so no aggregations will be requested.
 
 ```php
 Query::create('')
-    ->filterByCategories(
-        ['Shoes'],
-        Filter::MUST_ALL_WITH_LEVELS,
+    ->filterByTypes(
+        ['product'],
         true
     )
     ->disabledAggregations()
@@ -1085,41 +561,37 @@ Query::create('')
 ### Excluding some elements
 
 Having some kind of black list would be useful as well. For example, when
-printing a related carousel given a product, and filtering by the manufacturer,
+printing a related carousel given an item, and filtering by the type,
 would be useful to exclude the current element from the list.
 
-In order to do that we will use references, so we can filter by any kind of
-element (not only products) only having the reference.
+In order to do this, we will use UUIDs, so we can filter by any kind of
+element only having the UUID.
 
 ```php
 Query::create('')
-    ->filterByManufacturers(
-        ['4'],
-        Filter::MUST_ALL
+    ->filterByTypes(
+        ['product']
     )
-    ->excludeReference(new ProductReference('10', 'product'))
+    ->excludeUUID(new ItemUUID('10', 'product'))
 ;
 ```
 
-In this example we are excluding the Product with ID 10 and 'product' as family.
-Remember that a product is always referenced not only by the id but with a
-composition between the ID and the family.
+In this example we are excluding the Item with ID 10 and 'product' as type.
+Remember that an item is always referenced not only by the id but with a
+composition between the ID and the type.
 
-We can filter by several references as well, mixing different type of references
-at the same time.
+We can filter by several UUIDs as well.
 
 ```php
 Query::create('')
-    ->filterByManufacturers(
-        ['4'],
-        Filter::MUST_ALL
+    ->filterByTypes(
+        ['product']
     )
     ->excludeReferences([
-        new ProductReference('10', 'product'),
-        new ManufacturerReference('5'),
-        new BrandReference('100'),
-        new CategoryReference('21'),
-        new TagReference('with-discount'),
+        new ItemUUID('10', 'product'),
+        new ItemUUID('5', 'product'),
+        new ItemUUID('100', 'product'),
+        new ItemUUID('21', 'product'),
     ])
 ;
 ```
@@ -1134,49 +606,30 @@ aggregations, result of our filters.
 $result = $repository->query($query);
 ```
 
-One one hand, you can retrieve all the types produced by the query. Remember
-that you have 5 types of elements (Products, Categories, Manufacturers, Brands
-and Tags). The last four will be empty if at least one filter is applied (you
-can have results if only a query string is applied), so the most important
-element here is the first one.
-
-```php
-$products = $result->getproducts();
-$categories = $result->getCategories();
-$manufacturers = $result->getManufacturers();
-$brands = $result->getBrands();
-$tags = $result->getTags();
-```
-
 You can retrieve as well all elements in a single array, respecting the order
 defined by the Query.
 
 ```php
-$results = $result->getResults();
+$results = $result->getItems();
 ```
 
-If you queried by a reference, for example, or even in any query, you can easily
+If you queried by a UUID, for example, or even in any query, you can easily
 retrieve the first (and more useful when is the only expected) result by using
 this method
 
 ```php
-$results = $result->getFirstResult();
+$results = $result->getFirstItem();
 ```
 
 Each of these methods will return an array of hydrated instances of our model (
 not yours. If you want your model instances, you need to create manual
-transformers, but in that case it won't be probably necessary, so even if are
-not your model instances, you have enough information to build urls).
+transformers.
 
 The Result instance have some other interesting methods to retrieve some extra
-information of your dataset.
+information of your data set.
 
-- getTotalElements() - get the total elements in your dataset, including all
-types
-- getTotalProducts() - get the total products in your dataset
+- getTotalElements() - get the total items in your data set
 - getTotalHits() - get the total hits produced by your query
-- getMinPrice() - get the minimum price of your query
-- getMaxPrice() - get the maximum price of your query
 
 ### Result Aggregations
 
@@ -1223,7 +676,7 @@ possible translation (for example for tags).
 example, each returned available category will have the level). By default, 1.
 - ->isUsed() - Does this counter belongs to an active element?
 - ->getN() - Number of results in your database having this element (for
-example, number of products with the category Adidas). This is the number
+example, number of item with the category Adidas). This is the number
 commonly printed in your app.
 
 ```
@@ -1280,29 +733,13 @@ any object. Otherwise, your database will not be created yet, and your queries
 won't work.
 
 ```php
-$repository->addProduct(Product $product);
+$repository->addItem(Item $item);
 ```
 
-Adds a new product in the flushable bucket. To understand this it is important
+Adds a new item in the bucket. To understand this it is important
 to understand that at the moment you add a new type through the index API, for
-example addProduct(), nothing happens indeed. Until you explicitly flush all
+example addItem(), nothing happens indeed. Until you explicitly flush all
 changes nothing will happen.
-
-Once you add a new product, internally the api will look for related categories,
-manufacturers, brands and tags, and per each one, it will add them all one by
-one. This means that if you have a product with relations inside, you don't need
-to add them all one by one. This action is done by default.
-
-Of course, if you have isolated elements for updating, for example a
-Manufacturer with an existing ID but a different name, and you don't have any
-product that reflects that, don't hesitate to add it by hand.
-
-```php
-$repository->addCategory(Category $category)
-$repository->addManufacturer(Manufacturer $manufacturer)
-$repository->addBrand(Brand $brand)
-$repository->addTag(Tag $tag)
-```
 
 Once all your model is inserted, or all your desired instances are now under the
 API control, it's time to flush.
@@ -1316,13 +753,9 @@ the same time...), there is a parameter called $bulkNumber. The default value
 for this element is 500.
 
 What does this number means? Well, that simple. It will make packages of 500
-products for sending through the Http API. Because we consider that the number
-of products is the one that can be really high, only products are sliced into n
-blocks. At the first API call, all other minor elements (Categories,
-Manufacturers, Brands and Tags) will be sent.
-
-If the number of elements in the repository is smalled than the defined as bulk,
-then only one query will be executed.
+items for sending through the Http API. If the number of elements in the 
+repository is smalled than the defined as bulk, then only one query will be 
+executed.
 
 ## Query API
 
@@ -1345,51 +778,18 @@ than used in the Index API. A key must be defined the same way we did before.
 $repository->setKey(string $key);
 ```
 
-### Delete Product
+### Delete an Item
 
-A product is referenced by its ID and family.
+A item is referenced by its ID and type.
 
 ```php
-$bookReference = new ProductReference('10', 'book');
+$book = new ItemUUID('10', 'book');
 ```
 
-And to delete the Product
+And to delete the item
 
 ```php
-$repository->deleteProduct(ProductReference $bookReference);
-```
-
-### Delete Category, Manufacturer, Brand
-
-These three entities are referenced the same way. In all cases, same ID means,
-always, same instance, so only ID will be used here.
-
-```php
-$categoryReference = new CategoryReference('10');
-$manufacturerReference = new ManufacturerReference('10');
-$brandReference = new BrandReference('10');
-```
-
-To delete each reference
-
-```php
-$repository->deleteCategory(CategoryReference $categoryReference);
-$repository->deleteManufacturer(ManufacturerReference $manufacturerReference);
-$repository->deleteBrand(BrandReference $brandReference);
-```
-
-### Delete Tags
-
-The Tag Reference is defined only by the tag name
-
-```php
-$tagReference = new TagReference('kids');
-```
-
-To delete references
-
-```php
-$repository->deleteTag(TagReference $tagReference);
+$repository->deleteItem(ItemUUID $book);
 ```
 
 In order to flush all changes, remember to use the flush method.

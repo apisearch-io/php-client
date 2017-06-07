@@ -14,20 +14,20 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Model;
+namespace Puntmig\Search\Exception;
 
 /**
- * Class CategoryReference.
+ * Class CoordinateException.
  */
-class CategoryReference extends IdReference
+class CoordinateException extends ModelException
 {
     /**
-     * Compose unique id.
+     * Create Coordinate bad format exception.
      *
-     * @return string
+     * @return CoordinateException
      */
-    public function composeUUID() : string
+    public static function createCoordinateBadFormatException() : CoordinateException
     {
-        return "c~{$this->id}";
+        return new self('A Coordinate should always contain a lat (Latitude) and a lon (Longitude)');
     }
 }

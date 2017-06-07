@@ -16,10 +16,12 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Model;
 
+use Puntmig\Search\Exception\UUIDException;
+
 /**
- * Class ProductReference.
+ * Class ItemUUID.
  */
-class ProductReference implements HttpTransportable, UUIDReference
+class ItemUUID implements HttpTransportable, UUIDReference
 {
     /**
      * @var string
@@ -31,20 +33,22 @@ class ProductReference implements HttpTransportable, UUIDReference
     /**
      * @var string
      *
-     * family
+     * Type
      */
-    private $family;
+    private $type;
 
     /**
-     * ProductReference constructor.
+     * ItemReference constructor.
      *
      * @param string $id
-     * @param string $family
+     * @param string $type
      */
-    public function __construct(string $id, string $family)
-    {
+    public function __construct(
+        string $id,
+        string $type
+    ) {
         $this->id = $id;
-        $this->family = $family;
+        $this->type = $type;
     }
 
     /**
@@ -58,13 +62,13 @@ class ProductReference implements HttpTransportable, UUIDReference
     }
 
     /**
-     * Get family.
+     * Get type.
      *
      * @return string
      */
-    public function getFamily() : string
+    public function getType() : string
     {
-        return $this->family;
+        return $this->type;
     }
 
     /**
@@ -76,7 +80,7 @@ class ProductReference implements HttpTransportable, UUIDReference
     {
         return [
             'id' => $this->id,
-            'family' => $this->family,
+            'type' => $this->type,
         ];
     }
 
@@ -91,14 +95,16 @@ class ProductReference implements HttpTransportable, UUIDReference
     {
         if (
             !isset($array['id']) ||
-            !isset($array['family'])
+            !isset($array['type'])
         ) {
-            return null;
+            if (!isset($array['uuid'])) {
+                throw UUIDException::createUUIDBadFormatException();
+            }
         }
 
         return new static(
             (string) $array['id'],
-            (string) $array['family']
+            (string) $array['type']
         );
     }
 
@@ -109,6 +115,6 @@ class ProductReference implements HttpTransportable, UUIDReference
      */
     public function composeUUID() : string
     {
-        return "p~{$this->family}~{$this->id}";
+        return "{$this->type}~{$this->id}";
     }
 }

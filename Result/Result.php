@@ -16,12 +16,8 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Result;
 
-use Puntmig\Search\Model\Brand;
-use Puntmig\Search\Model\Category;
 use Puntmig\Search\Model\HttpTransportable;
-use Puntmig\Search\Model\Manufacturer;
-use Puntmig\Search\Model\Product;
-use Puntmig\Search\Model\Tag;
+use Puntmig\Search\Model\Item;
 use Puntmig\Search\Query\Query;
 
 /**
@@ -30,19 +26,6 @@ use Puntmig\Search\Query\Query;
 class Result implements HttpTransportable
 {
     /**
-     * @var array
-     *
-     * Abbreviations
-     */
-    private $abbreviations = [
-        'p' => 'products',
-        'c' => 'categories',
-        'm' => 'manufacturers',
-        'b' => 'brands',
-        't' => 'tags',
-    ];
-
-    /**
      * @var Query
      *
      * Query associated
@@ -50,46 +33,11 @@ class Result implements HttpTransportable
     private $query;
 
     /**
-     * @var Product[]
+     * @var Item[]
      *
-     * Products
+     * Items
      */
-    private $products = [];
-
-    /**
-     * @var Category[]
-     *
-     * Categories
-     */
-    private $categories = [];
-
-    /**
-     * @var Manufacturer[]
-     *
-     * Manufacturers
-     */
-    private $manufacturers = [];
-
-    /**
-     * @var Brand[]
-     *
-     * Brands
-     */
-    private $brands = [];
-
-    /**
-     * @var Tag[]
-     *
-     * Tags
-     */
-    private $tags = [];
-
-    /**
-     * @var array
-     *
-     * Results
-     */
-    private $results = [];
+    private $items = [];
 
     /**
      * @var array
@@ -106,18 +54,11 @@ class Result implements HttpTransportable
     private $aggregations;
 
     /**
-     * Total elements.
+     * Total items.
      *
      * @var int
      */
-    private $totalElements;
-
-    /**
-     * Total products.
-     *
-     * @var int
-     */
-    private $totalProducts;
+    private $totalItems;
 
     /**
      * Total hits.
@@ -127,222 +68,91 @@ class Result implements HttpTransportable
     private $totalHits;
 
     /**
-     * Min price.
-     *
-     * @var int
-     */
-    private $minPrice;
-
-    /**
-     * Max price.
-     *
-     * @var int
-     */
-    private $maxPrice;
-
-    /**
-     * @var float
-     *
-     * Price average
-     */
-    private $priceAverage;
-
-    /**
-     * @var float
-     *
-     * Rating average
-     */
-    private $ratingAverage;
-
-    /**
      * Result constructor.
      *
      * @param Query $query
-     * @param int   $totalElements
-     * @param int   $totalProducts
+     * @param int   $totalItems
      * @param int   $totalHits
-     * @param int   $minPrice
-     * @param int   $maxPrice
-     * @param float $priceAverage
-     * @param float $ratingAverage
      */
     public function __construct(
         Query $query,
-        int $totalElements,
-        int $totalProducts,
-        int $totalHits,
-        int $minPrice,
-        int $maxPrice,
-        float $priceAverage,
-        float $ratingAverage
+        int $totalItems,
+        int $totalHits
     ) {
         $this->query = $query;
-        $this->totalElements = $totalElements;
-        $this->totalProducts = $totalProducts;
+        $this->totalItems = $totalItems;
         $this->totalHits = $totalHits;
-        $this->minPrice = $minPrice;
-        $this->maxPrice = $maxPrice;
-        $this->priceAverage = $priceAverage;
-        $this->ratingAverage = $ratingAverage;
+    }
+
+    /**
+     * Create by.
+     *
+     * @param Query             $query
+     * @param int               $totalItems
+     * @param int               $totalHits
+     * @param Aggregations|null $aggregations
+     * @param string[]          $suggests
+     * @param Item[]            $items
+     *
+     * @return Result
+     */
+    public static function create(
+        Query $query,
+        int $totalItems,
+        int $totalHits,
+        ? Aggregations $aggregations,
+        array $suggests,
+        array $items
+    ) : Result {
+        $result = new self(
+            $query,
+            $totalItems,
+            $totalHits
+        );
+
+        $result->aggregations = $aggregations;
+        $result->suggests = $suggests;
+        $result->items = $items;
+
+        return $result;
     }
 
     /**
      * Add product.
      *
-     * @param Product $product
+     * @param Item $item
      */
-    public function addProduct(Product $product)
+    public function addItem(Item $item)
     {
-        $productUUID = $product
-            ->getProductReference()
-            ->composeUUID();
-
-        $this->products[$productUUID] = $product;
-        $this->results[] = ['p', $productUUID];
+        $this->items[] = $item;
     }
 
     /**
-     * Get products.
+     * Get items.
      *
-     * @return Product[]
+     * @return Item[]
      */
-    public function getProducts(): array
+    public function getItems() : array
     {
-        return array_values($this->products);
-    }
-
-    /**
-     * Add category.
-     *
-     * @param Category $category
-     */
-    public function addCategory(Category $category)
-    {
-        $categoryUUID = $category
-            ->getCategoryReference()
-            ->composeUUID();
-
-        $this->categories[$categoryUUID] = $category;
-        $this->results[] = ['c', $categoryUUID];
-    }
-
-    /**
-     * Get categories.
-     *
-     * @return Category[]
-     */
-    public function getCategories(): array
-    {
-        return array_values($this->categories);
-    }
-
-    /**
-     * Add manufacturer.
-     *
-     * @param Manufacturer $manufacturer
-     */
-    public function addManufacturer(Manufacturer $manufacturer)
-    {
-        $manufacturerUUID = $manufacturer
-            ->getManufacturerReference()
-            ->composeUUID();
-
-        $this->manufacturers[$manufacturerUUID] = $manufacturer;
-        $this->results[] = ['m', $manufacturerUUID];
-    }
-
-    /**
-     * Get manufacturers.
-     *
-     * @return Manufacturer[]
-     */
-    public function getManufacturers(): array
-    {
-        return array_values($this->manufacturers);
-    }
-
-    /**
-     * Add brand.
-     *
-     * @param Brand $brand
-     */
-    public function addBrand(Brand $brand)
-    {
-        $brandUUID = $brand
-            ->getBrandReference()
-            ->composeUUID();
-
-        $this->brands[$brandUUID] = $brand;
-        $this->results[] = ['b', $brandUUID];
-    }
-
-    /**
-     * Get brands.
-     *
-     * @return Brand[]
-     */
-    public function getBrands(): array
-    {
-        return array_values($this->brands);
-    }
-
-    /**
-     * Add tag.
-     *
-     * @param Tag $tag
-     */
-    public function addTag(Tag $tag)
-    {
-        $tagUUID = $tag
-            ->getTagReference()
-            ->composeUUID();
-
-        $this->tags[$tagUUID] = $tag;
-        $this->results[] = ['t', $tagUUID];
-    }
-
-    /**
-     * Get tags.
-     *
-     * @return Tag[]
-     */
-    public function getTags(): array
-    {
-        return array_values($this->tags);
-    }
-
-    /**
-     * Get results.
-     *
-     * @return array
-     */
-    public function getResults() : array
-    {
-        return array_values(
-            array_map(function (array $result) {
-                $container = $this->abbreviations[$result[0]];
-
-                return $this->$container[$result[1]];
-            }, $this->results)
-        );
+        return $this->items;
     }
 
     /**
      * Get first result.
      *
-     * @return null|mixed
+     * @return null|Item
      */
-    public function getFirstResult()
+    public function getFirstItem()
     {
-        $results = $this->getResults();
+        $results = $this->getItems();
 
         if (empty($results)) {
             return null;
         }
 
-        $firstResult = reset($results);
+        $firstItem = reset($results);
 
-        return $firstResult;
+        return $firstItem;
     }
 
     /**
@@ -450,23 +260,13 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Total elements.
+     * Total items.
      *
      * @return int
      */
-    public function getTotalElements() : int
+    public function getTotalItems() : int
     {
-        return $this->totalElements;
-    }
-
-    /**
-     * Total products.
-     *
-     * @return int
-     */
-    public function getTotalProducts(): int
-    {
-        return $this->totalProducts;
+        return $this->totalItems;
     }
 
     /**
@@ -480,46 +280,6 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Get min price.
-     *
-     * @return int
-     */
-    public function getMinPrice(): int
-    {
-        return $this->minPrice;
-    }
-
-    /**
-     * Get max price.
-     *
-     * @return int
-     */
-    public function getMaxPrice(): int
-    {
-        return $this->maxPrice;
-    }
-
-    /**
-     * Get price average.
-     *
-     * @return float
-     */
-    public function getPriceAverage(): float
-    {
-        return $this->priceAverage;
-    }
-
-    /**
-     * Get rating average.
-     *
-     * @return float
-     */
-    public function getRatingAverage(): float
-    {
-        return $this->ratingAverage;
-    }
-
-    /**
      * To array.
      *
      * @return array
@@ -528,33 +288,13 @@ class Result implements HttpTransportable
     {
         return array_filter([
             'query' => $this->query->toArray(),
-            'total_elements' => $this->totalElements,
-            'total_products' => $this->totalProducts,
+            'total_items' => $this->totalItems,
             'total_hits' => $this->totalHits,
-            'min_price' => $this->minPrice,
-            'max_price' => $this->maxPrice,
-            'price_average' => $this->priceAverage,
-            'rating_average' => $this->ratingAverage,
-            'products' => array_map(function (Product $product) {
-                return $product->toArray();
-            }, $this->products),
-            'categories' => array_map(function (Category $category) {
-                return $category->toArray();
-            }, $this->categories),
-            'brands' => array_map(function (Brand $brand) {
-                return $brand->toArray();
-            }, $this->brands),
-            'manufacturers' => array_map(function (Manufacturer $manufacturer) {
-                return $manufacturer->toArray();
-            }, $this->manufacturers),
-            'tags' => array_map(function (Tag $tag) {
-                return $tag->toArray();
-            }, $this->tags),
-            'results' => $this->results,
+            'items' => array_map(function (Item $item) {
+                return $item->toArray();
+            }, $this->items),
             'aggregations' => $this->aggregations instanceof Aggregations
-                ? $this
-                    ->aggregations
-                    ->toArray()
+                ? $this->aggregations->toArray()
                 : null,
             'suggests' => $this->suggests,
         ]);
@@ -565,49 +305,21 @@ class Result implements HttpTransportable
      *
      * @param array $array
      *
-     * @return self
+     * @return Result
      */
-    public static function createFromArray(array $array) : self
+    public static function createFromArray(array $array) : Result
     {
-        $result = new self(
+        return self::create(
             Query::createFromArray($array['query']),
-            $array['total_elements'] ?? 0,
-            $array['total_products'] ?? 0,
+            $array['total_items'] ?? 0,
             $array['total_hits'] ?? 0,
-            $array['min_price'] ?? 0,
-            $array['max_price'] ?? 0,
-            $array['price_average'] ?? 0,
-            $array['rating_average'] ?? 0
+            isset($array['aggregations'])
+                ? Aggregations::createFromArray($array['aggregations'])
+                : null,
+            $array['suggests'] ?? [],
+            array_map(function (array $item) {
+                return Item::createFromArray($item);
+            }, $array['items'] ?? [])
         );
-
-        $result->products = array_map(function (array $product) {
-            return Product::createFromArray($product);
-        }, $array['products'] ?? []);
-
-        $result->categories = array_map(function (array $category) {
-            return Category::createFromArray($category);
-        }, $array['categories'] ?? []);
-
-        $result->manufacturers = array_map(function (array $manufacturer) {
-            return Manufacturer::createFromArray($manufacturer);
-        }, $array['manufacturers'] ?? []);
-
-        $result->brands = array_map(function (array $brand) {
-            return Brand::createFromArray($brand);
-        }, $array['brands'] ?? []);
-
-        $result->tags = array_map(function (array $tag) {
-            return Tag::createFromArray($tag);
-        }, $array['tags'] ?? []);
-
-        $result->results = $array['results'] ?? [];
-
-        if (isset($array['aggregations'])) {
-            $result->aggregations = Aggregations::createFromArray($array['aggregations']);
-        }
-
-        $result->suggests = $array['suggests'] ?? [];
-
-        return $result;
     }
 }
