@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Transformer;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Puntmig\Search\Exception\TransformerException;
 use Puntmig\Search\Model\Item;
 
@@ -24,6 +26,13 @@ use Puntmig\Search\Model\Item;
  */
 class Transformer
 {
+    /**
+     * @var EventDispatcherInterface
+     *
+     * Event dispatcher
+     */
+    private $eventDispatcher;
+
     /**
      * @var ReadTransformer[]
      *
@@ -37,6 +46,16 @@ class Transformer
      * Write transformers
      */
     private $writeTransformers = [];
+
+    /**
+     * Transformer constructor.
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
 
     /**
      * Add an read transformer.
@@ -125,7 +144,18 @@ class Transformer
     {
         foreach ($this->writeTransformers as $writeTransformer) {
             if ($writeTransformer->isValidObject($object)) {
-                return $writeTransformer->toItem($object);
+                $item = $writeTransformer->toItem($object);
+                $this
+                    ->eventDispatcher
+                    ->dispatch(
+                        new ItemTransformed(
+                            $item,
+                            $object
+                        ),
+                        'puntmig_search.item_transformed'
+                    );
+
+                return $item;
             }
         }
 
