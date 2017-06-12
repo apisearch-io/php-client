@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Puntmig\Search\Result;
 
 use Puntmig\Search\Model\HttpTransportable;
+use Puntmig\Search\Model\Metadata;
 
 /**
  * Class Counter.
@@ -145,29 +146,9 @@ class Counter implements HttpTransportable
         int $n,
         array $activeElements
     ) : ? Counter {
-        $values = [];
-        $splittedParts = explode('~~', $name);
-        foreach ($splittedParts as $part) {
-            $parts = explode('##', $part);
-            if (count($parts) === 2) {
-                $values[$parts[0]] = $parts[1];
-            } else {
-                $values[] = $parts[0];
-            }
-        }
+        $values = Metadata::fromMetadata($name);
 
-        if (count($values) == 1) {
-            $firstAndUniqueElement = reset($values);
-            $values = [
-                'id' => $firstAndUniqueElement,
-                'name' => $firstAndUniqueElement,
-            ];
-        }
-
-        if (
-            !isset($values['id']) ||
-            $values['id'] === 'null'
-        ) {
+        if (is_null($values)) {
             return null;
         }
 
