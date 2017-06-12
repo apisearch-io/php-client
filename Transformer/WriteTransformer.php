@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Puntmig\Search\Transformer;
 
 use Puntmig\Search\Model\Item;
+use Puntmig\Search\Model\ItemUUID;
 
 /**
  * Interface WriteTransformer.
@@ -40,4 +41,13 @@ interface WriteTransformer
      * @return Item
      */
     public function toItem($object) : Item;
+
+    /**
+     * Create item UUID by object.
+     *
+     * @param mixed $object
+     *
+     * @return ItemUUID
+     */
+    public function toItemUUID($object) : ItemUUID;
 }

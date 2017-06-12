@@ -36,4 +36,18 @@ class TransformerException extends LogicException
             get_class($object)
         ));
     }
+
+    /**
+     * Return new unable to create an item UUID by an object exception.
+     *
+     * @param mixed $object
+     *
+     * @return TransformerException
+     */
+    public static function createUnableToCreateItemUUIDException($object) : TransformerException
+    {
+        return new self(sprintf('Unable to create a new ItemUUID instance given type %s. Check that the transformer is properly initialized',
+            get_class($object)
+        ));
+    }
 }

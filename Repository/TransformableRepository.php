@@ -125,4 +125,18 @@ class TransformableRepository extends Repository
 
         $this->addItem($item);
     }
+
+    /**
+     * Delete item document by uuid.
+     *
+     * @param mixed $object
+     */
+    public function deleteObject($object)
+    {
+        $item = $this
+            ->transformer
+            ->toItemUUID($object);
+
+        $this->deleteObject($item);
+    }
 }

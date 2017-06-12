@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Puntmig\Search\Exception\TransformerException;
 use Puntmig\Search\Model\Item;
+use Puntmig\Search\Model\ItemUUID;
 
 /**
  * Class Transformer.
@@ -148,11 +149,11 @@ class Transformer
                 $this
                     ->eventDispatcher
                     ->dispatch(
+                        'puntmig_search.item_transformed',
                         new ItemTransformed(
                             $item,
                             $object
-                        ),
-                        'puntmig_search.item_transformed'
+                        )
                     );
 
                 return $item;
@@ -160,5 +161,44 @@ class Transformer
         }
 
         throw TransformerException::createUnableToCreateItemException($object);
+    }
+
+    /**
+     * Transform a set of objects into a set of itemUUIDs.
+     *
+     * @param array $objects
+     *
+     * @return ItemUUID[]
+     *
+     * @throws TransformerException Unable to create ItemUUID
+     */
+    public function toItemUUIDs(array $objects) : array
+    {
+        $itemUUIDs = [];
+        foreach ($objects as $object) {
+            $itemUUIDs[] = $this->toItemUUID($object);
+        }
+
+        return $itemUUIDs;
+    }
+
+    /**
+     * Transform an object into an itemUUID.
+     *
+     * @param mixed $object
+     *
+     * @return ItemUUID
+     *
+     * @throws TransformerException Unable to create ItemUUID
+     */
+    public function toItemUUID($object) : ItemUUID
+    {
+        foreach ($this->writeTransformers as $writeTransformer) {
+            if ($writeTransformer->isValidObject($object)) {
+                return $writeTransformer->toItemUUID($object);
+            }
+        }
+
+        throw TransformerException::createUnableToCreateItemUUIDException($object);
     }
 }

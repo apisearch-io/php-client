@@ -50,7 +50,7 @@ class ProductWriteTransformer implements WriteTransformer
          * @var Product $object
          */
         return Item::create(
-            new ItemUUID($object->getSku(), 'product'),
+            $this->toItemUUID($object),
             [
                 'created_at' => $object->getCreatedAt()->format(DATE_ATOM),
             ],
@@ -67,5 +67,17 @@ class ProductWriteTransformer implements WriteTransformer
                 $object->getName(),
             ]
         );
+    }
+
+    /**
+     * Create item UUID by object.
+     *
+     * @param mixed $object
+     *
+     * @return ItemUUID
+     */
+    public function toItemUUID($object) : ItemUUID
+    {
+        return new ItemUUID($object->getSku(), 'product');
     }
 }

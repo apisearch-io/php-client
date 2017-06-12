@@ -18,6 +18,7 @@ namespace Puntmig\Search\Tests\Transformer;
 
 use DateTime;
 use PHPUnit_Framework_TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Puntmig\Search\Transformer\Transformer;
 
@@ -31,7 +32,7 @@ class TransformerTest extends PHPUnit_Framework_TestCase
      */
     public function testBasic()
     {
-        $transformer = new Transformer();
+        $transformer = new Transformer($this->createMock(EventDispatcherInterface::class));
         $transformer->addReadTransformer(new ProductReadTransformer());
         $transformer->addWriteTransformer(new ProductWriteTransformer());
         $product = new Product('34672864', 'zapatilla', new DateTime());
@@ -40,6 +41,13 @@ class TransformerTest extends PHPUnit_Framework_TestCase
             $item,
             $transformer->toItems([$product])[0]
         );
+        $itemUUID = $transformer->toItemUUID($product);
+        $this->assertEquals(
+            $itemUUID,
+            $transformer->toItemUUIDs([$product])[0]
+        );
+        $this->assertSame('34672864', $itemUUID->getId());
+        $this->assertSame('product', $itemUUID->getType());
 
         $returnedProduct = $transformer->fromItem($item);
         $this->assertEquals(
@@ -67,7 +75,7 @@ class TransformerTest extends PHPUnit_Framework_TestCase
      */
     public function testBasicWithoutWriteTransformer()
     {
-        $transformer = new Transformer();
+        $transformer = new Transformer($this->createMock(EventDispatcherInterface::class));
         $transformer->addReadTransformer(new ProductReadTransformer());
         $product = new Product('34672864', 'zapatilla', new DateTime());
         $transformer->toItems([$product]);
@@ -78,7 +86,7 @@ class TransformerTest extends PHPUnit_Framework_TestCase
      */
     public function testBasicWithoutReadTransformer()
     {
-        $transformer = new Transformer();
+        $transformer = new Transformer($this->createMock(EventDispatcherInterface::class));
         $transformer->addWriteTransformer(new ProductWriteTransformer());
         $product = new Product('34672864', 'zapatilla', new DateTime());
         $item = $transformer->toItem($product);
