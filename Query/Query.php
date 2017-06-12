@@ -20,7 +20,7 @@ use Puntmig\Search\Exception\QueryBuildException;
 use Puntmig\Search\Geo\LocationRange;
 use Puntmig\Search\Model\Coordinate;
 use Puntmig\Search\Model\HttpTransportable;
-use Puntmig\Search\Model\UUIDReference;
+use Puntmig\Search\Model\ItemUUID;
 
 /**
  * Class Query.
@@ -91,6 +91,13 @@ class Query implements HttpTransportable
     private $aggregationsEnabled = true;
 
     /**
+     * @var string[]
+     *
+     * Filter fields
+     */
+    private $filterFields = [];
+
+    /**
      * Construct.
      *
      * @param $queryText
@@ -114,7 +121,7 @@ class Query implements HttpTransportable
      * @param int        $page
      * @param int        $size
      *
-     * @return self
+     * @return Query
      */
     public static function createLocated(
         Coordinate $coordinate,
@@ -140,13 +147,13 @@ class Query implements HttpTransportable
      * @param int    $page
      * @param int    $size
      *
-     * @return self
+     * @return Query
      */
     public static function create(
         string $queryText,
         int $page = 1,
         int $size = 10
-    ) : self {
+    ) : Query {
         $page = (int) (max(1, $page));
         $query = new self($queryText);
         $query->from = ($page - 1) * $size;
@@ -159,7 +166,7 @@ class Query implements HttpTransportable
     /**
      * Create new query all.
      *
-     * @return self
+     * @return Query
      */
     public static function createMatchAll()
     {
@@ -171,128 +178,74 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Create by reference.
+     * Create by uuid.
      *
-     * @param UUIDReference $reference
+     * @param ItemUUID $uuid
      *
-     * @return self
+     * @return Query
      */
-    public static function createByReference(UUIDReference $reference) : self
+    public static function createByUUID(ItemUUID $uuid) : Query
     {
-        return self::createByReferences([$reference]);
+        return self::createByUUIDs([$uuid]);
     }
 
     /**
      * Create by references.
      *
-     * @param UUIDReference[] $references
+     * @param ItemUUID[] $uuids
      *
-     * @return self
+     * @return Query
      */
-    public static function createByReferences(array $references) : self
+    public static function createByUUIDs(array $uuids) : Query
     {
-        $ids = array_map(function (UUIDReference $reference) {
-            return $reference->composeUUID();
-        }, $references);
+        $ids = array_map(function (ItemUUID $uuid) {
+            return $uuid->composeUUID();
+        }, $uuids);
 
-        $ids = array_unique($ids);
-
-        return self::create('', 1, count($references))
-            ->filterBy('_id', $ids, Filter::AT_LEAST_ONE)
+        $query = self::create('', 1, count($uuids))
             ->disableAggregations()
             ->disableSuggestions();
+
+        $query->filters['_id'] = Filter::create(
+            '_id',
+            array_unique($ids),
+            Filter::AT_LEAST_ONE,
+            Filter::TYPE_FIELD
+        );
+
+        return $query;
     }
 
     /**
-     * Filter by custom field.
+     * Filter by types.
      *
-     * @param string $field
-     * @param array  $values
-     * @param int    $applicationType
-     *
-     * @return self
-     */
-    public function filterBy(
-        string $field,
-        array $values,
-        int $applicationType
-    ) : self {
-        if (!empty($values)) {
-            $this->filters["_$field"] = Filter::create(
-                $field,
-                $values,
-                $applicationType,
-                Filter::TYPE_FIELD
-            );
-        } else {
-            unset($this->filters["_$field"]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Filter by custom meta field.
-     *
-     * @param string $field
-     * @param array  $values
-     * @param int    $applicationType
-     * @param bool   $aggregate
-     *
-     * @return self
-     */
-    public function filterByMeta(
-        string $field,
-        array $values,
-        int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
-    ) : self {
-        $internalField = "indexed_metadata.$field";
-        if (!empty($values)) {
-            $this->filters[$internalField] = Filter::create(
-                $internalField,
-                $values,
-                $applicationType,
-                Filter::TYPE_FIELD
-            );
-        } else {
-            unset($this->filters[$internalField]);
-        }
-
-        if ($aggregate) {
-            $this->addMetaAggregation($field, $applicationType);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Filter by families.
-     *
-     * @param array $families
-     * @param int   $applicationType
+     * @param array $values
      * @param bool  $aggregate
      *
-     * @return self
+     * @return Query
      */
-    public function filterByFamilies(
-        array $families,
-        int $applicationType = Filter::MUST_ALL,
+    public function filterByTypes(
+        array $values,
         bool $aggregate = true
-    ) : self {
-        if (!empty($families)) {
-            $this->filters['family'] = Filter::create(
-                'family',
-                $families,
-                $applicationType,
+    ) : Query {
+        if (!empty($values)) {
+            $this->filters['uuid.type'] = Filter::create(
+                'uuid.type',
+                $values,
+                Filter::AT_LEAST_ONE,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->filters['family']);
+            unset($this->filters['uuid.type']);
         }
 
         if ($aggregate) {
-            $this->addFamiliesAggregation($applicationType);
+            $this->aggregations['uuid.type'] = Aggregation::create(
+                'uuid.type',
+                'uuid.type',
+                Filter::AT_LEAST_ONE,
+                Filter::TYPE_FIELD
+            );
         }
 
         return $this;
@@ -301,253 +254,96 @@ class Query implements HttpTransportable
     /**
      * Filter by types.
      *
-     * @param array $types
-     * @param int   $applicationType
-     * @param bool  $aggregate
+     * @param array $values
      *
-     * @return self
+     * @return Query
      */
-    public function filterByTypes(
-        array $types,
-        int $applicationType = Filter::MUST_ALL,
-        bool $aggregate = true
-    ) : self {
-        if (!empty($types)) {
-            $this->filters['type'] = Filter::create(
-                '_type',
-                $types,
-                $applicationType,
+    public function filterByIds(array $values) : Query
+    {
+        if (!empty($values)) {
+            $this->filters['uuid.id'] = Filter::create(
+                'uuid.id',
+                $values,
+                Filter::AT_LEAST_ONE,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->filters['type']);
-        }
-
-        if ($aggregate) {
-            $this->addTypesAggregation($applicationType);
+            unset($this->filters['uuid.id']);
         }
 
         return $this;
     }
 
     /**
-     * Filter by categories.
+     * Filter by.
      *
-     * @param array $categories
-     * @param int   $applicationType
-     * @param bool  $aggregate
-     *
-     * @return self
-     */
-    public function filterByCategories(
-        array $categories,
-        int $applicationType = Filter::MUST_ALL_WITH_LEVELS,
-        bool $aggregate = true
-    ) : self {
-        if (!empty($categories)) {
-            $this->filters['categories'] = Filter::create(
-                'categories.id',
-                $categories,
-                $applicationType,
-                Filter::TYPE_NESTED
-            );
-        } else {
-            unset($this->filters['categories']);
-        }
-
-        if ($aggregate) {
-            $this->addCategoriesAggregation($applicationType);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Filter by manufacturer.
-     *
-     * @param array $manufacturers
-     * @param int   $applicationType
-     * @param bool  $aggregate
-     *
-     * @return self
-     */
-    public function filterByManufacturers(
-        array $manufacturers,
-        int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
-    ) : self {
-        if (!empty($manufacturers)) {
-            $this->filters['manufacturers'] = Filter::create(
-                'manufacturers.id',
-                $manufacturers,
-                $applicationType,
-                Filter::TYPE_NESTED
-            );
-        } else {
-            unset($this->filters['manufacturers']);
-        }
-
-        if ($aggregate) {
-            $this->addManufacturerAggregation($applicationType);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Filter by brand.
-     *
-     * @param array $brands
-     * @param int   $applicationType
-     * @param bool  $aggregate
-     *
-     * @return self
-     */
-    public function filterByBrands(
-        array $brands,
-        int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
-    ) : self {
-        if (!empty($brands)) {
-            $this->filters['brand'] = Filter::create(
-                'brand.id',
-                $brands,
-                $applicationType,
-                Filter::TYPE_FIELD
-            );
-        } else {
-            unset($this->filters['brand']);
-        }
-
-        if ($aggregate) {
-            $this->addBrandAggregation($applicationType);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Filter by tags.
-     *
-     * @param string $groupName
-     * @param array  $options
-     * @param array  $tags
+     * @param string $filterName
+     * @param string $field
+     * @param array  $values
      * @param int    $applicationType
      * @param bool   $aggregate
      *
-     * @return self
+     * @return Query
      */
-    public function filterByTags(
-        string $groupName,
-        array $options,
-        array $tags,
-        int $applicationType = Filter::MUST_ALL,
+    public function filterBy(
+        string $filterName,
+        string $field,
+        array $values,
+        int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
-    ) : self {
-        if (!empty($tags)) {
-            $this->filters[$groupName] = Filter::create(
-                'tags.name',
-                $tags,
+    ) : Query {
+        if (!empty($values)) {
+            $this->filters[$filterName] = Filter::create(
+                "indexed_metadata.$field",
+                $values,
                 $applicationType,
-                Filter::TYPE_NESTED,
-                [
-                    'tags.name',
-                    $options,
-                ]
+                Filter::TYPE_FIELD
             );
         } else {
-            unset($this->filters[$groupName]);
+            unset($this->filters[$filterName]);
         }
 
         if ($aggregate) {
-            $this->addTagsAggregation($groupName, $options, $applicationType);
+            $this->aggregateBy(
+                $filterName,
+                $field,
+                $applicationType
+            );
         }
 
         return $this;
-    }
-
-    /**
-     * Filter by price range.
-     *
-     * @param array $options
-     * @param array $values
-     * @param int   $applicationType
-     * @param bool  $aggregate
-     *
-     * @return self
-     */
-    public function filterByPriceRange(
-        array $options,
-        array $values,
-        int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
-    ) : self {
-        return $this->filterByRange(
-            'price',
-            'real_price',
-            $options,
-            $values,
-            $applicationType,
-            $aggregate
-        );
-    }
-
-    /**
-     * Filter by rating range.
-     *
-     * @param array $options
-     * @param array $values
-     * @param int   $applicationType
-     * @param bool  $aggregate
-     *
-     * @return self
-     */
-    public function filterByRatingRange(
-        array $options,
-        array $values,
-        int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
-    ) : self {
-        return $this->filterByRange(
-            'rating',
-            'rating',
-            $options,
-            $values,
-            $applicationType,
-            $aggregate
-        );
     }
 
     /**
      * Filter by range.
      *
-     * @param string $rangeName
+     * @param string $filterName
      * @param string $field
      * @param array  $options
      * @param array  $values
      * @param int    $applicationType
      * @param bool   $aggregate
      *
-     * @return self
+     * @return Query
      */
     public function filterByRange(
-        string $rangeName,
+        string $filterName,
         string $field,
         array $options,
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
-    ) : self {
-        $this->filters[$rangeName] = Filter::create(
-            $field,
+    ) : Query {
+        $this->filters[$filterName] = Filter::create(
+            "indexed_metadata.$field",
             $values,
             $applicationType,
             Filter::TYPE_RANGE
         );
 
         if ($aggregate) {
-            $this->addRangeAggregation(
-                $rangeName,
+            $this->aggregateByRange(
+                $filterName,
                 $field,
                 $options,
                 $applicationType
@@ -562,9 +358,9 @@ class Query implements HttpTransportable
      *
      * @param LocationRange $locationRange
      *
-     * @return self
+     * @return Query
      */
-    public function filterByLocation(LocationRange $locationRange) : self
+    public function filterByLocation(LocationRange $locationRange) : Query
     {
         $this->filters['coordinate'] = Filter::create(
             'coordinate',
@@ -577,25 +373,25 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Filter by stores.
+     * Set filter fields.
      *
-     * @param string[] $stores
-     * @param int      $applicationType
+     * @param string[] $filterFields
      *
-     * @return self
+     * @return Query
      */
-    public function filterByStores(
-        array $stores,
-        int $applicationType = Filter::AT_LEAST_ONE
-    ) : self {
-        $this->filters['stores'] = Filter::create(
-            'stores',
-            $stores,
-            $applicationType,
-            Filter::TYPE_FIELD
-        );
+    public function setFilterFields(array $filterFields)
+    {
+        $this->filterFields = $filterFields;
+    }
 
-        return $this;
+    /**
+     * Get filter fields.
+     *
+     * @return string[]
+     */
+    public function getFilterFields() : array
+    {
+        return $this->filterFields;
     }
 
     /**
@@ -603,9 +399,9 @@ class Query implements HttpTransportable
      *
      * @param array $sort
      *
-     * @return self
+     * @return Query
      */
-    public function sortBy(array $sort) : self
+    public function sortBy(array $sort) : Query
     {
         if (isset($sort['_geo_distance'])) {
             if (!$this->coordinate instanceof Coordinate) {
@@ -622,120 +418,24 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Add Manufacturer aggregation.
-     *
-     * @param int $applicationType
-     *
-     * @return self
-     */
-    private function addManufacturerAggregation(int $applicationType) : self
-    {
-        $this->aggregations['manufacturers'] = Aggregation::create(
-            'manufacturers',
-            'manufacturers.id|manufacturers.name|manufacturers.slug|manufacturers.slug',
-            $applicationType,
-            Filter::TYPE_NESTED
-        );
-
-        return $this;
-    }
-
-    /**
      * Add Families aggregation.
      *
-     * @param int $applicationType
-     *
-     * @return self
-     */
-    private function addFamiliesAggregation(int $applicationType) : self
-    {
-        $this->aggregations['family'] = Aggregation::create(
-            'family',
-            'family',
-            $applicationType,
-            Filter::TYPE_FIELD
-        );
-
-        return $this;
-    }
-
-    /**
-     * Add Types aggregation.
-     *
-     * @param int $applicationType
-     *
-     * @return self
-     */
-    private function addTypesAggregation(int $applicationType) : self
-    {
-        $this->aggregations['type'] = Aggregation::create(
-            'type',
-            '_type',
-            $applicationType,
-            Filter::TYPE_FIELD
-        );
-
-        return $this;
-    }
-
-    /**
-     * Add Brand aggregation.
-     *
-     * @param int $applicationType
-     *
-     * @return self
-     */
-    private function addBrandAggregation(int $applicationType) : self
-    {
-        $this->aggregations['brand'] = Aggregation::create(
-            'brand',
-            'brand.id|brand.name|brand.slug|brand.slug',
-            $applicationType,
-            Filter::TYPE_FIELD
-        );
-
-        return $this;
-    }
-
-    /**
-     * Add categories aggregation.
-     *
-     * @param int $applicationType
-     *
-     * @return self
-     */
-    private function addCategoriesAggregation(int $applicationType) : self
-    {
-        $this->aggregations['categories'] = Aggregation::create(
-            'categories',
-            'categories.id|categories.slug|categories.name|categories.level',
-            $applicationType,
-            Filter::TYPE_NESTED
-        );
-
-        return $this;
-    }
-
-    /**
-     * Add tags aggregation.
-     *
-     * @param string $groupName
-     * @param array  $options
+     * @param string $filterName
+     * @param string $field
      * @param int    $applicationType
      *
-     * @return self
+     * @return Query
      */
-    private function addTagsAggregation(
-        string $groupName,
-        array $options,
+    public function aggregateBy(
+        string $filterName,
+        string $field,
         int $applicationType
-    ) : self {
-        $this->aggregations[$groupName] = Aggregation::create(
-            $groupName,
-            'tags.name',
+    ) : Query {
+        $this->aggregations[$filterName] = Aggregation::create(
+            $filterName,
+            "indexed_metadata.$field",
             $applicationType,
-            Filter::TYPE_NESTED,
-            $options
+            Filter::TYPE_FIELD
         );
 
         return $this;
@@ -744,52 +444,29 @@ class Query implements HttpTransportable
     /**
      * Add tags aggregation.
      *
-     * @param string $rangeName
+     * @param string $filterName
      * @param string $field
      * @param array  $options
      * @param int    $applicationType
      *
-     * @return self
+     * @return Query
      */
-    private function addRangeAggregation(
-        string $rangeName,
+    public function aggregateByRange(
+        string $filterName,
         string $field,
         array $options,
         int $applicationType
-    ) : self {
+    ) : Query {
         if (empty($options)) {
             return $this;
         }
 
-        $this->aggregations[$rangeName] = Aggregation::create(
-            $rangeName,
-            $field,
+        $this->aggregations[$filterName] = Aggregation::create(
+            $filterName,
+            "indexed_metadata.$field",
             $applicationType,
             Filter::TYPE_RANGE,
             $options
-        );
-
-        return $this;
-    }
-
-    /**
-     * Add Families aggregation.
-     *
-     * @param string $field
-     * @param int    $applicationType
-     *
-     * @return self
-     */
-    private function addMetaAggregation(
-        string $field,
-        int $applicationType
-    ) : self {
-        $internalField = "indexed_metadata.$field";
-        $this->aggregations[$internalField] = Aggregation::create(
-            $internalField,
-            $internalField,
-            $applicationType,
-            Filter::TYPE_FIELD
         );
 
         return $this;
@@ -894,9 +571,9 @@ class Query implements HttpTransportable
     /**
      * Enable suggestions.
      *
-     * @return self
+     * @return Query
      */
-    public function enableSuggestions() : self
+    public function enableSuggestions() : Query
     {
         $this->suggestionsEnabled = true;
 
@@ -906,9 +583,9 @@ class Query implements HttpTransportable
     /**
      * Disable suggestions.
      *
-     * @return self
+     * @return Query
      */
-    public function disableSuggestions() : self
+    public function disableSuggestions() : Query
     {
         $this->suggestionsEnabled = false;
 
@@ -928,9 +605,9 @@ class Query implements HttpTransportable
     /**
      * Enable aggregations.
      *
-     * @return self
+     * @return Query
      */
-    public function enableAggregations() : self
+    public function enableAggregations() : Query
     {
         $this->aggregationsEnabled = true;
 
@@ -940,9 +617,9 @@ class Query implements HttpTransportable
     /**
      * Disable aggregations.
      *
-     * @return self
+     * @return Query
      */
-    public function disableAggregations() : self
+    public function disableAggregations() : Query
     {
         $this->aggregationsEnabled = false;
 
@@ -962,15 +639,20 @@ class Query implements HttpTransportable
     /**
      * Exclude reference.
      *
-     * @param UUIDReference[] $uuidReferences
+     * @param ItemUUID[] $uuids
      *
-     * @return self
+     * @return Query
      */
-    public function excludeReferences(array $uuidReferences) : self
+    public function excludeUUIDs(array $uuids) : Query
     {
-        $this->filterBy('_id', array_map(function (UUIDReference $uuidReference) {
-            return $uuidReference->composeUUID();
-        }, $uuidReferences), Filter::EXCLUDE);
+        $this->filters['excluded_ids'] = Filter::create(
+            '_id',
+            array_map(function (ItemUUID $uuid) {
+                return $uuid->composeUUID();
+            }, $uuids),
+            Filter::EXCLUDE,
+            Filter::TYPE_FIELD
+        );
 
         return $this;
     }
@@ -978,13 +660,13 @@ class Query implements HttpTransportable
     /**
      * Exclude reference.
      *
-     * @param UUIDReference $uuidReference
+     * @param ItemUUID $uuid
      *
-     * @return self
+     * @return Query
      */
-    public function excludeReference(UUIDReference $referenceReference) : self
+    public function excludeUUID(ItemUUID $uuid) : Query
     {
-        $this->excludeReferences([$referenceReference]);
+        $this->excludeUUIDs([$uuid]);
 
         return $this;
     }
@@ -1018,8 +700,11 @@ class Query implements HttpTransportable
             'size' => $this->size,
             'suggestions_enabled' => $this->suggestionsEnabled,
             'aggregations_enabled' => $this->aggregationsEnabled,
+            'filter_fields' => $this->filterFields,
         ], function ($element) {
-            return !is_null($element);
+            return
+                !is_null($element) ||
+                (is_array($element) && !empty($element));
         });
     }
 
@@ -1028,9 +713,9 @@ class Query implements HttpTransportable
      *
      * @param array $array
      *
-     * @return self
+     * @return Query
      */
-    public static function createFromArray(array $array) : self
+    public static function createFromArray(array $array) : Query
     {
         $query = isset($array['coordinate'])
             ? self::createLocated(
@@ -1057,6 +742,7 @@ class Query implements HttpTransportable
         );
         $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
         $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
+        $query->filterFields = $array['filter_fields'] ?? [];
 
         return $query;
     }

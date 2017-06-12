@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Model;
 
+use Puntmig\Search\Exception\CoordinateException;
+
 /**
  * Class Coordinate.
  */
@@ -87,10 +89,17 @@ class Coordinate implements HttpTransportable
      *
      * @param array $array
      *
-     * @return self
+     * @return Coordinate
      */
-    public static function createFromArray(array $array) : self
+    public static function createFromArray(array $array) : Coordinate
     {
+        if (
+            !isset($array['lat']) ||
+            !isset($array['lon'])
+        ) {
+            throw CoordinateException::createCoordinateBadFormatException();
+        }
+
         return new self(
             $array['lat'],
             $array['lon']

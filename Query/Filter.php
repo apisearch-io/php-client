@@ -63,13 +63,6 @@ class Filter implements HttpTransportable
      *
      * Filter type field
      */
-    const TYPE_NESTED = 'nested';
-
-    /**
-     * @var string
-     *
-     * Filter type field
-     */
     const TYPE_RANGE = 'range';
 
     /**
@@ -215,7 +208,7 @@ class Filter implements HttpTransportable
      * @param string $filterType
      * @param array  $filterTerms
      *
-     * @return self
+     * @return Filter
      */
     public static function create(
         string $field,
@@ -223,7 +216,7 @@ class Filter implements HttpTransportable
         int $applicationType,
         string $filterType,
         array $filterTerms = []
-    ) : self {
+    ) : Filter {
         return new self(
             $field,
             $values,
@@ -254,9 +247,9 @@ class Filter implements HttpTransportable
      *
      * @param array $array
      *
-     * @return self
+     * @return Filter
      */
-    public static function createFromArray(array $array) : self
+    public static function createFromArray(array $array) : Filter
     {
         return self::create(
             $array['field'],

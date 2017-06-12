@@ -31,122 +31,30 @@ class SortBy
     /**
      * @var array
      *
-     * Sort by name ASC
+     * Sort by id ASC
      */
-    const AZ = ['sortable_name' => 'asc'];
+    const ID_ASC = ['uuid.id' => 'asc'];
 
     /**
      * @var array
      *
-     * Sort by name DESC
+     * Sort by id DESC
      */
-    const ZA = ['sortable_name' => 'desc'];
+    const ID_DESC = ['uuid.id' => 'desc'];
 
     /**
      * @var array
      *
-     * Sort by price ASC
+     * Sort by type ASC
      */
-    const PRICE_ASC = ['real_price' => 'asc'];
+    const TYPE_ASC = ['uuid.type' => 'asc'];
 
     /**
      * @var array
      *
-     * Sort by price DESC
+     * Sort by type DESC
      */
-    const PRICE_DESC = ['real_price' => 'desc'];
-
-    /**
-     * @var array
-     *
-     * Sort by discount ASC
-     */
-    const DISCOUNT_ASC = ['discount' => 'asc'];
-
-    /**
-     * @var array
-     *
-     * Sort by discount DESC
-     */
-    const DISCOUNT_DESC = ['discount' => 'desc'];
-
-    /**
-     * @var array
-     *
-     * Sort by discount percentage ASC
-     */
-    const DISCOUNT_PERCENTAGE_ASC = ['discount_percentage' => 'asc'];
-
-    /**
-     * @var array
-     *
-     * Sort by discount percentage DESC
-     */
-    const DISCOUNT_PERCENTAGE_DESC = ['discount_percentage' => 'desc'];
-
-    /**
-     * @var array
-     *
-     * Sort by update at ASC
-     */
-    const UPDATED_AT_ASC = ['updated_at' => 'asc'];
-
-    /**
-     * @var array
-     *
-     * Sort by update at ASC
-     */
-    const UPDATED_AT_DESC = ['updated_at' => 'desc'];
-
-    /**
-     * @var array
-     *
-     * Sort by manufacturer ASC
-     */
-    const MANUFACTURER_ASC = ['manufacturers.name' => [
-        'order' => 'asc',
-        'nested_path' => 'manufacturers',
-        'mode' => 'max',
-    ]];
-
-    /**
-     * @var array
-     *
-     * Sort by manufacturer DESC
-     */
-    const MANUFACTURER_DESC = ['manufacturers.name' => [
-        'order' => 'desc',
-        'nested_path' => 'manufacturers',
-        'mode' => 'max',
-    ]];
-
-    /**
-     * @var array
-     *
-     * Sort by manufacturer ASC
-     */
-    const BRAND_ASC = ['brand.name' => 'asc'];
-
-    /**
-     * @var array
-     *
-     * Sort by manufacturer DESC
-     */
-    const BRAND_DESC = ['brand.name' => 'desc'];
-
-    /**
-     * @var array
-     *
-     * Sort by rating ASC
-     */
-    const RATING_ASC = ['rating' => 'asc'];
-
-    /**
-     * @var array
-     *
-     * Sort by rating DESC
-     */
-    const RATING_DESC = ['rating' => 'desc'];
+    const TYPE_DESC = ['uuid.type' => 'desc'];
 
     /**
      * @var array

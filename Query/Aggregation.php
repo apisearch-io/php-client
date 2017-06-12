@@ -140,7 +140,7 @@ class Aggregation implements HttpTransportable
      * @param string $filterType
      * @param array  $subgroup
      *
-     * @return self
+     * @return Aggregation
      */
     public static function create(
         string $name,
@@ -148,7 +148,7 @@ class Aggregation implements HttpTransportable
         int $applicationType,
         string $filterType,
         array $subgroup = []
-    ) : self {
+    ) : Aggregation {
         return new self(
             $name,
             $field,
@@ -179,9 +179,9 @@ class Aggregation implements HttpTransportable
      *
      * @param array $array
      *
-     * @return self
+     * @return Aggregation
      */
-    public static function createFromArray(array $array) : self
+    public static function createFromArray(array $array) : Aggregation
     {
         return self::create(
             $array['name'],

@@ -14,20 +14,20 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Model;
+namespace Puntmig\Search\Exception;
 
 /**
- * Class ManufacturerReference.
+ * Class UUIDException.
  */
-class ManufacturerReference extends IdReference
+class UUIDException extends ModelException
 {
     /**
-     * Compose unique id.
+     * Create UUID bad format exception.
      *
-     * @return string
+     * @return UUIDException
      */
-    public function composeUUID() : string
+    public static function createUUIDBadFormatException() : UUIDException
     {
-        return "m~{$this->id}";
+        return new self('An Item should always contain a UUID, with an ID and a Type');
     }
 }
