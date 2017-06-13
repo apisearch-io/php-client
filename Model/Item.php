@@ -483,6 +483,18 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
+     * Magic property is set.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function __isset(string $name) : bool
+    {
+        return array_key_exists($name, $this->getAllMetadata());
+    }
+
+    /**
      * Magic get method.
      *
      * @param string $name
