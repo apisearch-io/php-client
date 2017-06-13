@@ -309,5 +309,45 @@ class ItemTest extends PHPUnit_Framework_TestCase
             'suggest' => [],
         ]);
         $itemArray = $item->toArray();
+        $this->assertSame(
+            ['id' => '1', 'type' => 'product'],
+            $itemArray['uuid']
+        );
+        $this->assertFalse(array_key_exists('coordinate', $itemArray));
+        $this->assertFalse(array_key_exists('distance', $itemArray));
+        $this->assertFalse(array_key_exists('metadata', $itemArray));
+        $this->assertFalse(array_key_exists('indexed_metadata', $itemArray));
+        $this->assertFalse(array_key_exists('searchable_metadata', $itemArray));
+        $this->assertFalse(array_key_exists('exact_matching_metadata', $itemArray));
+        $this->assertFalse(array_key_exists('suggest', $itemArray));
+    }
+
+    /**
+     * Test magic get method.
+     */
+    public function testMagicGetter()
+    {
+        $item = Item::createFromArray([
+            'uuid' => [
+                'id' => '1',
+                'type' => 'product',
+            ],
+            'metadata' => [
+                'a' => 1,
+                'b' => true,
+            ],
+            'indexed_metadata' => [
+                'c' => 2,
+                'd' => [
+                    'e' => 'z',
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(1, $item->a);
+        $this->assertEquals(true, $item->b);
+        $this->assertEquals(2, $item->c);
+        $this->assertEquals('z', $item->d['e']);
+        $this->assertNull($item->nonexisting);
     }
 }

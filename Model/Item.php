@@ -414,8 +414,10 @@ class Item implements HttpTransportable, UUIDReference
             'suggest' => $this->suggest,
         ], function ($element) {
             return
-                !is_null($element) ||
-                (is_array($element) && !empty($element));
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
         });
     }
 
@@ -478,5 +480,17 @@ class Item implements HttpTransportable, UUIDReference
         return $this
             ->uuid
             ->composeUUID();
+    }
+
+    /**
+     * Magic get method.
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function __get(string $name)
+    {
+        return $this->get($name);
     }
 }
