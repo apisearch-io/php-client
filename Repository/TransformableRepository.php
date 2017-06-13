@@ -123,7 +123,9 @@ class TransformableRepository extends Repository
             ->transformer
             ->toItem($object);
 
-        $this->addItem($item);
+        if ($item instanceof Item) {
+            $this->addItem($item);
+        }
     }
 
     /**
@@ -137,6 +139,8 @@ class TransformableRepository extends Repository
             ->transformer
             ->toItemUUID($object);
 
-        $this->deleteObject($item);
+        if ($item instanceof Item) {
+            $this->deleteObject($item);
+        }
     }
 }
