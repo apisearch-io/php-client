@@ -703,8 +703,10 @@ class Query implements HttpTransportable
             'filter_fields' => $this->filterFields,
         ], function ($element) {
             return
-                !is_null($element) ||
-                (is_array($element) && !empty($element));
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
         });
     }
 

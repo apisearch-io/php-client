@@ -297,7 +297,13 @@ class Result implements HttpTransportable
                 ? $this->aggregations->toArray()
                 : null,
             'suggests' => $this->suggests,
-        ]);
+        ], function ($element) {
+            return
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
+        });
     }
 
     /**
