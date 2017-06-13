@@ -69,19 +69,6 @@ class TransformerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test basic without write transformer.
-     *
-     * @expectedException \Puntmig\Search\Exception\TransformerException
-     */
-    public function testBasicWithoutWriteTransformer()
-    {
-        $transformer = new Transformer($this->createMock(EventDispatcherInterface::class));
-        $transformer->addReadTransformer(new ProductReadTransformer());
-        $product = new Product('34672864', 'zapatilla', new DateTime());
-        $transformer->toItems([$product]);
-    }
-
-    /**
      * Test basic without read transformer.
      */
     public function testBasicWithoutReadTransformer()

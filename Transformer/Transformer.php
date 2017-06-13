@@ -126,7 +126,10 @@ class Transformer
     {
         $items = [];
         foreach ($objects as $object) {
-            $items[] = $this->toItem($object);
+            $item = $this->toItem($object);
+            if ($item instanceof Item) {
+                $items[] = $item;
+            }
         }
 
         return $items;
@@ -137,11 +140,9 @@ class Transformer
      *
      * @param mixed $object
      *
-     * @return Item
-     *
-     * @throws TransformerException Unable to create Item
+     * @return Item|null
      */
-    public function toItem($object) : Item
+    public function toItem($object) : ? Item
     {
         foreach ($this->writeTransformers as $writeTransformer) {
             if ($writeTransformer->isValidObject($object)) {
@@ -160,7 +161,7 @@ class Transformer
             }
         }
 
-        throw TransformerException::createUnableToCreateItemException($object);
+        return null;
     }
 
     /**
@@ -176,7 +177,10 @@ class Transformer
     {
         $itemUUIDs = [];
         foreach ($objects as $object) {
-            $itemUUIDs[] = $this->toItemUUID($object);
+            $itemUUID = $this->toItemUUID($object);
+            if ($itemUUID instanceof ItemUUID) {
+                $itemUUIDs[] = $itemUUID;
+            }
         }
 
         return $itemUUIDs;
@@ -198,7 +202,5 @@ class Transformer
                 return $writeTransformer->toItemUUID($object);
             }
         }
-
-        throw TransformerException::createUnableToCreateItemUUIDException($object);
     }
 }
