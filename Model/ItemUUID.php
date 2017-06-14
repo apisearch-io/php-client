@@ -52,7 +52,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
     }
 
     /**
-     * Create by composed uuid
+     * Create by composed uuid.
      *
      * @param string $composedUUID
      *
@@ -67,7 +67,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
             throw UUIDException::createComposedUUIDBadFormatException($composedUUID);
         }
 
-        return new ItemUUID($parts[1], $parts[0]);
+        return new self($parts[1], $parts[0]);
     }
 
     /**

@@ -68,6 +68,13 @@ class Result implements HttpTransportable
     private $totalHits;
 
     /**
+     * Items grouped by types cache.
+     *
+     * @var array
+     */
+    private $itemsGroupedByTypeCache;
+
+    /**
      * Result constructor.
      *
      * @param Query $query
@@ -135,6 +142,43 @@ class Result implements HttpTransportable
     public function getItems() : array
     {
         return $this->items;
+    }
+
+    /**
+     * Get items grouped by type.
+     *
+     * @return array
+     */
+    public function getItemsGroupedByTypes() : array
+    {
+        if (is_array($this->itemsGroupedByTypeCache)) {
+            return $this->itemsGroupedByTypeCache;
+        }
+
+        $items = $this->getItems();
+        $itemsGroupedByType = [];
+        foreach ($items as $item) {
+            if (!isset($itemsGroupedByType[$item->getType()])) {
+                $itemsGroupedByType[$item->getType()] = [];
+            }
+            $itemsGroupedByType[$item->getType()][] = $item;
+        }
+
+        $this->itemsGroupedByTypeCache = $itemsGroupedByType;
+
+        return $itemsGroupedByType;
+    }
+
+    /**
+     * Get Items by a certain type.
+     *
+     * @param string $type
+     *
+     * @return Item[]
+     */
+    public function getItemsByType(string $type) : array
+    {
+        return $this->getItemsGroupedByTypes()[$type] ?? [];
     }
 
     /**

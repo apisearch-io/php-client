@@ -32,7 +32,7 @@ class UUIDException extends ModelException
     }
 
     /**
-     * Create Composed UUID bad format
+     * Create Composed UUID bad format.
      *
      * @param string $composedUUID
      *

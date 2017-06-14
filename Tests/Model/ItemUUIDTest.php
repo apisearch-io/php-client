@@ -60,7 +60,7 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test create by composed UUID
+     * Test create by composed UUID.
      */
     public function testCreateByComposedUUID()
     {
@@ -70,7 +70,7 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test create by composed UUID with exception
+     * Test create by composed UUID with exception.
      *
      * @dataProvider dataCreateByComposedUUIDException
      *
@@ -82,7 +82,7 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Data for testCreateByComposedUUIDException
+     * Data for testCreateByComposedUUIDException.
      */
     public function dataCreateByComposedUUIDException()
     {
