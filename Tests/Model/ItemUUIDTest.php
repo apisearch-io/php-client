@@ -58,4 +58,38 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
         $uuid = new ItemUUID('1', 'product');
         $this->assertEquals('product~1', $uuid->composeUUID());
     }
+
+    /**
+     * Test create by composed UUID
+     */
+    public function testCreateByComposedUUID()
+    {
+        $itemUUID = ItemUUID::createByComposedUUID('type~1');
+        $this->assertSame('type', $itemUUID->getType());
+        $this->assertSame('1', $itemUUID->getId());
+    }
+
+    /**
+     * Test create by composed UUID with exception
+     *
+     * @dataProvider dataCreateByComposedUUIDException
+     *
+     * @expectedException \Puntmig\Search\Exception\UUIDException
+     */
+    public function testCreateByComposedUUIDException(string $composedUUID)
+    {
+        ItemUUID::createByComposedUUID($composedUUID);
+    }
+
+    /**
+     * Data for testCreateByComposedUUIDException
+     */
+    public function dataCreateByComposedUUIDException()
+    {
+        return [
+            ['item'],
+            [''],
+            ['1'],
+        ];
+    }
 }

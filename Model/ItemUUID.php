@@ -52,6 +52,25 @@ class ItemUUID implements HttpTransportable, UUIDReference
     }
 
     /**
+     * Create by composed uuid
+     *
+     * @param string $composedUUID
+     *
+     * @return ItemUUID
+     *
+     * @throws UUIDException
+     */
+    public static function createByComposedUUID(string $composedUUID) : ItemUUID
+    {
+        $parts = explode('~', $composedUUID, 2);
+        if (count($parts) === 1) {
+            throw UUIDException::createComposedUUIDBadFormatException($composedUUID);
+        }
+
+        return new ItemUUID($parts[1], $parts[0]);
+    }
+
+    /**
      * Get product id.
      *
      * @return string
