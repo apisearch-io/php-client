@@ -71,5 +71,10 @@ class ResultTest extends PHPUnit_Framework_TestCase
             'type-nonextisting',
             $result->getItemsGroupedByTypes()
         ));
+
+        $this->assertCount(4, $result->getItemsByTypes(['type1', 'type2']));
+        $this->assertCount(3, $result->getItemsByTypes(['type1', 'type3']));
+        $this->assertCount(2, $result->getItemsByTypes(['type1', 'type-nonextisting']));
+        $this->assertCount(0, $result->getItemsByTypes(['type-nonextisting']));
     }
 }

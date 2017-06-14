@@ -182,6 +182,26 @@ class Result implements HttpTransportable
     }
 
     /**
+     * Get Items by a certain types.
+     *
+     * @param array $types
+     *
+     * @return Item[]
+     */
+    public function getItemsByTypes(array $types) : array
+    {
+        return array_filter(
+            $this->getItems(),
+            function (Item $item) use ($types) {
+                return in_array(
+                    $item->getType(),
+                    $types
+                );
+            }
+        );
+    }
+
+    /**
      * Get first result.
      *
      * @return null|Item
