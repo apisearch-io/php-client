@@ -639,9 +639,6 @@ of the `->getAggregations()` result (returns an implementation of the PHP
 interface Traversable). You can access directly to an aggregation by using the
 `->getAggregation($name)` method and the aggregation assigned name.
 
-If you want to retrieve a metadata aggregation, you can use as well the shortcut
-method `->getMetaAggregation($field)`
-
 ### Result Aggregation
 
 Let's analyze what a result Aggregation instance is and how useful can be in our

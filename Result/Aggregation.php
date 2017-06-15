@@ -221,7 +221,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             return [];
         }
 
-        if ($this->applicationType & FILTER::MUST_ALL_WITH_LEVELS) {
+        if ($this->applicationType & Filter::MUST_ALL_WITH_LEVELS) {
             $value = [array_reduce(
                 $this->activeElements,
                 function ($carry, $counter) {
