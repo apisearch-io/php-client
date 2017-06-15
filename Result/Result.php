@@ -276,24 +276,6 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Get metadata aggregation.
-     *
-     * @param string $field
-     *
-     * @return null|Aggregation
-     */
-    public function getMetaAggregation(string $field) : ? Aggregation
-    {
-        if (is_null($this->aggregations)) {
-            return null;
-        }
-
-        return $this
-            ->aggregations
-            ->getMetaAggregation($field);
-    }
-
-    /**
      * Add suggest.
      *
      * @param string $suggest
