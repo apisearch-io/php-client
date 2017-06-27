@@ -66,9 +66,9 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     /**
      * @var int
      *
-     * Lowest level
+     * Highest active level
      */
-    private $lowestLevel;
+    private $highestActiveLevel = 0;
 
     /**
      * Aggregation constructor.
@@ -128,14 +128,15 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             $counter->isUsed()
         ) {
             $this->activeElements[$counter->getId()] = $counter;
+            $this->highestActiveLevel = max(
+                $counter->getLevel(),
+                $this->highestActiveLevel
+            );
 
             return;
         }
 
         $this->counters[$counter->getId()] = $counter;
-        $this->lowestLevel = is_null($this->lowestLevel)
-            ? $counter->getLevel()
-            : min($this->lowestLevel, $counter->getLevel());
     }
 
     /**
@@ -262,10 +263,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     public function cleanCountersByLevel()
     {
         foreach ($this->counters as $pos => $counter) {
-            if ($counter->getLevel() !== $this->lowestLevel) {
-                if ($counter->isUsed()) {
-                    $this->activeElements[$counter->getId()] = $counter;
-                }
+            if ($counter->getLevel() !== $this->highestActiveLevel + 1) {
                 unset($this->counters[$pos]);
             }
         }
@@ -317,7 +315,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
                     ? $counter->toArray()
                     : $counter;
             }, $this->activeElements),
-            'lowest_level' => $this->lowestLevel,
+            'highest_active_level' => $this->highestActiveLevel,
         ];
     }
 
@@ -348,7 +346,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             return Counter::createFromArray($counter);
         }, $array['counters']);
 
-        $aggregation->lowestLevel = $array['lowest_level'];
+        $aggregation->highestActiveLevel = $array['highest_active_level'];
 
         return $aggregation;
     }
