@@ -104,13 +104,16 @@ class HttpRepository extends Repository
 
     /**
      * Reset the index.
+     *
+     * @var null|string $language
      */
-    public function reset()
+    public function reset(? string $language)
     {
         $this
             ->httpClient
             ->get('/', 'delete', [
                 'key' => $this->getKey(),
+                'language' => $language,
             ]);
     }
 }

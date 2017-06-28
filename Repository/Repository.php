@@ -173,6 +173,8 @@ abstract class Repository
 
     /**
      * Reset the index.
+     *
+     * @var null|string $language
      */
-    abstract public function reset();
+    abstract public function reset(? string $language);
 }

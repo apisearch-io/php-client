@@ -118,12 +118,14 @@ class TransformableRepository extends Repository
 
     /**
      * Reset the index.
+     *
+     * @var null|string $language
      */
-    public function reset()
+    public function reset(? string $language)
     {
         $this
             ->repository
-            ->reset();
+            ->reset($language);
     }
 
     /**
