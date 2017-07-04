@@ -70,7 +70,7 @@ class GuzzleClient implements HttpClient
          * @var ResponseInterface $response
          */
         $response = $client->$method(
-            $this->host . $url,
+            rtrim($this->host . $url, '/'),
             [$bodyFieldName => $options]
         );
 
