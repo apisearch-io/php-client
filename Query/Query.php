@@ -37,6 +37,13 @@ class Query implements HttpTransportable
     /**
      * @var Filter[]
      *
+     * Universe Filters
+     */
+    private $universeFilters = [];
+
+    /**
+     * @var Filter[]
+     *
      * Filters
      */
     private $filters = [];
@@ -217,6 +224,29 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Filter universe by types.
+     *
+     * @param array $values
+     *
+     * @return Query
+     */
+    public function filterUniverseByTypes(array $values) : Query
+    {
+        if (!empty($values)) {
+            $this->universeFilters['uuid.type'] = Filter::create(
+                'uuid.type',
+                $values,
+                Filter::AT_LEAST_ONE,
+                Filter::TYPE_FIELD
+            );
+        } else {
+            unset($this->universeFilters['uuid.type']);
+        }
+
+        return $this;
+    }
+
+    /**
      * Filter by types.
      *
      * @param array $values
@@ -252,6 +282,29 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Filter universe by types.
+     *
+     * @param array $values
+     *
+     * @return Query
+     */
+    public function filterUniverseByIds(array $values) : Query
+    {
+        if (!empty($values)) {
+            $this->universeFilters['uuid.id'] = Filter::create(
+                'uuid.id',
+                $values,
+                Filter::AT_LEAST_ONE,
+                Filter::TYPE_FIELD
+            );
+        } else {
+            unset($this->universeFilters['uuid.id']);
+        }
+
+        return $this;
+    }
+
+    /**
      * Filter by types.
      *
      * @param array $values
@@ -269,6 +322,34 @@ class Query implements HttpTransportable
             );
         } else {
             unset($this->filters['uuid.id']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Filter universe by.
+     *
+     * @param string $field
+     * @param array  $values
+     * @param int    $applicationType
+     *
+     * @return Query
+     */
+    public function filterUniverseBy(
+        string $field,
+        array $values,
+        int $applicationType = Filter::AT_LEAST_ONE
+    ) : Query {
+        if (!empty($values)) {
+            $this->universeFilters["indexed_metadata.$field"] = Filter::create(
+                "indexed_metadata.$field",
+                $values,
+                $applicationType,
+                Filter::TYPE_FIELD
+            );
+        } else {
+            unset($this->universeFilters["indexed_metadata.$field"]);
         }
 
         return $this;
@@ -315,6 +396,34 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Filter universe by range.
+     *
+     * @param string $field
+     * @param array  $values
+     * @param int    $applicationType
+     *
+     * @return Query
+     */
+    public function filterUniverseByRange(
+        string $field,
+        array $values,
+        int $applicationType = Filter::AT_LEAST_ONE
+    ) : Query {
+        if (!empty($values)) {
+            $this->universeFilters["indexed_metadata.$field"] = Filter::create(
+                "indexed_metadata.$field",
+                $values,
+                $applicationType,
+                Filter::TYPE_RANGE
+            );
+        } else {
+            unset($this->universeFilters["indexed_metadata.$field"]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Filter by range.
      *
      * @param string $filterName
@@ -334,12 +443,16 @@ class Query implements HttpTransportable
         int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
     ) : Query {
-        $this->filters[$filterName] = Filter::create(
-            "indexed_metadata.$field",
-            $values,
-            $applicationType,
-            Filter::TYPE_RANGE
-        );
+        if (!empty($values)) {
+            $this->filters[$filterName] = Filter::create(
+                "indexed_metadata.$field",
+                $values,
+                $applicationType,
+                Filter::TYPE_RANGE
+            );
+        } else {
+            unset($this->filters["indexed_metadata.$field"]);
+        }
 
         if ($aggregate) {
             $this->aggregateByRange(
@@ -349,6 +462,25 @@ class Query implements HttpTransportable
                 $applicationType
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Filter universe by location.
+     *
+     * @param LocationRange $locationRange
+     *
+     * @return Query
+     */
+    public function filterUniverseByLocation(LocationRange $locationRange) : Query
+    {
+        $this->universeFilters['coordinate'] = Filter::create(
+            'coordinate',
+            $locationRange->toArray(),
+            Filter::AT_LEAST_ONE,
+            Filter::TYPE_GEO
+        );
 
         return $this;
     }
@@ -504,6 +636,16 @@ class Query implements HttpTransportable
         return $this
             ->getFilter('_query')
             ->getValues()[0];
+    }
+
+    /**
+     * Get universe filters.
+     *
+     * @return Filter[]
+     */
+    public function getUniverseFilters() : array
+    {
+        return $this->universeFilters;
     }
 
     /**
@@ -692,6 +834,11 @@ class Query implements HttpTransportable
                         : null;
                 }, $this->filters)
             ),
+            'universe_filters' => array_filter(
+                array_map(function (Filter $filter) {
+                    return $filter->toArray();
+                }, $this->universeFilters)
+            ),
             'aggregations' => array_map(function (Aggregation $aggregation) {
                 return $aggregation->toArray();
             }, $this->aggregations),
@@ -741,6 +888,12 @@ class Query implements HttpTransportable
             array_map(function (array $filter) {
                 return Filter::createFromArray($filter);
             }, $array['filters'] ?? [])
+        );
+        $query->universeFilters = array_merge(
+            $query->universeFilters,
+            array_map(function (array $filter) {
+                return Filter::createFromArray($filter);
+            }, $array['universe_filters'] ?? [])
         );
         $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
         $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
