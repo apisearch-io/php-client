@@ -151,12 +151,12 @@ class TransformableRepository extends Repository
      */
     public function deleteObject($object)
     {
-        $item = $this
+        $itemUUID = $this
             ->transformer
             ->toItemUUID($object);
 
-        if ($item instanceof Item) {
-            $this->deleteObject($item);
+        if ($itemUUID instanceof ItemUUID) {
+            $this->deleteItem($itemUUID);
         }
     }
 }
