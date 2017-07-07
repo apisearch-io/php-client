@@ -259,4 +259,18 @@ class Filter implements HttpTransportable
             $array['filter_terms'] ?? []
         );
     }
+
+    /**
+     * Get path by field.
+     *
+     * @param string $field
+     *
+     * @return string
+     */
+    public static function getFilterPathByField(string $field)
+    {
+        return in_array($field, ['id', 'type'])
+            ? 'uuid.' . $field
+            : 'indexed_metadata.' . $field;
+    }
 }

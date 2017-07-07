@@ -232,15 +232,16 @@ class Query implements HttpTransportable
      */
     public function filterUniverseByTypes(array $values) : Query
     {
+        $fieldPath = Filter::getFilterPathByField('type');
         if (!empty($values)) {
-            $this->universeFilters['uuid.type'] = Filter::create(
-                'uuid.type',
+            $this->universeFilters['type'] = Filter::create(
+                $fieldPath,
                 $values,
                 Filter::AT_LEAST_ONE,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->universeFilters['uuid.type']);
+            unset($this->universeFilters['type']);
         }
 
         return $this;
@@ -258,21 +259,22 @@ class Query implements HttpTransportable
         array $values,
         bool $aggregate = true
     ) : Query {
+        $fieldPath = Filter::getFilterPathByField('type');
         if (!empty($values)) {
-            $this->filters['uuid.type'] = Filter::create(
-                'uuid.type',
+            $this->filters['type'] = Filter::create(
+                $fieldPath,
                 $values,
                 Filter::AT_LEAST_ONE,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->filters['uuid.type']);
+            unset($this->filters['type']);
         }
 
         if ($aggregate) {
-            $this->aggregations['uuid.type'] = Aggregation::create(
-                'uuid.type',
-                'uuid.type',
+            $this->aggregations['type'] = Aggregation::create(
+                'type',
+                $fieldPath,
                 Filter::AT_LEAST_ONE,
                 Filter::TYPE_FIELD
             );
@@ -290,15 +292,16 @@ class Query implements HttpTransportable
      */
     public function filterUniverseByIds(array $values) : Query
     {
+        $fieldPath = Filter::getFilterPathByField('id');
         if (!empty($values)) {
-            $this->universeFilters['uuid.id'] = Filter::create(
-                'uuid.id',
+            $this->universeFilters['id'] = Filter::create(
+                $fieldPath,
                 $values,
                 Filter::AT_LEAST_ONE,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->universeFilters['uuid.id']);
+            unset($this->universeFilters['id']);
         }
 
         return $this;
@@ -313,15 +316,16 @@ class Query implements HttpTransportable
      */
     public function filterByIds(array $values) : Query
     {
+        $fieldPath = Filter::getFilterPathByField('id');
         if (!empty($values)) {
-            $this->filters['uuid.id'] = Filter::create(
-                'uuid.id',
+            $this->filters['id'] = Filter::create(
+                $fieldPath,
                 $values,
                 Filter::AT_LEAST_ONE,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->filters['uuid.id']);
+            unset($this->filters['id']);
         }
 
         return $this;
@@ -341,15 +345,16 @@ class Query implements HttpTransportable
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE
     ) : Query {
+        $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
-            $this->universeFilters["indexed_metadata.$field"] = Filter::create(
-                "indexed_metadata.$field",
+            $this->universeFilters[$field] = Filter::create(
+                $fieldPath,
                 $values,
                 $applicationType,
                 Filter::TYPE_FIELD
             );
         } else {
-            unset($this->universeFilters["indexed_metadata.$field"]);
+            unset($this->universeFilters[$field]);
         }
 
         return $this;
@@ -373,9 +378,10 @@ class Query implements HttpTransportable
         int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
     ) : Query {
+        $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
             $this->filters[$filterName] = Filter::create(
-                "indexed_metadata.$field",
+                $fieldPath,
                 $values,
                 $applicationType,
                 Filter::TYPE_FIELD
@@ -409,15 +415,16 @@ class Query implements HttpTransportable
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE
     ) : Query {
+        $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
-            $this->universeFilters["indexed_metadata.$field"] = Filter::create(
-                "indexed_metadata.$field",
+            $this->universeFilters[$field] = Filter::create(
+                $fieldPath,
                 $values,
                 $applicationType,
                 Filter::TYPE_RANGE
             );
         } else {
-            unset($this->universeFilters["indexed_metadata.$field"]);
+            unset($this->universeFilters[$field]);
         }
 
         return $this;
@@ -443,21 +450,22 @@ class Query implements HttpTransportable
         int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
     ) : Query {
+        $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
             $this->filters[$filterName] = Filter::create(
-                "indexed_metadata.$field",
+                $fieldPath,
                 $values,
                 $applicationType,
                 Filter::TYPE_RANGE
             );
         } else {
-            unset($this->filters["indexed_metadata.$field"]);
+            unset($this->filters[$filterName]);
         }
 
         if ($aggregate) {
             $this->aggregateByRange(
                 $filterName,
-                $field,
+                $fieldPath,
                 $options,
                 $applicationType
             );
@@ -565,7 +573,7 @@ class Query implements HttpTransportable
     ) : Query {
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
-            "indexed_metadata.$field",
+            Filter::getFilterPathByField($field),
             $applicationType,
             Filter::TYPE_FIELD
         );
@@ -595,7 +603,7 @@ class Query implements HttpTransportable
 
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
-            "indexed_metadata.$field",
+            Filter::getFilterPathByField($field),
             $applicationType,
             Filter::TYPE_RANGE,
             $options
