@@ -54,11 +54,15 @@ class Range
         list($from, $to) = explode(self::SEPARATOR, $string);
         $from = empty($from)
             ? self::ZERO
-            : (int) $from;
+            : (is_numeric($from)
+                ? (int) $from
+                : $from);
 
         $to = empty($to)
             ? self::INFINITE
-            : (int) $to;
+            : (is_numeric($to)
+                ? (int) $to
+                : $to);
 
         return [$from, $to];
     }

@@ -407,13 +407,15 @@ class Query implements HttpTransportable
      * @param string $field
      * @param array  $values
      * @param int    $applicationType
+     * @param string $rangeType
      *
      * @return Query
      */
     public function filterUniverseByRange(
         string $field,
         array $values,
-        int $applicationType = Filter::AT_LEAST_ONE
+        int $applicationType = Filter::AT_LEAST_ONE,
+        string $rangeType = Filter::TYPE_RANGE
     ) : Query {
         $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
@@ -421,10 +423,78 @@ class Query implements HttpTransportable
                 $fieldPath,
                 $values,
                 $applicationType,
-                Filter::TYPE_RANGE
+                $rangeType
             );
         } else {
             unset($this->universeFilters[$field]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Filter universe by range.
+     *
+     * @param string $field
+     * @param array  $values
+     * @param int    $applicationType
+     *
+     * @return Query
+     */
+    public function filterUniverseByDateRange(
+        string $field,
+        array $values,
+        int $applicationType = Filter::AT_LEAST_ONE
+    ) : Query {
+        return $this->filterUniverseByRange(
+            $field,
+            $values,
+            $applicationType,
+            Filter::TYPE_DATE_RANGE
+        );
+    }
+
+    /**
+     * Filter by range.
+     *
+     * @param string $filterName
+     * @param string $field
+     * @param array  $options
+     * @param array  $values
+     * @param int    $applicationType
+     * @param bool   $aggregate
+     * @param string $rangeType
+     *
+     * @return Query
+     */
+    public function filterByRange(
+        string $filterName,
+        string $field,
+        array $options,
+        array $values,
+        int $applicationType = Filter::AT_LEAST_ONE,
+        bool $aggregate = true,
+        string $rangeType = Filter::TYPE_RANGE
+    ) : Query {
+        $fieldPath = Filter::getFilterPathByField($field);
+        if (!empty($values)) {
+            $this->filters[$filterName] = Filter::create(
+                $fieldPath,
+                $values,
+                $applicationType,
+                $rangeType
+            );
+        } else {
+            unset($this->filters[$filterName]);
+        }
+
+        if ($aggregate) {
+            $this->aggregateByRange(
+                $filterName,
+                $fieldPath,
+                $options,
+                $applicationType
+            );
         }
 
         return $this;
@@ -442,7 +512,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function filterByRange(
+    public function filterByDateRange(
         string $filterName,
         string $field,
         array $options,
@@ -450,28 +520,15 @@ class Query implements HttpTransportable
         int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true
     ) : Query {
-        $fieldPath = Filter::getFilterPathByField($field);
-        if (!empty($values)) {
-            $this->filters[$filterName] = Filter::create(
-                $fieldPath,
-                $values,
-                $applicationType,
-                Filter::TYPE_RANGE
-            );
-        } else {
-            unset($this->filters[$filterName]);
-        }
-
-        if ($aggregate) {
-            $this->aggregateByRange(
-                $filterName,
-                $fieldPath,
-                $options,
-                $applicationType
-            );
-        }
-
-        return $this;
+        return $this->filterByRange(
+            $filterName,
+            $field,
+            $options,
+            $values,
+            $applicationType,
+            $aggregate,
+            Filter::TYPE_DATE_RANGE
+        );
     }
 
     /**
@@ -588,10 +645,43 @@ class Query implements HttpTransportable
      * @param string $field
      * @param array  $options
      * @param int    $applicationType
+     * @param string $rangeType
      *
      * @return Query
      */
     public function aggregateByRange(
+        string $filterName,
+        string $field,
+        array $options,
+        int $applicationType,
+        string $rangeType = Filter::TYPE_RANGE
+    ) : Query {
+        if (empty($options)) {
+            return $this;
+        }
+
+        $this->aggregations[$filterName] = Aggregation::create(
+            $filterName,
+            Filter::getFilterPathByField($field),
+            $applicationType,
+            $rangeType,
+            $options
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add tags aggregation.
+     *
+     * @param string $filterName
+     * @param string $field
+     * @param array  $options
+     * @param int    $applicationType
+     *
+     * @return Query
+     */
+    public function aggregateByDateRange(
         string $filterName,
         string $field,
         array $options,
@@ -605,7 +695,7 @@ class Query implements HttpTransportable
             $filterName,
             Filter::getFilterPathByField($field),
             $applicationType,
-            Filter::TYPE_RANGE,
+            Filter::TYPE_DATE_RANGE,
             $options
         );
 

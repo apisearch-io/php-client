@@ -70,6 +70,13 @@ class Filter implements HttpTransportable
      *
      * Filter type field
      */
+    const TYPE_DATE_RANGE = 'date_range';
+
+    /**
+     * @var string
+     *
+     * Filter type field
+     */
     const TYPE_GEO = 'geo';
 
     /**
