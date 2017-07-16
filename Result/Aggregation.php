@@ -303,20 +303,32 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'name' => $this->name,
             'counters' => array_map(function (Counter $counter) {
                 return $counter->toArray();
             }, $this->counters),
-            'application_type' => $this->applicationType,
-            'total_elements' => $this->totalElements,
+            'application_type' => $this->applicationType === Filter::AT_LEAST_ONE
+                ? null
+                : $this->applicationType,
+            'total_elements' => $this->totalElements === 0
+                ? null
+                : $this->totalElements,
             'active_elements' => array_map(function ($counter) {
                 return ($counter instanceof Counter)
                     ? $counter->toArray()
                     : $counter;
             }, $this->activeElements),
-            'highest_active_level' => $this->highestActiveLevel,
-        ];
+            'highest_active_level' => $this->highestActiveLevel === 0
+                ? null
+                : $this->highestActiveLevel,
+        ], function ($element) {
+            return
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
+        });
     }
 
     /**
@@ -329,7 +341,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     public static function createFromArray(array $array): self
     {
         $activeElements = [];
-        foreach ($array['active_elements'] as $activeElementName => $activeElement) {
+        foreach (($array['active_elements'] ?? []) as $activeElementName => $activeElement) {
             $activeElements[$activeElementName] = is_array($activeElement)
                 ? Counter::createFromArray($activeElement)
                 : $activeElement;
@@ -337,16 +349,16 @@ class Aggregation implements IteratorAggregate, HttpTransportable
 
         $aggregation = new self(
             $array['name'],
-            $array['application_type'],
-            $array['total_elements'],
+            (int) ($array['application_type'] ?? Filter::AT_LEAST_ONE),
+            (int) ($array['total_elements'] ?? 0),
             []
         );
         $aggregation->activeElements = $activeElements;
         $aggregation->counters = array_map(function (array $counter) {
             return Counter::createFromArray($counter);
-        }, $array['counters']);
+        }, $array['counters'] ?? []);
 
-        $aggregation->highestActiveLevel = $array['highest_active_level'];
+        $aggregation->highestActiveLevel = $array['highest_active_level'] ?? 0;
 
         return $aggregation;
     }

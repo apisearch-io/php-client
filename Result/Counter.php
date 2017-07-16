@@ -168,7 +168,9 @@ class Counter implements HttpTransportable
     {
         return [
             'values' => $this->values,
-            'used' => $this->used,
+            'used' => $this->used === false
+                ? null
+                : true,
             'n' => $this->n,
         ];
     }
@@ -184,7 +186,7 @@ class Counter implements HttpTransportable
     {
         return new self(
             $array['values'],
-            $array['used'],
+            (bool) ($array['used'] ?? false),
             $array['n']
         );
     }

@@ -240,13 +240,25 @@ class Filter implements HttpTransportable
      */
     public function toArray() : array
     {
-        return [
-            'field' => $this->field,
+        return array_filter([
+            'field' => $this->field === 'uuid.type'
+                ? null
+                : $this->field,
             'values' => $this->values,
-            'application_type' => $this->applicationType,
-            'filter_type' => $this->filterType,
+            'application_type' => $this->applicationType === self::AT_LEAST_ONE
+                ? null
+                : $this->applicationType,
+            'filter_type' => $this->filterType === self::TYPE_FIELD
+                ? null
+                : $this->filterType,
             'filter_terms' => $this->filterTerms,
-        ];
+        ], function ($element) {
+            return
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
+        });
     }
 
     /**
@@ -259,10 +271,10 @@ class Filter implements HttpTransportable
     public static function createFromArray(array $array) : Filter
     {
         return self::create(
-            $array['field'],
+            $array['field'] ?? 'uuid.type',
             $array['values'] ?? [],
-            (int) $array['application_type'],
-            $array['filter_type'],
+            (int) ($array['application_type'] ?? self::AT_LEAST_ONE),
+            $array['filter_type'] ?? self::TYPE_FIELD,
             $array['filter_terms'] ?? []
         );
     }

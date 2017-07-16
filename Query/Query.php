@@ -28,6 +28,27 @@ use Puntmig\Search\Model\ItemUUID;
 class Query implements HttpTransportable
 {
     /**
+     * @var int
+     *
+     * Default page
+     */
+    const DEFAULT_PAGE = 1;
+
+    /**
+     * @var int
+     *
+     * Default size
+     */
+    const DEFAULT_SIZE = 10;
+
+    /**
+     * @var int
+     *
+     * Infinite size
+     */
+    const INFINITE_SIZE = 1000;
+
+    /**
      * @var Coordinate
      *
      * Coordinate
@@ -133,8 +154,8 @@ class Query implements HttpTransportable
     public static function createLocated(
         Coordinate $coordinate,
         string $queryText,
-        int $page = 1,
-        int $size = 10
+        int $page = self::DEFAULT_PAGE,
+        int $size = self::DEFAULT_SIZE
     ) {
         $query = self::create(
             $queryText,
@@ -158,8 +179,8 @@ class Query implements HttpTransportable
      */
     public static function create(
         string $queryText,
-        int $page = 1,
-        int $size = 10
+        int $page = self::DEFAULT_PAGE,
+        int $size = self::DEFAULT_SIZE
     ) : Query {
         $page = (int) (max(1, $page));
         $query = new self($queryText);
@@ -179,8 +200,8 @@ class Query implements HttpTransportable
     {
         return self::create(
             '',
-            1,
-            1000
+            self::DEFAULT_PAGE,
+            self::INFINITE_SIZE
         );
     }
 
@@ -209,7 +230,7 @@ class Query implements HttpTransportable
             return $uuid->composeUUID();
         }, $uuids);
 
-        $query = self::create('', 1, count($uuids))
+        $query = self::create('', self::DEFAULT_PAGE, count($uuids))
             ->disableAggregations()
             ->disableSuggestions();
 
@@ -921,7 +942,9 @@ class Query implements HttpTransportable
         $query = $this->filters['_query'];
 
         return array_filter([
-            'q' => $query->getValues()[0],
+            'q' => !empty($query->getValues()[0])
+                ? $query->getValues()[0]
+                : null,
             'coordinate' => $this->coordinate instanceof HttpTransportable
                 ? $this->coordinate->toArray()
                 : null,
@@ -941,10 +964,16 @@ class Query implements HttpTransportable
                 return $aggregation->toArray();
             }, $this->aggregations),
             'sort' => $this->sort,
-            'page' => $this->page,
-            'size' => $this->size,
-            'suggestions_enabled' => $this->suggestionsEnabled,
-            'aggregations_enabled' => $this->aggregationsEnabled,
+            'page' => $this->page === self::DEFAULT_PAGE
+                ? null
+                : $this->page,
+            'size' => $this->size === self::DEFAULT_SIZE
+                ? null
+                : $this->size,
+            'suggestions_enabled' => $this->suggestionsEnabled ?: null,
+            'aggregations_enabled' => $this->aggregationsEnabled
+                ? null
+                : false,
             'filter_fields' => $this->filterFields,
         ], function ($element) {
             return
@@ -968,13 +997,13 @@ class Query implements HttpTransportable
             ? self::createLocated(
                 Coordinate::createFromArray($array['coordinate']),
                 $array['q'] ?? '',
-                (int) $array['page'],
-                (int) $array['size']
+                (int) ($array['page'] ?? self::DEFAULT_PAGE),
+                (int) ($array['size'] ?? self::DEFAULT_SIZE)
             )
             : self::create(
                 $array['q'] ?? '',
-                (int) $array['page'],
-                (int) $array['size']
+                (int) ($array['page'] ?? self::DEFAULT_PAGE),
+                (int) ($array['size'] ?? self::DEFAULT_SIZE)
             );
         $query->aggregations = array_map(function (array $aggregation) {
             return Aggregation::createFromArray($aggregation);

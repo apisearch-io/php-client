@@ -36,4 +36,34 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(array_key_exists('aggregations', $queryArray));
         $this->assertFalse(array_key_exists('filter_fields', $queryArray));
     }
+
+    /**
+     * Test defaults.
+     */
+    public function testDefaultsInfinite()
+    {
+        $queryArray = Query::createMatchAll()->toArray();
+        $query = Query::createFromArray($queryArray);
+
+        $this->assertFalse($query->areSuggestionsEnabled());
+        $this->assertTrue($query->areAggregationsEnabled());
+        $this->assertEquals('', $query->getQueryText());
+        $this->assertEquals(Query::DEFAULT_PAGE, $query->getPage());
+        $this->assertEquals(Query::INFINITE_SIZE, $query->getSize());
+    }
+
+    /**
+     * Test defaults.
+     */
+    public function testDefaults()
+    {
+        $queryArray = Query::create('')->toArray();
+        $query = Query::createFromArray($queryArray);
+
+        $this->assertFalse($query->areSuggestionsEnabled());
+        $this->assertTrue($query->areAggregationsEnabled());
+        $this->assertEquals('', $query->getQueryText());
+        $this->assertEquals(Query::DEFAULT_PAGE, $query->getPage());
+        $this->assertEquals(Query::DEFAULT_SIZE, $query->getSize());
+    }
 }

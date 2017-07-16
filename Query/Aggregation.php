@@ -165,13 +165,27 @@ class Aggregation implements HttpTransportable
      */
     public function toArray() : array
     {
-        return [
+        return array_filter([
             'name' => $this->name,
-            'field' => $this->field,
-            'application_type' => $this->applicationType,
-            'filter_type' => $this->filterType,
-            'subgroup' => $this->subgroup,
-        ];
+            'field' => $this->field === 'uuid.type'
+                ? null
+                : $this->field,
+            'application_type' => $this->applicationType === Filter::AT_LEAST_ONE
+                ? null
+                : $this->applicationType,
+            'filter_type' => $this->filterType === Filter::TYPE_FIELD
+                ? null
+                : $this->filterType,
+            'subgroup' => empty($this->subgroup)
+                ? null
+                : $this->subgroup,
+        ], function ($element) {
+            return
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
+        });
     }
 
     /**
@@ -185,9 +199,9 @@ class Aggregation implements HttpTransportable
     {
         return self::create(
             $array['name'],
-            $array['field'],
-            (int) $array['application_type'],
-            $array['filter_type'],
+            $array['field'] ?? 'uuid.type',
+            (int) ($array['application_type'] ?? Filter::AT_LEAST_ONE),
+            $array['filter_type'] ?? Filter::TYPE_FIELD,
             $array['subgroup'] ?? []
         );
     }
