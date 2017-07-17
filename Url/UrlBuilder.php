@@ -110,7 +110,6 @@ class UrlBuilder
             );
         }
         $this->routesCache[spl_object_hash($result)][$filterName] = $templateRoute;
-        var_dump($this->routesCache);
 
         return $urlElements['route'];
     }
