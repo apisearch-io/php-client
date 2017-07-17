@@ -40,6 +40,13 @@ class UrlBuilder
     private $router;
 
     /**
+     * @var array
+     *
+     * Routes cache
+     */
+    private $routesCache = [];
+
+    /**
      * UrlBuilder constructor.
      *
      * @param RouterInterface $router
@@ -73,6 +80,14 @@ class UrlBuilder
         string $filterName,
         string $value
     ) : string {
+        if (isset($this->routesCache[spl_object_hash($result)][$filterName])) {
+            return str_replace(
+                ['{id}', '{slug}'],
+                $result->getAggregation($filterName)->getCounter($value)->getValues(),
+                $this->routesCache[spl_object_hash($result)][$filterName]
+            );
+        }
+
         $urlParameters = $this->generateQueryUrlParameters($result, $filterName);
         if (
             !isset($urlParameters[$filterName]) ||
@@ -81,10 +96,23 @@ class UrlBuilder
             $urlParameters[$filterName][] = $value;
         }
 
-        return $this->createUrlByUrlParameters(
+        $urlElements = $this->createUrlByUrlParameters(
             $result,
             $urlParameters
         );
+
+        $templateRoute = $urlElements['template_path'];
+        if ($templateRoute === $this->routesDictionary['main']) {
+            $templateRoute = str_replace(
+                "{$filterName}[]=$value",
+                "{$filterName}[]={id}",
+                $templateRoute
+            );
+        }
+        $this->routesCache[spl_object_hash($result)][$filterName] = $templateRoute;
+        var_dump($this->routesCache);
+
+        return $urlElements['route'];
     }
 
     /**
@@ -115,7 +143,7 @@ class UrlBuilder
         return $this->createUrlByUrlParameters(
             $result,
             $urlParameters
-        );
+        )['route'];
     }
 
     /**
@@ -133,7 +161,7 @@ class UrlBuilder
         return $this->createUrlByUrlParameters(
             $result,
             $urlParameters
-        );
+        )['route'];
     }
 
     /**
@@ -154,7 +182,7 @@ class UrlBuilder
         return $this->createUrlByUrlParameters(
             $result,
             $urlParameters
-        );
+        )['route'];
     }
 
     /**
@@ -180,7 +208,7 @@ class UrlBuilder
         return $this->createUrlByUrlParameters(
             $result,
             $urlParameters
-        );
+        )['route'];
     }
 
     /**
@@ -206,7 +234,7 @@ class UrlBuilder
         return $this->createUrlByUrlParameters(
             $result,
             $urlParameters
-        );
+        )['route'];
     }
 
     /**
@@ -248,7 +276,7 @@ class UrlBuilder
         return $this->createUrlByUrlParameters(
             $result,
             $urlParameters
-        );
+        )['route'];
     }
 
     /**
@@ -304,12 +332,12 @@ class UrlBuilder
      * @param Result $result
      * @param array  $urlParameters
      *
-     * @return string
+     * @return string[]
      */
     private function createUrlByUrlParameters(
         Result $result,
         array $urlParameters
-    ) : string {
+    ) : array {
         foreach ($this->routesDictionary as $field => $route) {
             if (
                 isset($urlParameters[$field]) &&
@@ -323,39 +351,46 @@ class UrlBuilder
                     : $urlParameters[$field];
 
                 unset($urlParameters[$field]);
+                $path = $this
+                    ->router
+                    ->getRouteCollection()
+                    ->get($route)
+                    ->getPath();
                 preg_match_all(
                     '~\{(.+?)\}~',
-                    $this
-                        ->router
-                        ->getRouteCollection()
-                        ->get($route)
-                        ->getPath(),
+                    $path,
                     $matches
                 );
 
-                return $this
-                    ->router
-                    ->generate(
-                        $route,
-                        array_merge(
-                            array_intersect_key(
-                                $result
-                                    ->getAggregation($field)
-                                    ->getAllElements()[$value]
-                                    ->getValues(),
-                                array_flip($matches[1])
-                            ),
-                            $urlParameters
-                        )
-                    );
+                return [
+                    'route' => $this
+                        ->router
+                        ->generate(
+                            $route,
+                            array_merge(
+                                array_intersect_key(
+                                    $result
+                                        ->getAggregation($field)
+                                        ->getAllElements()[$value]
+                                        ->getValues(),
+                                    array_flip($matches[1])
+                                ),
+                                $urlParameters
+                            )
+                        ),
+                    'template_path' => $path,
+                ];
             }
         }
 
-        return $this
-            ->router
-            ->generate(
-                $this->routesDictionary['main'],
-                $urlParameters
-            );
+        return [
+            'route' => $this
+                ->router
+                ->generate(
+                    $this->routesDictionary['main'],
+                    $urlParameters
+                ),
+            'template_path' => $this->routesDictionary['main'],
+        ];
     }
 }
