@@ -963,7 +963,9 @@ class Query implements HttpTransportable
             'aggregations' => array_map(function (Aggregation $aggregation) {
                 return $aggregation->toArray();
             }, $this->aggregations),
-            'sort' => $this->sort,
+            'sort' => $this->sort === SortBy::SCORE
+                ? null
+                : $this->sort,
             'page' => $this->page === self::DEFAULT_PAGE
                 ? null
                 : $this->page,
@@ -1009,7 +1011,7 @@ class Query implements HttpTransportable
             return Aggregation::createFromArray($aggregation);
         }, $array['aggregations'] ?? []);
 
-        $query->sort = $array['sort'];
+        $query->sort = $array['sort'] ?? SortBy::SCORE;
         $query->filters = array_merge(
             $query->filters,
             array_map(function (array $filter) {

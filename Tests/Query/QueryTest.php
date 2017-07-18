@@ -19,6 +19,7 @@ namespace Puntmig\Search\Tests\Query;
 use PHPUnit_Framework_TestCase;
 
 use Puntmig\Search\Query\Query;
+use Puntmig\Search\Query\SortBy;
 
 /**
  * Class QueryTest.
@@ -65,5 +66,6 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('', $query->getQueryText());
         $this->assertEquals(Query::DEFAULT_PAGE, $query->getPage());
         $this->assertEquals(Query::DEFAULT_SIZE, $query->getSize());
+        $this->assertEquals(SortBy::SCORE, $query->getSortBy());
     }
 }
