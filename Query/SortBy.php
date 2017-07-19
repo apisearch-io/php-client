@@ -31,6 +31,20 @@ class SortBy
     /**
      * @var array
      *
+     * Sort random
+     */
+    const RANDOM = ['random'];
+
+    /**
+     * @var array
+     *
+     * Sort al-tun-tun
+     */
+    const AL_TUN_TUN = self::RANDOM;
+
+    /**
+     * @var array
+     *
      * Sort by id ASC
      */
     const ID_ASC = ['uuid.id' => 'asc'];

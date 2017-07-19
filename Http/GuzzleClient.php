@@ -71,7 +71,10 @@ class GuzzleClient implements HttpClient
          */
         $response = $client->$method(
             rtrim($this->host . $url, '/'),
-            [$bodyFieldName => $options]
+            [$bodyFieldName => $options],
+            [
+                'decode_content' => 'gzip',
+            ]
         );
 
         return [
