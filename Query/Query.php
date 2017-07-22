@@ -273,12 +273,14 @@ class Query implements HttpTransportable
      *
      * @param array $values
      * @param bool  $aggregate
+     * @param array $aggregationSort
      *
      * @return Query
      */
     public function filterByTypes(
         array $values,
-        bool $aggregate = true
+        bool $aggregate = true,
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ) : Query {
         $fieldPath = Filter::getFilterPathByField('type');
         if (!empty($values)) {
@@ -297,7 +299,9 @@ class Query implements HttpTransportable
                 'type',
                 $fieldPath,
                 Filter::AT_LEAST_ONE,
-                Filter::TYPE_FIELD
+                Filter::TYPE_FIELD,
+                [],
+                $aggregationSort
             );
         }
 
@@ -389,6 +393,7 @@ class Query implements HttpTransportable
      * @param array  $values
      * @param int    $applicationType
      * @param bool   $aggregate
+     * @param array  $aggregationSort
      *
      * @return Query
      */
@@ -397,7 +402,8 @@ class Query implements HttpTransportable
         string $field,
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
+        bool $aggregate = true,
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ) : Query {
         $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
@@ -415,7 +421,8 @@ class Query implements HttpTransportable
             $this->aggregateBy(
                 $filterName,
                 $field,
-                $applicationType
+                $applicationType,
+                $aggregationSort
             );
         }
 
@@ -483,8 +490,9 @@ class Query implements HttpTransportable
      * @param array  $options
      * @param array  $values
      * @param int    $applicationType
-     * @param bool   $aggregate
      * @param string $rangeType
+     * @param bool   $aggregate
+     * @param array  $aggregationSort
      *
      * @return Query
      */
@@ -494,8 +502,9 @@ class Query implements HttpTransportable
         array $options,
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE,
+        string $rangeType = Filter::TYPE_RANGE,
         bool $aggregate = true,
-        string $rangeType = Filter::TYPE_RANGE
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ) : Query {
         $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
@@ -514,7 +523,9 @@ class Query implements HttpTransportable
                 $filterName,
                 $fieldPath,
                 $options,
-                $applicationType
+                $applicationType,
+                $rangeType,
+                $aggregationSort
             );
         }
 
@@ -530,6 +541,7 @@ class Query implements HttpTransportable
      * @param array  $values
      * @param int    $applicationType
      * @param bool   $aggregate
+     * @param array  $aggregationSort
      *
      * @return Query
      */
@@ -539,7 +551,8 @@ class Query implements HttpTransportable
         array $options,
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE,
-        bool $aggregate = true
+        bool $aggregate = true,
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ) : Query {
         return $this->filterByRange(
             $filterName,
@@ -547,8 +560,9 @@ class Query implements HttpTransportable
             $options,
             $values,
             $applicationType,
+            Filter::TYPE_DATE_RANGE,
             $aggregate,
-            Filter::TYPE_DATE_RANGE
+            $aggregationSort
         );
     }
 
@@ -641,19 +655,23 @@ class Query implements HttpTransportable
      * @param string $filterName
      * @param string $field
      * @param int    $applicationType
+     * @param array  $aggregationSort
      *
      * @return Query
      */
     public function aggregateBy(
         string $filterName,
         string $field,
-        int $applicationType
+        int $applicationType,
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ) : Query {
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
             Filter::getFilterPathByField($field),
             $applicationType,
-            Filter::TYPE_FIELD
+            Filter::TYPE_FIELD,
+            [],
+            $aggregationSort
         );
 
         return $this;
@@ -667,6 +685,7 @@ class Query implements HttpTransportable
      * @param array  $options
      * @param int    $applicationType
      * @param string $rangeType
+     * @param array  $aggregationSort
      *
      * @return Query
      */
@@ -675,7 +694,8 @@ class Query implements HttpTransportable
         string $field,
         array $options,
         int $applicationType,
-        string $rangeType = Filter::TYPE_RANGE
+        string $rangeType = Filter::TYPE_RANGE,
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ) : Query {
         if (empty($options)) {
             return $this;
@@ -686,7 +706,8 @@ class Query implements HttpTransportable
             Filter::getFilterPathByField($field),
             $applicationType,
             $rangeType,
-            $options
+            $options,
+            $aggregationSort
         );
 
         return $this;
@@ -699,6 +720,7 @@ class Query implements HttpTransportable
      * @param string $field
      * @param array  $options
      * @param int    $applicationType
+     * @param array  $aggregationSort
      *
      * @return Query
      */
@@ -706,7 +728,8 @@ class Query implements HttpTransportable
         string $filterName,
         string $field,
         array $options,
-        int $applicationType
+        int $applicationType,
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ) : Query {
         if (empty($options)) {
             return $this;
@@ -717,7 +740,8 @@ class Query implements HttpTransportable
             Filter::getFilterPathByField($field),
             $applicationType,
             Filter::TYPE_DATE_RANGE,
-            $options
+            $options,
+            $aggregationSort
         );
 
         return $this;

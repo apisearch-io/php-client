@@ -24,6 +24,34 @@ use Puntmig\Search\Model\HttpTransportable;
 class Aggregation implements HttpTransportable
 {
     /**
+     * @var array
+     *
+     * Sort aggregation by count asc
+     */
+    const SORT_BY_COUNT_ASC = ['_count', 'asc'];
+
+    /**
+     * @var array
+     *
+     * Sort aggregation by count desc
+     */
+    const SORT_BY_COUNT_DESC = ['_count', 'desc'];
+
+    /**
+     * @var array
+     *
+     * Sort aggregation by name asc
+     */
+    const SORT_BY_NAME_ASC = ['_term', 'asc'];
+
+    /**
+     * @var array
+     *
+     * Sort aggregation by name desc
+     */
+    const SORT_BY_NAME_DESC = ['_term', 'desc'];
+
+    /**
      * @var string
      *
      * Name
@@ -59,6 +87,13 @@ class Aggregation implements HttpTransportable
     private $subgroup;
 
     /**
+     * @var array
+     *
+     * Aggregation sort
+     */
+    private $sort;
+
+    /**
      * Aggregation constructor.
      *
      * @param string $name
@@ -66,19 +101,22 @@ class Aggregation implements HttpTransportable
      * @param int    $applicationType
      * @param string $filterType
      * @param array  $subgroup
+     * @param array  $sort
      */
     private function __construct(
         string $name,
         string $field,
         int $applicationType,
         string $filterType,
-        array $subgroup
+        array $subgroup,
+        array $sort
     ) {
         $this->name = $name;
         $this->field = $field;
         $this->applicationType = $applicationType;
         $this->filterType = $filterType;
         $this->subgroup = $subgroup;
+        $this->sort = $sort;
     }
 
     /**
@@ -132,6 +170,16 @@ class Aggregation implements HttpTransportable
     }
 
     /**
+     * Get Sort.
+     *
+     * @return array
+     */
+    public function getSort() : array
+    {
+        return $this->sort;
+    }
+
+    /**
      * Create.
      *
      * @param string $name
@@ -139,6 +187,7 @@ class Aggregation implements HttpTransportable
      * @param int    $applicationType
      * @param string $filterType
      * @param array  $subgroup
+     * @param array  $sort
      *
      * @return Aggregation
      */
@@ -147,14 +196,16 @@ class Aggregation implements HttpTransportable
         string $field,
         int $applicationType,
         string $filterType,
-        array $subgroup = []
+        array $subgroup = [],
+        array $sort = self::SORT_BY_COUNT_DESC
     ) : Aggregation {
         return new self(
             $name,
             $field,
             $applicationType,
             $filterType,
-            $subgroup
+            $subgroup,
+            $sort
         );
     }
 
@@ -179,6 +230,9 @@ class Aggregation implements HttpTransportable
             'subgroup' => empty($this->subgroup)
                 ? null
                 : $this->subgroup,
+            'sort' => $this->sort === self::SORT_BY_COUNT_DESC
+                ? null
+                : $this->sort,
         ], function ($element) {
             return
             !(
@@ -202,7 +256,8 @@ class Aggregation implements HttpTransportable
             $array['field'] ?? 'uuid.type',
             (int) ($array['application_type'] ?? Filter::AT_LEAST_ONE),
             $array['filter_type'] ?? Filter::TYPE_FIELD,
-            $array['subgroup'] ?? []
+            $array['subgroup'] ?? [],
+            $array['sort'] ?? self::SORT_BY_COUNT_DESC
         );
     }
 }
