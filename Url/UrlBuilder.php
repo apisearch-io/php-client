@@ -366,7 +366,7 @@ class UrlBuilder
                     $path,
                     $matches
                 );
-                
+
                 return [
                     'route' => urldecode($this
                         ->router
