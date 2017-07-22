@@ -102,7 +102,10 @@ class UrlBuilder
             $urlParameters
         );
 
-        $templateRoute = $urlElements['template_path'];
+        $templateRoute = in_array($urlElements['field'], [false, $filterName])
+            ? $urlElements['template_path']
+            : parse_url($urlElements['route'], PHP_URL_PATH);
+
         $filteredUrlParameters = $urlElements['url_parameters'];
         $routeQuery = parse_url($urlElements['route'], PHP_URL_QUERY);
         $route = rtrim("$templateRoute?$routeQuery", '?');
@@ -386,6 +389,7 @@ class UrlBuilder
                         )),
                     'url_parameters' => $urlParameters,
                     'template_path' => $path,
+                    'field' => $field,
                 ];
             }
         }
@@ -407,6 +411,7 @@ class UrlBuilder
                     UrlGeneratorInterface::ABSOLUTE_URL
                 )
             ),
+            'field' => false,
         ];
     }
 }
