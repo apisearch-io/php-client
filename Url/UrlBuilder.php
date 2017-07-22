@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Url;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 use Puntmig\Search\Query\Filter;
@@ -102,14 +103,19 @@ class UrlBuilder
         );
 
         $templateRoute = $urlElements['template_path'];
-        if ($templateRoute === $this->routesDictionary['main']) {
-            $templateRoute = str_replace(
-                "{$filterName}[]=$value",
-                "{$filterName}[]={id}",
-                $templateRoute
+        $filteredUrlParameters = $urlElements['url_parameters'];
+        $routeQuery = parse_url($urlElements['route'], PHP_URL_QUERY);
+        $route = rtrim("$templateRoute?$routeQuery", '?');
+        if (isset($filteredUrlParameters[$filterName])) {
+            $paremeterKey = array_search($value, $filteredUrlParameters[$filterName]);
+            $route = str_replace(
+                "{$filterName}[$paremeterKey]=$value",
+                "{$filterName}[$paremeterKey]={id}",
+                $route
             );
         }
-        $this->routesCache[spl_object_hash($result)][$filterName] = $templateRoute;
+
+        $this->routesCache[spl_object_hash($result)][$filterName] = $route;
 
         return $urlElements['route'];
     }
@@ -360,9 +366,9 @@ class UrlBuilder
                     $path,
                     $matches
                 );
-
+                
                 return [
-                    'route' => $this
+                    'route' => urldecode($this
                         ->router
                         ->generate(
                             $route,
@@ -375,21 +381,32 @@ class UrlBuilder
                                     array_flip($matches[1])
                                 ),
                                 $urlParameters
-                            )
-                        ),
+                            ),
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        )),
+                    'url_parameters' => $urlParameters,
                     'template_path' => $path,
                 ];
             }
         }
 
         return [
-            'route' => $this
+            'route' => urldecode($this
                 ->router
                 ->generate(
                     $this->routesDictionary['main'],
-                    $urlParameters
-                ),
-            'template_path' => $this->routesDictionary['main'],
+                    $urlParameters,
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                )),
+            'url_parameters' => $urlParameters,
+            'template_path' => urldecode($this
+                ->router
+                ->generate(
+                    $this->routesDictionary['main'],
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                )
+            ),
         ];
     }
 }
