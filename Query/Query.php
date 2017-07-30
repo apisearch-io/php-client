@@ -656,6 +656,7 @@ class Query implements HttpTransportable
      * @param string $field
      * @param int    $applicationType
      * @param array  $aggregationSort
+     * @param int    $limit
      *
      * @return Query
      */
@@ -663,7 +664,8 @@ class Query implements HttpTransportable
         string $filterName,
         string $field,
         int $applicationType,
-        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC,
+        int $limit = Aggregation::NO_LIMIT
     ) : Query {
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
@@ -671,7 +673,8 @@ class Query implements HttpTransportable
             $applicationType,
             Filter::TYPE_FIELD,
             [],
-            $aggregationSort
+            $aggregationSort,
+            $limit
         );
 
         return $this;
@@ -686,6 +689,7 @@ class Query implements HttpTransportable
      * @param int    $applicationType
      * @param string $rangeType
      * @param array  $aggregationSort
+     * @param int    $limit
      *
      * @return Query
      */
@@ -695,7 +699,8 @@ class Query implements HttpTransportable
         array $options,
         int $applicationType,
         string $rangeType = Filter::TYPE_RANGE,
-        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC,
+        int $limit = Aggregation::NO_LIMIT
     ) : Query {
         if (empty($options)) {
             return $this;
@@ -707,7 +712,8 @@ class Query implements HttpTransportable
             $applicationType,
             $rangeType,
             $options,
-            $aggregationSort
+            $aggregationSort,
+            $limit
         );
 
         return $this;
@@ -721,6 +727,7 @@ class Query implements HttpTransportable
      * @param array  $options
      * @param int    $applicationType
      * @param array  $aggregationSort
+     * @param int    $limit
      *
      * @return Query
      */
@@ -729,7 +736,8 @@ class Query implements HttpTransportable
         string $field,
         array $options,
         int $applicationType,
-        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
+        array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC,
+        int $limit = Aggregation::NO_LIMIT
     ) : Query {
         if (empty($options)) {
             return $this;
@@ -741,7 +749,8 @@ class Query implements HttpTransportable
             $applicationType,
             Filter::TYPE_DATE_RANGE,
             $options,
-            $aggregationSort
+            $aggregationSort,
+            $limit
         );
 
         return $this;

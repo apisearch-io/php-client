@@ -52,6 +52,13 @@ class Aggregation implements HttpTransportable
     const SORT_BY_NAME_DESC = ['_term', 'desc'];
 
     /**
+     * @var int
+     *
+     * No limit
+     */
+    const NO_LIMIT = 0;
+
+    /**
      * @var string
      *
      * Name
@@ -94,6 +101,13 @@ class Aggregation implements HttpTransportable
     private $sort;
 
     /**
+     * @var int
+     *
+     * Limit
+     */
+    private $limit;
+
+    /**
      * Aggregation constructor.
      *
      * @param string $name
@@ -102,6 +116,7 @@ class Aggregation implements HttpTransportable
      * @param string $filterType
      * @param array  $subgroup
      * @param array  $sort
+     * @param int    $limit
      */
     private function __construct(
         string $name,
@@ -109,7 +124,8 @@ class Aggregation implements HttpTransportable
         int $applicationType,
         string $filterType,
         array $subgroup,
-        array $sort
+        array $sort,
+        int $limit
     ) {
         $this->name = $name;
         $this->field = $field;
@@ -117,6 +133,7 @@ class Aggregation implements HttpTransportable
         $this->filterType = $filterType;
         $this->subgroup = $subgroup;
         $this->sort = $sort;
+        $this->limit = $limit;
     }
 
     /**
@@ -180,6 +197,16 @@ class Aggregation implements HttpTransportable
     }
 
     /**
+     * Get limit.
+     *
+     * @return int
+     */
+    public function getLimit() : int
+    {
+        return $this->limit;
+    }
+
+    /**
      * Create.
      *
      * @param string $name
@@ -188,6 +215,7 @@ class Aggregation implements HttpTransportable
      * @param string $filterType
      * @param array  $subgroup
      * @param array  $sort
+     * @param int    $limit
      *
      * @return Aggregation
      */
@@ -197,7 +225,8 @@ class Aggregation implements HttpTransportable
         int $applicationType,
         string $filterType,
         array $subgroup = [],
-        array $sort = self::SORT_BY_COUNT_DESC
+        array $sort = self::SORT_BY_COUNT_DESC,
+        int $limit = self::NO_LIMIT
     ) : Aggregation {
         return new self(
             $name,
@@ -205,7 +234,8 @@ class Aggregation implements HttpTransportable
             $applicationType,
             $filterType,
             $subgroup,
-            $sort
+            $sort,
+            $limit
         );
     }
 
@@ -233,6 +263,9 @@ class Aggregation implements HttpTransportable
             'sort' => $this->sort === self::SORT_BY_COUNT_DESC
                 ? null
                 : $this->sort,
+            'limit' => $this->limit === self::NO_LIMIT
+                ? null
+                : $this->limit,
         ], function ($element) {
             return
             !(
@@ -257,7 +290,8 @@ class Aggregation implements HttpTransportable
             (int) ($array['application_type'] ?? Filter::AT_LEAST_ONE),
             $array['filter_type'] ?? Filter::TYPE_FIELD,
             $array['subgroup'] ?? [],
-            $array['sort'] ?? self::SORT_BY_COUNT_DESC
+            $array['sort'] ?? self::SORT_BY_COUNT_DESC,
+            $array['limit'] ?? self::NO_LIMIT
         );
     }
 }
