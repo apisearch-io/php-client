@@ -21,6 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Puntmig\Search\Query\Filter;
 use Puntmig\Search\Query\SortBy;
+use Puntmig\Search\Result\Counter;
 use Puntmig\Search\Result\Result;
 
 /**
@@ -348,50 +349,58 @@ class UrlBuilder
     ) : array {
         foreach ($this->routesDictionary as $field => $route) {
             if (
-                isset($urlParameters[$field]) &&
+                !isset($urlParameters[$field]) ||
                 (
-                    !is_array($urlParameters[$field]) ||
-                    count($urlParameters[$field]) === 1
+                    is_array($urlParameters[$field]) &&
+                    count($urlParameters[$field]) !== 1
                 )
             ) {
-                $value = is_array($urlParameters[$field])
-                    ? reset($urlParameters[$field])
-                    : $urlParameters[$field];
-
-                unset($urlParameters[$field]);
-                $path = $this
-                    ->router
-                    ->getRouteCollection()
-                    ->get($route)
-                    ->getPath();
-                preg_match_all(
-                    '~\{(.+?)\}~',
-                    $path,
-                    $matches
-                );
-
-                return [
-                    'route' => urldecode($this
-                        ->router
-                        ->generate(
-                            $route,
-                            array_merge(
-                                array_intersect_key(
-                                    $result
-                                        ->getAggregation($field)
-                                        ->getAllElements()[$value]
-                                        ->getValues(),
-                                    array_flip($matches[1])
-                                ),
-                                $urlParameters
-                            ),
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        )),
-                    'url_parameters' => $urlParameters,
-                    'template_path' => $path,
-                    'field' => $field,
-                ];
+                continue;
             }
+
+            $value = is_array($urlParameters[$field])
+                ? reset($urlParameters[$field])
+                : $urlParameters[$field];
+
+            if (!$result
+                ->getAggregation($field)
+                ->getAllElements()[$value] instanceof Counter) {
+                continue;
+            }
+
+            unset($urlParameters[$field]);
+            $path = $this
+                ->router
+                ->getRouteCollection()
+                ->get($route)
+                ->getPath();
+            preg_match_all(
+                '~\{(.+?)\}~',
+                $path,
+                $matches
+            );
+
+            return [
+                'route' => urldecode($this
+                    ->router
+                    ->generate(
+                        $route,
+                        array_merge(
+                            array_intersect_key(
+                                $result
+                                    ->getAggregation($field)
+                                    ->getAllElements()[$value]
+                                    ->getValues(),
+                                array_flip($matches[1])
+                            ),
+                            $urlParameters
+                        ),
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )),
+                'url_parameters' => $urlParameters,
+                'template_path' => $path,
+                'field' => $field,
+            ];
         }
 
         return [

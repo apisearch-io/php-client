@@ -138,7 +138,7 @@ class Filter implements HttpTransportable
         array $filterTerms
     ) {
         $this->field = $field;
-        $this->values = $values;
+        $this->values = array_values($values);
         $this->applicationType = $applicationType;
         $this->filterType = $filterType;
         $this->filterTerms = $filterTerms;
