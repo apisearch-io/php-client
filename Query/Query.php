@@ -651,6 +651,12 @@ class Query implements HttpTransportable
                 ->toArray();
         }
 
+        foreach ($sort as $field => $direction) {
+            if (!is_array($direction)) {
+                $sort[$field] = ['order' => $direction];
+            }
+        }
+
         $this->sort = $sort;
 
         return $this;

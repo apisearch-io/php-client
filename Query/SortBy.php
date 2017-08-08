@@ -26,14 +26,14 @@ class SortBy
      *
      * Sort by score
      */
-    const SCORE = ['_score' => 'asc'];
+    const SCORE = ['_score' => ['order' => 'asc']];
 
     /**
      * @var array
      *
      * Sort random
      */
-    const RANDOM = ['random'];
+    const RANDOM = ['random' => ['order' => 'asc']];
 
     /**
      * @var array
@@ -47,28 +47,28 @@ class SortBy
      *
      * Sort by id ASC
      */
-    const ID_ASC = ['uuid.id' => 'asc'];
+    const ID_ASC = ['uuid.id' => ['order' => 'asc']];
 
     /**
      * @var array
      *
      * Sort by id DESC
      */
-    const ID_DESC = ['uuid.id' => 'desc'];
+    const ID_DESC = ['uuid.id' => ['order' => 'desc']];
 
     /**
      * @var array
      *
      * Sort by type ASC
      */
-    const TYPE_ASC = ['uuid.type' => 'asc'];
+    const TYPE_ASC = ['uuid.type' => ['order' => 'asc']];
 
     /**
      * @var array
      *
      * Sort by type DESC
      */
-    const TYPE_DESC = ['uuid.type' => 'desc'];
+    const TYPE_DESC = ['uuid.type' => ['order' => 'desc']];
 
     /**
      * @var array
