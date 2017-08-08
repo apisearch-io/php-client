@@ -59,7 +59,7 @@ class HttpRepository extends Repository
         if (!empty($itemsToUpdate)) {
             $this
                 ->httpClient
-                ->get('/items', 'post', [
+                ->get('/items', 'postAsync', [
                     'key' => $this->getKey(),
                     'items' => json_encode(
                         array_map(function (Item $item) {
@@ -72,7 +72,7 @@ class HttpRepository extends Repository
         if (!empty($itemsToDelete)) {
             $this
                 ->httpClient
-                ->get('/items', 'delete', [
+                ->get('/items', 'deleteAsync', [
                     'key' => $this->getKey(),
                     'items' => json_encode(
                         array_map(function (ItemUUID $itemUUID) {
@@ -111,7 +111,7 @@ class HttpRepository extends Repository
     {
         $this
             ->httpClient
-            ->get('/', 'delete', [
+            ->get('/', 'deleteAsync', [
                 'key' => $this->getKey(),
                 'language' => $language,
             ]);

@@ -126,6 +126,13 @@ class Query implements HttpTransportable
     private $filterFields = [];
 
     /**
+     * @var User
+     *
+     * User associated to query
+     */
+    private $user;
+
+    /**
      * Construct.
      *
      * @param $queryText
@@ -966,6 +973,42 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Query by user.
+     *
+     * @param User $user
+     *
+     * @return Query
+     */
+    public function byUser(User $user) : Query
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Query anonymously.
+     *
+     * @return Query
+     */
+    public function anonymously() : Query
+    {
+        $this->user = null;
+
+        return $this;
+    }
+
+    /**
+     * Get User.
+     *
+     * @return null|User
+     */
+    public function getUser() : ? User
+    {
+        return $this->user;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -1010,6 +1053,9 @@ class Query implements HttpTransportable
                 ? null
                 : false,
             'filter_fields' => $this->filterFields,
+            'user' => ($this->user instanceof User)
+                ? $this->user->toArray()
+                : null,
         ], function ($element) {
             return
             !(
@@ -1060,6 +1106,9 @@ class Query implements HttpTransportable
         $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
         $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
         $query->filterFields = $array['filter_fields'] ?? [];
+        if (isset($array['user'])) {
+            $query->user = User::createFromArray($array['user']);
+        }
 
         return $query;
     }

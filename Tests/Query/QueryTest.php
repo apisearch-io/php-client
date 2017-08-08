@@ -36,6 +36,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(array_key_exists('filters', $queryArray));
         $this->assertFalse(array_key_exists('aggregations', $queryArray));
         $this->assertFalse(array_key_exists('filter_fields', $queryArray));
+        $this->assertFalse(array_key_exists('user', $queryArray));
     }
 
     /**
@@ -67,5 +68,6 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(Query::DEFAULT_PAGE, $query->getPage());
         $this->assertEquals(Query::DEFAULT_SIZE, $query->getSize());
         $this->assertEquals(SortBy::SCORE, $query->getSortBy());
+        $this->assertNull($query->getUser());
     }
 }
