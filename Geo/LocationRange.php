@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Puntmig\Search\Geo;
 
 use Puntmig\Search\Model\HttpTransportable;
+use Exception;
 
 /**
  * Interface LocationRange.
@@ -36,8 +37,13 @@ abstract class LocationRange implements HttpTransportable
      * @param array $array
      *
      * @return self
+     *
+     * @throws Exception
      */
-    abstract public static function fromFilterArray(array $array) : self;
+    public static function fromFilterArray(array $array) : self
+    {
+        throw new Exception('Method not valid');
+    }
 
     /**
      * To array.

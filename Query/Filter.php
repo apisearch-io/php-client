@@ -138,7 +138,9 @@ class Filter implements HttpTransportable
         array $filterTerms
     ) {
         $this->field = $field;
-        $this->values = array_values($values);
+        $this->values = $filterType !== Filter::TYPE_GEO
+            ? array_values($values)
+            : $values;
         $this->applicationType = $applicationType;
         $this->filterType = $filterType;
         $this->filterTerms = $filterTerms;
