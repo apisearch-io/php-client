@@ -49,7 +49,7 @@ class HttpRepository extends Repository
      */
     public function __construct(
         HttpClient $httpClient,
-        bool $writeAsync
+        bool $writeAsync = false
     )
     {
         parent::__construct();
