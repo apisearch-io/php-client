@@ -126,9 +126,14 @@ class HttpRepository extends Repository
      */
     public function reset(? string $language)
     {
+        $async = ($this->writeAsync)
+            ? 'Async'
+            : ''
+        ;
+        
         $this
             ->httpClient
-            ->get('/', 'deleteAsync', [
+            ->get('/', 'delete' . $async, [
                 'key' => $this->getKey(),
                 'language' => $language,
             ]);
