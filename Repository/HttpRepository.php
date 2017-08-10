@@ -33,19 +33,31 @@ class HttpRepository extends Repository
      * Http client
      */
     private $httpClient;
-
+    
+    /**
+     * @var bool
+     *
+     * Write (Post/Delete) Asynchronous
+     */
+    private $writeAsync;
+    
     /**
      * HttpAdapter constructor.
      *
      * @param HttpClient $httpClient
+     * @param bool       $writeAsync
      */
-    public function __construct(HttpClient $httpClient)
+    public function __construct(
+        HttpClient $httpClient,
+        bool $writeAsync
+    )
     {
         parent::__construct();
 
         $this->httpClient = $httpClient;
+        $this->writeAsync = $writeAsync;
     }
-
+    
     /**
      * Flush items.
      *
@@ -56,10 +68,15 @@ class HttpRepository extends Repository
         array $itemsToUpdate,
         array $itemsToDelete
     ) {
+        $async = ($this->writeAsync)
+            ? 'Async'
+            : ''
+        ;
+        
         if (!empty($itemsToUpdate)) {
             $this
                 ->httpClient
-                ->get('/items', 'postAsync', [
+                ->get('/items', 'post' . $async, [
                     'key' => $this->getKey(),
                     'items' => json_encode(
                         array_map(function (Item $item) {
@@ -68,11 +85,11 @@ class HttpRepository extends Repository
                     ),
                 ]);
         }
-
+        
         if (!empty($itemsToDelete)) {
             $this
                 ->httpClient
-                ->get('/items', 'deleteAsync', [
+                ->get('/items', 'delete' . $async, [
                     'key' => $this->getKey(),
                     'items' => json_encode(
                         array_map(function (ItemUUID $itemUUID) {
@@ -82,7 +99,7 @@ class HttpRepository extends Repository
                 ]);
         }
     }
-
+    
     /**
      * Search across the index types.
      *
@@ -98,10 +115,10 @@ class HttpRepository extends Repository
                 'key' => $this->getKey(),
                 'query' => json_encode($query->toArray()),
             ]);
-
+        
         return Result::createFromArray($response['body']);
     }
-
+    
     /**
      * Reset the index.
      *
