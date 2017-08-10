@@ -27,13 +27,14 @@ interface HttpClient
      *
      * @param string $url
      * @param string $method
-     * @param array  $options
-     *
+     * @param array  $parameters
+     * @param array  $server
      * @return array
      */
     public function get(
         string $url,
         string $method,
-        array $options
+        array $parameters,
+        array $server = []
     ) : array;
 }
