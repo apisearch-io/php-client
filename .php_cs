@@ -1,29 +1,17 @@
 <?php
 
-$config = Symfony\CS\Config\Config::create()
-    // use SYMFONY_LEVEL:
-    ->level(Symfony\CS\FixerInterface::SYMFONY_LEVEL)
-    // and extra fixers:
-    ->fixers([
-        'concat_with_spaces',
-        'multiline_spaces_before_semicolon',
-        'short_array_syntax',
-        '-remove_lines_between_uses',
-        '-empty_return',
-        '-phpdoc_var_without_name',
-        '-phpdoc_to_comment',
-    ]);
+$finder = PhpCsFixer\Finder::create()
+    ->exclude('vendor')
+    ->exclude('web')
+    ->exclude('bin')
+    ->exclude('var')
+    ->in(__DIR__)
+;
 
-if (null === $input->getArgument('path')) {
-    $config
-        ->finder(
-            Symfony\CS\Finder\DefaultFinder::create()
-                ->in('.')
-                ->exclude('vendor')
-                ->exclude('web')
-                ->exclude('bin')
-                ->exclude('var')
-        );
-}
-
-return $config;
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@PSR2' => true,
+        '@Symfony' => true,
+    ])
+    ->setFinder($finder)
+;
