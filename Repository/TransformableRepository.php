@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Repository;
 
+use Puntmig\Search\Event\Event;
 use Puntmig\Search\Model\Item;
 use Puntmig\Search\Model\ItemUUID;
 use Puntmig\Search\Query\Query;
@@ -126,6 +127,32 @@ class TransformableRepository extends Repository
         $this
             ->repository
             ->reset($language);
+    }
+
+    /**
+     * Get events.
+     *
+     * @param int|null $from
+     * @param int|null $to
+     * @param int|null $length
+     * @param int|null $offset
+     *
+     * @return Event[]
+     */
+    public function events(
+        ? int $from = null,
+        ? int $to = null,
+        ? int $length = 10,
+        ? int $offset = 0
+    ) : array {
+        $this
+            ->repository
+            ->events(
+                $from,
+                $to,
+                $length,
+                $offset
+            );
     }
 
     /**

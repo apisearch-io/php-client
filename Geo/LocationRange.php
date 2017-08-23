@@ -16,8 +16,9 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Geo;
 
-use Puntmig\Search\Model\HttpTransportable;
 use Exception;
+
+use Puntmig\Search\Model\HttpTransportable;
 
 /**
  * Interface LocationRange.

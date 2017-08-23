@@ -100,6 +100,18 @@ abstract class Repository
     }
 
     /**
+     * Generate item documents.
+     *
+     * @param Item[] $items
+     */
+    public function addItems(array $items)
+    {
+        foreach ($items as $item) {
+            $this->addItem($item);
+        }
+    }
+
+    /**
      * Delete item document by uuid.
      *
      * @param ItemUUID $uuid
@@ -109,6 +121,18 @@ abstract class Repository
         $itemUUID = $uuid->composeUUID();
         $this->elementsToDelete[$itemUUID] = $uuid;
         unset($this->elementsToUpdate[$itemUUID]);
+    }
+
+    /**
+     * Delete item documents by uuid.
+     *
+     * @param ItemUUID[] $uuids
+     */
+    public function deleteItems(array $uuids)
+    {
+        foreach ($uuids as $uuid) {
+            $this->deleteItem($uuid);
+        }
     }
 
     /**

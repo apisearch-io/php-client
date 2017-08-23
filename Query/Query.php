@@ -140,12 +140,14 @@ class Query implements HttpTransportable
     private function __construct($queryText)
     {
         $this->sortBy(SortBy::SCORE);
-        $this->filters['_query'] = Filter::create(
-            '',
-            [$queryText],
-            0,
-            Filter::TYPE_QUERY
-        );
+        if (!empty($queryText)) {
+            $this->filters['_query'] = Filter::create(
+                '',
+                [$queryText],
+                0,
+                Filter::TYPE_QUERY
+            );
+        }
     }
 
     /**
@@ -798,9 +800,12 @@ class Query implements HttpTransportable
      */
     public function getQueryText() : string
     {
-        return $this
-            ->getFilter('_query')
-            ->getValues()[0];
+        return $query = (
+                isset($this->filters['_query']) &&
+                $this->filters['_query'] instanceof Filter
+        )
+            ? $this->filters['_query']->getValues()[0]
+            : '';
     }
 
     /**
@@ -1021,12 +1026,8 @@ class Query implements HttpTransportable
      */
     public function toArray() : array
     {
-        $query = $this->filters['_query'];
-
         return array_filter([
-            'q' => !empty($query->getValues()[0])
-                ? $query->getValues()[0]
-                : null,
+            'q' => $this->getQueryText(),
             'coordinate' => $this->coordinate instanceof HttpTransportable
                 ? $this->coordinate->toArray()
                 : null,

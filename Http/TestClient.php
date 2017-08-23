@@ -55,6 +55,8 @@ class TestClient implements HttpClient
         string $method,
         array $options
     ): array {
+        $method = trim(str_replace('Async', '', $method));
+
         $this
             ->client
             ->request($method, $url, $options);

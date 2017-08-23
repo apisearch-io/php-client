@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Puntmig\Search\Http;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise\Promise;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -67,7 +68,7 @@ class GuzzleClient implements HttpClient
             : 'form_params';
 
         /**
-         * @var ResponseInterface $response
+         * @var ResponseInterface|Promise $response
          */
         $response = $client->$method(
             rtrim($this->host . $url, '/'),
@@ -77,9 +78,14 @@ class GuzzleClient implements HttpClient
             ]
         );
 
-        return [
-            'code' => $response->getStatusCode(),
-            'body' => json_decode($response->getBody()->getContents(), true),
-        ];
+        return $response instanceof ResponseInterface
+            ? [
+                'code' => $response->getStatusCode(),
+                'body' => json_decode($response->getBody()->getContents(), true),
+            ]
+            : [
+                'code' => 200,
+                'body' => 'Work enqueued asynchronously',
+            ];
     }
 }

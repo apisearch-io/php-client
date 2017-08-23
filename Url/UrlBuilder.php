@@ -302,6 +302,7 @@ class UrlBuilder
     ) : array {
         $query = $result->getQuery();
         $queryFilters = $query->getFilters();
+        $urlParameters = [];
         foreach ($queryFilters as $currentFilterName => $filter) {
             /**
              * Special case for elements with LEVEL.
@@ -317,9 +318,10 @@ class UrlBuilder
 
         unset($urlParameters['_query']);
 
-        $queryString = $query
-            ->getFilter('_query')
-            ->getValues()[0];
+        $queryFilter = $query->getFilter('_query');
+        $queryString = $queryFilter instanceof Filter
+            ? $queryFilter->getValues()[0]
+            : '';
 
         if (!empty($queryString)) {
             $urlParameters['q'] = $queryString;
