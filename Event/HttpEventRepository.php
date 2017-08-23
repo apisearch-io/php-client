@@ -60,7 +60,7 @@ class HttpEventRepository implements EventRepository
         ? int $to = null,
         ? int $length = 10,
         ? int $offset = 0
-    ) : array {
+    ): array {
         $response = $this
             ->httpClient
             ->get('/events/', 'get', [
@@ -96,7 +96,7 @@ class HttpEventRepository implements EventRepository
      *
      * @throws EventException
      */
-    public function last() : ? Event
+    public function last(): ? Event
     {
         throw EventException::throwEndpointNotAvailable();
     }

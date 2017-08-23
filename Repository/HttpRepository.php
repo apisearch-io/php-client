@@ -105,7 +105,7 @@ class HttpRepository extends Repository
     /**
      * Reset the index.
      *
-     * @var null|string $language
+     * @var null|string
      */
     public function reset(? string $language)
     {

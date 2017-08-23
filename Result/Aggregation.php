@@ -117,7 +117,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             return;
         }
 
-        /**
+        /*
          * The entry is used.
          * This block should take in account when the filter is of type
          * levels, but only levels.
@@ -174,7 +174,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      *
      * @return bool
      */
-    public function hasLevels() : bool
+    public function hasLevels(): bool
     {
         return (bool) ($this->applicationType & Filter::MUST_ALL_WITH_LEVELS);
     }
@@ -186,7 +186,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      *
      * @return null|Counter
      */
-    public function getCounter(string $name) : ? Counter
+    public function getCounter(string $name): ? Counter
     {
         return $this->counters[$name] ?? null;
     }
@@ -196,7 +196,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      *
      * @return Counter[]
      */
-    public function getAllElements() : array
+    public function getAllElements(): array
     {
         return $this->counters + $this->activeElements;
     }
@@ -206,7 +206,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      *
      * @return int
      */
-    public function getTotalElements() : int
+    public function getTotalElements(): int
     {
         return $this->totalElements;
     }
@@ -272,7 +272,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     /**
      * Retrieve an external iterator.
      *
-     * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
+     * @see  http://php.net/manual/en/iteratoraggregate.getiterator.php
      *
      * @return Traversable An instance of an object implementing <b>Iterator</b> or
      *                     <b>Traversable</b>
@@ -289,7 +289,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      *
      * @return bool
      */
-    public function isEmpty() : bool
+    public function isEmpty(): bool
     {
         return
             empty($this->activeElements) &&

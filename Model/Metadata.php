@@ -28,7 +28,7 @@ class Metadata
      *
      * @return string
      */
-    public static function toMetadata(array $array) : string
+    public static function toMetadata(array $array): string
     {
         array_walk(
             $array,
@@ -57,7 +57,7 @@ class Metadata
      *
      * @return array|null
      */
-    public static function fromMetadata(string $metadata) : ? array
+    public static function fromMetadata(string $metadata): ? array
     {
         $values = [];
         $splittedParts = explode('~~', $metadata);

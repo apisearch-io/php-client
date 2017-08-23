@@ -67,7 +67,7 @@ class Counter implements HttpTransportable
      *
      * @return null|string
      */
-    public function getId() : ? string
+    public function getId(): ? string
     {
         return $this->values['id'] ?? null;
     }
@@ -77,7 +77,7 @@ class Counter implements HttpTransportable
      *
      * @return null|string
      */
-    public function getName() : ? string
+    public function getName(): ? string
     {
         return $this->values['name'] ?? null;
     }
@@ -87,7 +87,7 @@ class Counter implements HttpTransportable
      *
      * @return null|string
      */
-    public function getSlug() : ? string
+    public function getSlug(): ? string
     {
         return $this->values['slug'] ?? null;
     }
@@ -97,7 +97,7 @@ class Counter implements HttpTransportable
      *
      * @return null|int
      */
-    public function getLevel() : ? int
+    public function getLevel(): ? int
     {
         return (int) ($this->values['level'] ?? 0);
     }
@@ -107,7 +107,7 @@ class Counter implements HttpTransportable
      *
      * @return string[]
      */
-    public function getValues() : array
+    public function getValues(): array
     {
         return $this->values;
     }
@@ -117,7 +117,7 @@ class Counter implements HttpTransportable
      *
      * @return bool
      */
-    public function isUsed() : bool
+    public function isUsed(): bool
     {
         return $this->used;
     }
@@ -145,7 +145,7 @@ class Counter implements HttpTransportable
         string $name,
         int $n,
         array $activeElements
-    ) : ? Counter {
+    ): ? Counter {
         $values = Metadata::fromMetadata($name);
 
         if (is_null($values)) {
@@ -164,7 +164,7 @@ class Counter implements HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return [
             'values' => $this->values,

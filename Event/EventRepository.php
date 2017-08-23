@@ -47,12 +47,12 @@ interface EventRepository
         ? int $to = null,
         ? int $length = 10,
         ? int $offset = 0
-    ) : array;
+    ): array;
 
     /**
      * Get last event.
      *
      * @return Event|null
      */
-    public function last() : ? Event;
+    public function last(): ? Event;
 }

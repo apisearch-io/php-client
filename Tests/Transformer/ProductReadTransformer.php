@@ -33,7 +33,7 @@ class ProductReadTransformer implements ReadTransformer
      *
      * @return bool
      */
-    public function isValidItem(Item $item) : bool
+    public function isValidItem(Item $item): bool
     {
         return $item
             ->getUUID()->getType() === 'product';

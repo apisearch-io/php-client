@@ -61,7 +61,7 @@ class Polygon extends LocationRange
      *
      * @return LocationRange
      */
-    public static function fromFilterArray(array $array) : LocationRange
+    public static function fromFilterArray(array $array): LocationRange
     {
         $coordinates = array_map(function (array $coordinate) {
             return Coordinate::createFromArray($coordinate);

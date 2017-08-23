@@ -26,7 +26,7 @@ interface HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array;
+    public function toArray(): array;
 
     /**
      * Create from array.

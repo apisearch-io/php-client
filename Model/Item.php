@@ -178,7 +178,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return ItemUUID
      */
-    public function getUUID() : ItemUUID
+    public function getUUID(): ItemUUID
     {
         return $this->uuid;
     }
@@ -188,7 +188,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function getId() : string
+    public function getId(): string
     {
         return $this
             ->uuid
@@ -200,7 +200,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function getType() : string
+    public function getType(): string
     {
         return $this
             ->uuid
@@ -222,7 +222,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return null|float
      */
-    public function getDistance() : ? float
+    public function getDistance(): ? float
     {
         return $this->distance;
     }
@@ -232,7 +232,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return array
      */
-    public function getMetadata() : array
+    public function getMetadata(): array
     {
         return $this->metadata;
     }
@@ -364,7 +364,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return array
      */
-    public function getAllMetadata() : array
+    public function getAllMetadata(): array
     {
         return array_merge(
             $this->metadata,
@@ -389,7 +389,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return array
      */
-    public function getSuggest() : array
+    public function getSuggest(): array
     {
         return $this->suggest;
     }
@@ -399,7 +399,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return array_filter([
             'uuid' => $this->uuid->toArray(),
@@ -428,7 +428,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return Item
      */
-    public static function createFromArray(array $array) : Item
+    public static function createFromArray(array $array): Item
     {
         if (
             !isset($array['uuid']) ||
@@ -475,7 +475,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function composeUUID() : string
+    public function composeUUID(): string
     {
         return $this
             ->uuid
@@ -489,7 +489,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return bool
      */
-    public function __isset(string $name) : bool
+    public function __isset(string $name): bool
     {
         return array_key_exists($name, $this->getAllMetadata());
     }

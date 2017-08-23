@@ -110,7 +110,7 @@ class Result implements HttpTransportable
         ? Aggregations $aggregations,
         array $suggests,
         array $items
-    ) : Result {
+    ): Result {
         $result = new self(
             $query,
             $totalItems,
@@ -139,7 +139,7 @@ class Result implements HttpTransportable
      *
      * @return Item[]
      */
-    public function getItems() : array
+    public function getItems(): array
     {
         return $this->items;
     }
@@ -149,7 +149,7 @@ class Result implements HttpTransportable
      *
      * @return array
      */
-    public function getItemsGroupedByTypes() : array
+    public function getItemsGroupedByTypes(): array
     {
         if (is_array($this->itemsGroupedByTypeCache)) {
             return $this->itemsGroupedByTypeCache;
@@ -176,7 +176,7 @@ class Result implements HttpTransportable
      *
      * @return Item[]
      */
-    public function getItemsByType(string $type) : array
+    public function getItemsByType(string $type): array
     {
         return $this->getItemsGroupedByTypes()[$type] ?? [];
     }
@@ -188,7 +188,7 @@ class Result implements HttpTransportable
      *
      * @return Item[]
      */
-    public function getItemsByTypes(array $types) : array
+    public function getItemsByTypes(array $types): array
     {
         return array_filter(
             $this->getItems(),
@@ -246,7 +246,7 @@ class Result implements HttpTransportable
      *
      * @return null|Aggregation
      */
-    public function getAggregation(string $name) : ? Aggregation
+    public function getAggregation(string $name): ? Aggregation
     {
         if (is_null($this->aggregations)) {
             return null;
@@ -264,7 +264,7 @@ class Result implements HttpTransportable
      *
      * @return bool
      */
-    public function hasNotEmptyAggregation(string $name) : bool
+    public function hasNotEmptyAggregation(string $name): bool
     {
         if (is_null($this->aggregations)) {
             return false;
@@ -290,7 +290,7 @@ class Result implements HttpTransportable
      *
      * @return string[]
      */
-    public function getSuggests() : array
+    public function getSuggests(): array
     {
         return array_values($this->suggests);
     }
@@ -300,7 +300,7 @@ class Result implements HttpTransportable
      *
      * @return Query
      */
-    public function getQuery() : Query
+    public function getQuery(): Query
     {
         return $this->query;
     }
@@ -310,7 +310,7 @@ class Result implements HttpTransportable
      *
      * @return int
      */
-    public function getTotalItems() : int
+    public function getTotalItems(): int
     {
         return $this->totalItems;
     }
@@ -320,7 +320,7 @@ class Result implements HttpTransportable
      *
      * @return int
      */
-    public function getTotalHits() : int
+    public function getTotalHits(): int
     {
         return $this->totalHits;
     }
@@ -330,7 +330,7 @@ class Result implements HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return array_filter([
             'query' => $this->query->toArray(),
@@ -359,7 +359,7 @@ class Result implements HttpTransportable
      *
      * @return Result
      */
-    public static function createFromArray(array $array) : Result
+    public static function createFromArray(array $array): Result
     {
         return self::create(
             Query::createFromArray($array['query']),

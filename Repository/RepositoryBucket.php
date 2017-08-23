@@ -48,7 +48,7 @@ class RepositoryBucket
      *
      * @return TransformableRepository|null
      */
-    public function getRepositoryByName(string $name) : ? TransformableRepository
+    public function getRepositoryByName(string $name): ? TransformableRepository
     {
         return $this->repositories[$name] ?? null;
     }

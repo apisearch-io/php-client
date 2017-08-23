@@ -31,7 +31,7 @@ interface WriteTransformer
      *
      * @return bool
      */
-    public function isValidObject($object) : bool;
+    public function isValidObject($object): bool;
 
     /**
      * Create item by object.
@@ -40,7 +40,7 @@ interface WriteTransformer
      *
      * @return Item
      */
-    public function toItem($object) : Item;
+    public function toItem($object): Item;
 
     /**
      * Create item UUID by object.
@@ -49,5 +49,5 @@ interface WriteTransformer
      *
      * @return ItemUUID
      */
-    public function toItemUUID($object) : ItemUUID;
+    public function toItemUUID($object): ItemUUID;
 }

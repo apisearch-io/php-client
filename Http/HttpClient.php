@@ -35,5 +35,5 @@ interface HttpClient
         string $url,
         string $method,
         array $options
-    ) : array;
+    ): array;
 }

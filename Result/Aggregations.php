@@ -81,7 +81,7 @@ class Aggregations implements IteratorAggregate, HttpTransportable
      *
      * @return null|Aggregation
      */
-    public function getAggregation(string $name) : ? Aggregation
+    public function getAggregation(string $name): ? Aggregation
     {
         return $this->aggregations[$name] ?? null;
     }
@@ -93,7 +93,7 @@ class Aggregations implements IteratorAggregate, HttpTransportable
      *
      * @return bool
      */
-    public function hasNotEmptyAggregation(string $name) : bool
+    public function hasNotEmptyAggregation(string $name): bool
     {
         return
             !is_null($this->getAggregation($name)) &&
@@ -107,7 +107,7 @@ class Aggregations implements IteratorAggregate, HttpTransportable
      *
      * @return int
      */
-    public function getTotalElements() : int
+    public function getTotalElements(): int
     {
         return $this->totalElements;
     }
@@ -115,7 +115,7 @@ class Aggregations implements IteratorAggregate, HttpTransportable
     /**
      * Retrieve an external iterator.
      *
-     * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
+     * @see  http://php.net/manual/en/iteratoraggregate.getiterator.php
      *
      * @return Traversable An instance of an object implementing <b>Iterator</b> or
      *                     <b>Traversable</b>

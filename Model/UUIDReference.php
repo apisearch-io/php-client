@@ -26,5 +26,5 @@ interface UUIDReference
      *
      * @return string
      */
-    public function composeUUID() : string;
+    public function composeUUID(): string;
 }

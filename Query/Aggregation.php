@@ -191,7 +191,7 @@ class Aggregation implements HttpTransportable
      *
      * @return array
      */
-    public function getSort() : array
+    public function getSort(): array
     {
         return $this->sort;
     }
@@ -201,7 +201,7 @@ class Aggregation implements HttpTransportable
      *
      * @return int
      */
-    public function getLimit() : int
+    public function getLimit(): int
     {
         return $this->limit;
     }
@@ -227,7 +227,7 @@ class Aggregation implements HttpTransportable
         array $subgroup = [],
         array $sort = self::SORT_BY_COUNT_DESC,
         int $limit = self::NO_LIMIT
-    ) : Aggregation {
+    ): Aggregation {
         return new self(
             $name,
             $field,
@@ -244,7 +244,7 @@ class Aggregation implements HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return array_filter([
             'name' => $this->name,
@@ -282,7 +282,7 @@ class Aggregation implements HttpTransportable
      *
      * @return Aggregation
      */
-    public static function createFromArray(array $array) : Aggregation
+    public static function createFromArray(array $array): Aggregation
     {
         return self::create(
             $array['name'],

@@ -43,7 +43,7 @@ abstract class IdReference implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function getId() : string
+    public function getId(): string
     {
         return $this->id;
     }

@@ -30,7 +30,7 @@ abstract class LocationRange implements HttpTransportable
      *
      * @return array
      */
-    abstract public function toFilterArray() : array;
+    abstract public function toFilterArray(): array;
 
     /**
      * From filter array.
@@ -41,7 +41,7 @@ abstract class LocationRange implements HttpTransportable
      *
      * @throws Exception
      */
-    public static function fromFilterArray(array $array) : self
+    public static function fromFilterArray(array $array): self
     {
         throw new Exception('Method not valid');
     }
@@ -51,7 +51,7 @@ abstract class LocationRange implements HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return [
             'type' => (new \ReflectionClass($this))->getShortName(),
@@ -69,9 +69,9 @@ abstract class LocationRange implements HttpTransportable
     public static function createFromArray(array $array)
     {
         /**
-         * @var $className static
+         * @var static
          */
-        $className = 'Puntmig\Search\Geo\\' . $array['type'];
+        $className = 'Puntmig\Search\Geo\\'.$array['type'];
 
         return $className::fromFilterArray($array['data']);
     }

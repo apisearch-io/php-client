@@ -75,7 +75,7 @@ class Square extends LocationRange
      *
      * @return LocationRange
      */
-    public static function fromFilterArray(array $array) : LocationRange
+    public static function fromFilterArray(array $array): LocationRange
     {
         return new self(
             Coordinate::createFromArray($array[0]),

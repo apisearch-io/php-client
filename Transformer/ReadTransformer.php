@@ -30,7 +30,7 @@ interface ReadTransformer
      *
      * @return bool
      */
-    public function isValidItem(Item $item) : bool;
+    public function isValidItem(Item $item): bool;
 
     /**
      * Create object by item.

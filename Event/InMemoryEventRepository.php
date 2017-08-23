@@ -49,7 +49,7 @@ class InMemoryEventRepository implements EventRepository
         ? int $to = null,
         ? int $length = 10,
         ? int $offset = 0
-    ) : array {
+    ): array {
         return array_slice(
             array_filter(
                 $this->events,
@@ -83,7 +83,7 @@ class InMemoryEventRepository implements EventRepository
      *
      * @return Event|null
      */
-    public function last() : ? Event
+    public function last(): ? Event
     {
         $lastEvent = end($this->events);
 

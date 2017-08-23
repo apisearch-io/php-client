@@ -81,7 +81,7 @@ class UrlBuilder
         Result $result,
         string $filterName,
         string $value
-    ) : string {
+    ): string {
         if (isset($this->routesCache[spl_object_hash($result)][$filterName])) {
             return str_replace(
                 ['{id}', '{slug}'],
@@ -137,7 +137,7 @@ class UrlBuilder
         Result $result,
         string $filterName,
         string $value = null
-    ) : string {
+    ): string {
         $urlParameters = $this->generateQueryUrlParameters($result);
 
         if (
@@ -162,7 +162,7 @@ class UrlBuilder
      *
      * @return string
      */
-    public function removePriceRangeFilter(Result $result) : string
+    public function removePriceRangeFilter(Result $result): string
     {
         $urlParameters = $this->generateQueryUrlParameters($result);
         unset($urlParameters['price']);
@@ -184,7 +184,7 @@ class UrlBuilder
     public function addPage(
         Result $result,
         int $page
-    ) : string {
+    ): string {
         $urlParameters = $this->generateQueryUrlParameters($result);
         $urlParameters['page'] = $page;
 
@@ -201,7 +201,7 @@ class UrlBuilder
      *
      * @return null|string
      */
-    public function addPrevPage(Result $result) : ? string
+    public function addPrevPage(Result $result): ? string
     {
         $query = $result->getQuery();
         $urlParameters = $this->generateQueryUrlParameters($result);
@@ -227,7 +227,7 @@ class UrlBuilder
      *
      * @return null|string
      */
-    public function addNextPage(Result $result) : ? string
+    public function addNextPage(Result $result): ? string
     {
         $query = $result->getQuery();
         $urlParameters = $this->generateQueryUrlParameters($result);
@@ -259,7 +259,7 @@ class UrlBuilder
         Result $result,
         string $field,
         string $mode
-    ) : ? string {
+    ): ? string {
         $urlParameters = $this->generateQueryUrlParameters($result);
 
         if (
@@ -299,12 +299,12 @@ class UrlBuilder
     private function generateQueryUrlParameters(
         Result $result,
         string $filterName = null
-    ) : array {
+    ): array {
         $query = $result->getQuery();
         $queryFilters = $query->getFilters();
         $urlParameters = [];
         foreach ($queryFilters as $currentFilterName => $filter) {
-            /**
+            /*
              * Special case for elements with LEVEL.
              */
             $urlParameters[$currentFilterName] = (
@@ -348,7 +348,7 @@ class UrlBuilder
     private function createUrlByUrlParameters(
         Result $result,
         array $urlParameters
-    ) : array {
+    ): array {
         foreach ($this->routesDictionary as $field => $route) {
             if (
                 !isset($urlParameters[$field]) ||

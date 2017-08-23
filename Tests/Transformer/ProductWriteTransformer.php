@@ -32,7 +32,7 @@ class ProductWriteTransformer implements WriteTransformer
      *
      * @return bool
      */
-    public function isValidObject($object) : bool
+    public function isValidObject($object): bool
     {
         return $object instanceof Product;
     }
@@ -44,9 +44,9 @@ class ProductWriteTransformer implements WriteTransformer
      *
      * @return Item
      */
-    public function toItem($object) : Item
+    public function toItem($object): Item
     {
-        /**
+        /*
          * @var Product $object
          */
         return Item::create(
@@ -76,7 +76,7 @@ class ProductWriteTransformer implements WriteTransformer
      *
      * @return ItemUUID
      */
-    public function toItemUUID($object) : ItemUUID
+    public function toItemUUID($object): ItemUUID
     {
         return new ItemUUID($object->getSku(), 'product');
     }

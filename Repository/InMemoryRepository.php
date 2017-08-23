@@ -42,7 +42,7 @@ class InMemoryRepository extends Repository
      *
      * @return Result
      */
-    public function query(Query $query) : Result
+    public function query(Query $query): Result
     {
         $this->normalizeItemsArray();
         $resultingItems = [];
@@ -81,7 +81,7 @@ class InMemoryRepository extends Repository
     /**
      * Reset the index.
      *
-     * @var null|string $language
+     * @var null|string
      */
     public function reset(? string $language)
     {

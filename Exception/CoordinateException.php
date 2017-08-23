@@ -26,7 +26,7 @@ class CoordinateException extends ModelException
      *
      * @return CoordinateException
      */
-    public static function createCoordinateBadFormatException() : CoordinateException
+    public static function createCoordinateBadFormatException(): CoordinateException
     {
         return new self('A Coordinate should always contain a lat (Latitude) and a lon (Longitude)');
     }

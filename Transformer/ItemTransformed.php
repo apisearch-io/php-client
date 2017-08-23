@@ -58,7 +58,7 @@ class ItemTransformed extends Event
      *
      * @return Item
      */
-    public function getItem() : Item
+    public function getItem(): Item
     {
         return $this->item;
     }

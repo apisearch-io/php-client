@@ -93,7 +93,7 @@ class Event implements HttpTransportable
      *
      * @return int
      */
-    public function getId() : int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -153,7 +153,7 @@ class Event implements HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return [
             'id' => $this->id,
@@ -201,13 +201,13 @@ class Event implements HttpTransportable
         string $key,
         string $payload,
         int $occurredOn
-    ) : Event {
+    ): Event {
         $lastEventUUID = $previousEvent instanceof self
             ? $previousEvent->getConsistencyHash()
             : '';
 
         return new self(
-            hash('sha256', $lastEventUUID . $name . $key . $payload . $occurredOn),
+            hash('sha256', $lastEventUUID.$name.$key.$payload.$occurredOn),
             $name,
             $key,
             $payload,
@@ -234,7 +234,7 @@ class Event implements HttpTransportable
         string $key,
         string $payload,
         int $occurredOn
-    ) : Event {
+    ): Event {
         $event = new self(
             $consistencyHash,
             $name,

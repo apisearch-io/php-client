@@ -26,7 +26,7 @@ class UUIDException extends ModelException
      *
      * @return UUIDException
      */
-    public static function createUUIDBadFormatException() : UUIDException
+    public static function createUUIDBadFormatException(): UUIDException
     {
         return new self('An Item should always contain a UUID, with an ID and a Type');
     }
@@ -38,7 +38,7 @@ class UUIDException extends ModelException
      *
      * @return UUIDException
      */
-    public static function createComposedUUIDBadFormatException(string $composedUUID) : UUIDException
+    public static function createComposedUUIDBadFormatException(string $composedUUID): UUIDException
     {
         return new self(sprintf('A composed UUID should always follow this format: {type}~{id}. %s given', $composedUUID));
     }

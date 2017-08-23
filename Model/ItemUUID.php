@@ -60,7 +60,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
      *
      * @throws UUIDException
      */
-    public static function createByComposedUUID(string $composedUUID) : ItemUUID
+    public static function createByComposedUUID(string $composedUUID): ItemUUID
     {
         $parts = explode('~', $composedUUID, 2);
         if (count($parts) === 1) {
@@ -75,7 +75,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function getId() : string
+    public function getId(): string
     {
         return $this->id;
     }
@@ -85,7 +85,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function getType() : string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -132,7 +132,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
      *
      * @return string
      */
-    public function composeUUID() : string
+    public function composeUUID(): string
     {
         return "{$this->type}~{$this->id}";
     }

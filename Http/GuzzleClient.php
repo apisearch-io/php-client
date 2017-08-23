@@ -68,10 +68,10 @@ class GuzzleClient implements HttpClient
             : 'form_params';
 
         /**
-         * @var ResponseInterface|Promise $response
+         * @var ResponseInterface|Promise
          */
         $response = $client->$method(
-            rtrim($this->host . $url, '/'),
+            rtrim($this->host.$url, '/'),
             [$bodyFieldName => $options],
             [
                 'decode_content' => 'gzip',

@@ -173,7 +173,7 @@ class Filter implements HttpTransportable
      *
      * @return bool
      */
-    public function hasValue(string $value) : bool
+    public function hasValue(string $value): bool
     {
         return in_array($value, $this->getValues());
     }
@@ -225,7 +225,7 @@ class Filter implements HttpTransportable
         int $applicationType,
         string $filterType,
         array $filterTerms = []
-    ) : Filter {
+    ): Filter {
         return new self(
             $field,
             $values,
@@ -240,7 +240,7 @@ class Filter implements HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return array_filter([
             'field' => $this->field === 'uuid.type'
@@ -270,7 +270,7 @@ class Filter implements HttpTransportable
      *
      * @return Filter
      */
-    public static function createFromArray(array $array) : Filter
+    public static function createFromArray(array $array): Filter
     {
         return self::create(
             $array['field'] ?? 'uuid.type',
@@ -291,7 +291,7 @@ class Filter implements HttpTransportable
     public static function getFilterPathByField(string $field)
     {
         return in_array($field, ['id', 'type'])
-            ? 'uuid.' . $field
-            : 'indexed_metadata.' . $field;
+            ? 'uuid.'.$field
+            : 'indexed_metadata.'.$field;
     }
 }

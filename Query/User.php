@@ -55,7 +55,7 @@ class User implements HttpTransportable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return [
             'id' => $this->id,

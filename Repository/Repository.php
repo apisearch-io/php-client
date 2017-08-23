@@ -193,12 +193,12 @@ abstract class Repository
      *
      * @return Result
      */
-    abstract public function query(Query $query) : Result;
+    abstract public function query(Query $query): Result;
 
     /**
      * Reset the index.
      *
-     * @var null|string $language
+     * @var null|string
      */
     abstract public function reset(? string $language);
 }

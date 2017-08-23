@@ -84,7 +84,7 @@ class Transformer
      *
      * @return array
      */
-    public function fromItems(array $items) : array
+    public function fromItems(array $items): array
     {
         $objects = [];
         foreach ($items as $item) {
@@ -119,7 +119,7 @@ class Transformer
      *
      * @return Item[]
      */
-    public function toItems(array $objects) : array
+    public function toItems(array $objects): array
     {
         $items = [];
         foreach ($objects as $object) {
@@ -139,7 +139,7 @@ class Transformer
      *
      * @return Item|null
      */
-    public function toItem($object) : ? Item
+    public function toItem($object): ? Item
     {
         foreach ($this->writeTransformers as $writeTransformer) {
             if ($writeTransformer->isValidObject($object)) {
@@ -168,7 +168,7 @@ class Transformer
      *
      * @return ItemUUID[]
      */
-    public function toItemUUIDs(array $objects) : array
+    public function toItemUUIDs(array $objects): array
     {
         $itemUUIDs = [];
         foreach ($objects as $object) {
@@ -189,7 +189,7 @@ class Transformer
      *
      * @return ItemUUID|null
      */
-    public function toItemUUID($object) : ? ItemUUID
+    public function toItemUUID($object): ? ItemUUID
     {
         foreach ($this->writeTransformers as $writeTransformer) {
             if ($writeTransformer->isValidObject($object)) {

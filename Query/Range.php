@@ -49,7 +49,7 @@ class Range
      *
      * @return array
      */
-    public static function stringToArray(string $string) : array
+    public static function stringToArray(string $string): array
     {
         list($from, $to) = explode(self::SEPARATOR, $string);
         $from = empty($from)
@@ -74,7 +74,7 @@ class Range
      *
      * @return string
      */
-    public static function arrayToString(array $values) : string
+    public static function arrayToString(array $values): string
     {
         list($from, $to) = $values;
         $string = '';
@@ -104,7 +104,7 @@ class Range
         int $from,
         int $to,
         int $incremental
-    ) : array {
+    ): array {
         $ranges = [];
         while ($from < $to) {
             $nextTo = $from + $incremental;
