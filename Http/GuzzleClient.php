@@ -32,7 +32,7 @@ class GuzzleClient implements HttpClient
      * Host
      */
     private $host;
-    
+
     /**
      * GuzzleClient constructor.
      *
@@ -42,7 +42,7 @@ class GuzzleClient implements HttpClient
     {
         $this->host = $host;
     }
-    
+
     /**
      * Get a response given some parameters.
      * Return an array with the status code and the body.
@@ -59,22 +59,22 @@ class GuzzleClient implements HttpClient
         string $method,
         array $parameters,
         array $server = []
-    ) : array {
+    ): array {
         $client = new Client([
             'defaults' => [
                 'timeout' => 5,
             ],
         ]);
-        
+
         $bodyFieldName = ($method === 'get')
             ? 'query'
             : 'form_params';
-        
+
         /**
          * @var ResponseInterface|Promise
          */
         $response = $client->$method(
-            rtrim($this->host . $url, '/'),
+            rtrim($this->host.$url, '/'),
             [
                 $bodyFieldName => $parameters,
                 'headers' => $server,
@@ -83,7 +83,7 @@ class GuzzleClient implements HttpClient
                 'decode_content' => 'gzip',
             ]
         );
-        
+
         return ($response instanceof Response)
             ? [
                 'code' => $response->getStatusCode(),
@@ -92,8 +92,8 @@ class GuzzleClient implements HttpClient
             : [
                 'code' => 200,
                 'body' => [
-                    'message' => 'Task enqueued successfully'
-                ]
+                    'message' => 'Task enqueued successfully',
+                ],
             ]
         ;
     }

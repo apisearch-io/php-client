@@ -37,7 +37,7 @@ class LocationFilterTest extends PHPUnit_Framework_TestCase
     public function testLocationFilterPolygon()
     {
         $query = Query::createLocated(new Coordinate(40.0, 70.0), '')
-            ->filterByLocation(
+            ->filterUniverseByLocation(
                 new Polygon(
                     new Coordinate(40.0, 70.0)
                 )
@@ -45,7 +45,7 @@ class LocationFilterTest extends PHPUnit_Framework_TestCase
             ->toArray();
 
         $query = Query::createFromArray($query);
-        $filter = $query->getFilter('coordinate');
+        $filter = $query->getUniverseFilter('coordinate');
         $this->assertInstanceof(Filter::class, $filter);
         $polygon = LocationRange::createFromArray($filter->getValues());
         $this->assertInstanceof(Polygon::class, $polygon);
@@ -61,7 +61,7 @@ class LocationFilterTest extends PHPUnit_Framework_TestCase
     public function testLocationFilterSquare()
     {
         $query = Query::createLocated(new Coordinate(40.0, 70.0), '')
-            ->filterByLocation(
+            ->filterUniverseByLocation(
                 new Square(
                     new Coordinate(40.0, 70.0),
                     new Coordinate(39.0, 71.0)
@@ -70,7 +70,7 @@ class LocationFilterTest extends PHPUnit_Framework_TestCase
             ->toArray();
 
         $query = Query::createFromArray($query);
-        $filter = $query->getFilter('coordinate');
+        $filter = $query->getUniverseFilter('coordinate');
         $this->assertInstanceof(Filter::class, $filter);
         $square = LocationRange::createFromArray($filter->getValues());
         $this->assertInstanceof(Square::class, $square);
@@ -92,7 +92,7 @@ class LocationFilterTest extends PHPUnit_Framework_TestCase
     public function testLocationFilterCoordinateAndDistance()
     {
         $query = Query::createLocated(new Coordinate(40.0, 70.0), '')
-            ->filterByLocation(
+            ->filterUniverseByLocation(
                 new CoordinateAndDistance(
                     new Coordinate(40.0, 70.0),
                     '12Km'
@@ -101,7 +101,7 @@ class LocationFilterTest extends PHPUnit_Framework_TestCase
             ->toArray();
 
         $query = Query::createFromArray($query);
-        $filter = $query->getFilter('coordinate');
+        $filter = $query->getUniverseFilter('coordinate');
         $this->assertInstanceof(Filter::class, $filter);
         $coordinateAndDistance = LocationRange::createFromArray($filter->getValues());
         $this->assertInstanceof(CoordinateAndDistance::class, $coordinateAndDistance);

@@ -37,5 +37,5 @@ interface HttpClient
         string $method,
         array $parameters,
         array $server = []
-    ) : array;
+    ): array;
 }

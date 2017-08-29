@@ -800,6 +800,18 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Get universe filter.
+     *
+     * @param string $universeFilterName
+     *
+     * @return null|Filter
+     */
+    public function getUniverseFilter(string $universeFilterName): ? Filter
+    {
+        return $this->getUniverseFilters()[$universeFilterName] ?? null;
+    }
+
+    /**
      * Get filters.
      *
      * @return Filter[]

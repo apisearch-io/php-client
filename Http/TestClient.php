@@ -29,7 +29,7 @@ class TestClient implements HttpClient
      * test client
      */
     private $client;
-    
+
     /**
      * TestClient constructor.
      *
@@ -39,7 +39,7 @@ class TestClient implements HttpClient
     {
         $this->client = $client;
     }
-    
+
     /**
      * Get a response given some parameters.
      * Return an array with the status code and the body.
@@ -48,6 +48,7 @@ class TestClient implements HttpClient
      * @param string $method
      * @param array  $parameters
      * @param array  $server
+     *
      * @return array
      */
     public function get(
@@ -55,8 +56,7 @@ class TestClient implements HttpClient
         string $method,
         array $parameters,
         array $server = []
-    ) : array {
-
+    ): array {
         $method = trim(str_ireplace('async', '', $method));
         $this
             ->client
@@ -68,11 +68,11 @@ class TestClient implements HttpClient
                 $server
             )
         ;
-        
+
         $response = $this
             ->client
             ->getResponse();
-        
+
         return [
             'code' => $response->getStatusCode(),
             'body' => json_decode($response->getContent(), true),
