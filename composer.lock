@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "b7953d7c0931f4f667d2625b525bc39c",
+=======
+    "content-hash": "9463249010db0fe5f2b48a359e4507ed",
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -423,6 +427,7 @@
                 "instantiate"
             ],
             "time": "2017-07-22T11:58:36+00:00"
+<<<<<<< HEAD
         },
         {
             "name": "doctrine/lexer",
@@ -477,6 +482,8 @@
                 "parser"
             ],
             "time": "2014-09-09T13:34:57+00:00"
+=======
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
         },
         {
             "name": "friendsofphp/php-cs-fixer",
@@ -1156,6 +1163,7 @@
         },
         {
             "name": "phpunit/php-token-stream",
+<<<<<<< HEAD
             "version": "2.0.1",
             "source": {
                 "type": "git",
@@ -1166,6 +1174,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/9a02332089ac48e704c70f6cefed30c224e3c0b0",
                 "reference": "9a02332089ac48e704c70f6cefed30c224e3c0b0",
+=======
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-token-stream.git",
+                "reference": "ecb0b2cdaa0add708fe6f329ef65ae0c5225130b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/ecb0b2cdaa0add708fe6f329ef65ae0c5225130b",
+                "reference": "ecb0b2cdaa0add708fe6f329ef65ae0c5225130b",
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 "shasum": ""
             },
             "require": {
@@ -1201,7 +1221,11 @@
             "keywords": [
                 "tokenizer"
             ],
+<<<<<<< HEAD
             "time": "2017-08-20T05:47:52+00:00"
+=======
+            "time": "2017-08-03T14:17:41+00:00"
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
         },
         {
             "name": "phpunit/phpunit",
@@ -2028,6 +2052,7 @@
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
             "time": "2017-07-28T15:27:31+00:00"
+<<<<<<< HEAD
         },
         {
             "name": "symfony/filesystem",
@@ -2090,6 +2115,21 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/finder/zipball/baea7f66d30854ad32988c11a09d7ffd485810c4",
                 "reference": "baea7f66d30854ad32988c11a09d7ffd485810c4",
+=======
+        },
+        {
+            "name": "symfony/filesystem",
+            "version": "v3.3.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/filesystem.git",
+                "reference": "427987eb4eed764c3b6e38d52a0f87989e010676"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/427987eb4eed764c3b6e38d52a0f87989e010676",
+                "reference": "427987eb4eed764c3b6e38d52a0f87989e010676",
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 "shasum": ""
             },
             "require": {
@@ -2125,6 +2165,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
+<<<<<<< HEAD
             "time": "2017-06-01T21:01:25+00:00"
         },
         {
@@ -2139,6 +2180,22 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/inflector/zipball/aed5a0874a3bcfd8d0393a2d91b4cf828f29c7fb",
                 "reference": "aed5a0874a3bcfd8d0393a2d91b4cf828f29c7fb",
+=======
+            "time": "2017-07-11T07:17:58+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "v3.3.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/finder.git",
+                "reference": "baea7f66d30854ad32988c11a09d7ffd485810c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/baea7f66d30854ad32988c11a09d7ffd485810c4",
+                "reference": "baea7f66d30854ad32988c11a09d7ffd485810c4",
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 "shasum": ""
             },
             "require": {
@@ -2174,6 +2231,7 @@
             ],
             "description": "Symfony Inflector Component",
             "homepage": "https://symfony.com",
+<<<<<<< HEAD
             "keywords": [
                 "inflection",
                 "pluralize",
@@ -2196,6 +2254,22 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/options-resolver/zipball/ff48982d295bcac1fd861f934f041ebc73ae40f0",
                 "reference": "ff48982d295bcac1fd861f934f041ebc73ae40f0",
+=======
+            "time": "2017-06-01T21:01:25+00:00"
+        },
+        {
+            "name": "symfony/inflector",
+            "version": "v3.3.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/inflector.git",
+                "reference": "aed5a0874a3bcfd8d0393a2d91b4cf828f29c7fb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/inflector/zipball/aed5a0874a3bcfd8d0393a2d91b4cf828f29c7fb",
+                "reference": "aed5a0874a3bcfd8d0393a2d91b4cf828f29c7fb",
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 "shasum": ""
             },
             "require": {
@@ -2240,6 +2314,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
+<<<<<<< HEAD
             "version": "v1.5.0",
             "source": {
                 "type": "git",
@@ -2250,6 +2325,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
                 "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
+=======
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-mbstring.git",
+                "reference": "f29dca382a6485c3cbe6379f0c61230167681937"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/f29dca382a6485c3cbe6379f0c61230167681937",
+                "reference": "f29dca382a6485c3cbe6379f0c61230167681937",
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 "shasum": ""
             },
             "require": {
@@ -2261,7 +2348,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-master": "1.5-dev"
+=======
+                    "dev-master": "1.4-dev"
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 }
             },
             "autoload": {
@@ -2295,6 +2386,7 @@
                 "portable",
                 "shim"
             ],
+<<<<<<< HEAD
             "time": "2017-06-14T15:44:48+00:00"
         },
         {
@@ -2309,6 +2401,22 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/b6482e68974486984f59449ecea1fbbb22ff840f",
                 "reference": "b6482e68974486984f59449ecea1fbbb22ff840f",
+=======
+            "time": "2017-06-09T14:24:12+00:00"
+        },
+        {
+            "name": "symfony/polyfill-php70",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php70.git",
+                "reference": "032fd647d5c11a9ceab8ee8747e13b5448e93874"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/032fd647d5c11a9ceab8ee8747e13b5448e93874",
+                "reference": "032fd647d5c11a9ceab8ee8747e13b5448e93874",
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 "shasum": ""
             },
             "require": {
@@ -2318,7 +2426,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-master": "1.5-dev"
+=======
+                    "dev-master": "1.4-dev"
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
                 }
             },
             "autoload": {
@@ -2354,6 +2466,7 @@
                 "portable",
                 "shim"
             ],
+<<<<<<< HEAD
             "time": "2017-06-14T15:44:48+00:00"
         },
         {
@@ -2410,6 +2523,9 @@
                 "shim"
             ],
             "time": "2017-07-11T13:25:55+00:00"
+=======
+            "time": "2017-06-09T14:24:12+00:00"
+>>>>>>> 2d62f78eead61ea0d74d2575d5c24e43d705d2da
         },
         {
             "name": "symfony/process",

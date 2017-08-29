@@ -18,6 +18,7 @@ namespace Puntmig\Search\Http;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -31,7 +32,7 @@ class GuzzleClient implements HttpClient
      * Host
      */
     private $host;
-
+    
     /**
      * GuzzleClient constructor.
      *
@@ -41,51 +42,59 @@ class GuzzleClient implements HttpClient
     {
         $this->host = $host;
     }
-
+    
     /**
      * Get a response given some parameters.
      * Return an array with the status code and the body.
      *
      * @param string $url
      * @param string $method
-     * @param array  $options
+     * @param array  $parameters
+     * @param array  $server
      *
      * @return array
      */
     public function get(
         string $url,
         string $method,
-        array $options
-    ): array {
+        array $parameters,
+        array $server = []
+    ) : array {
         $client = new Client([
             'defaults' => [
                 'timeout' => 5,
             ],
         ]);
-
+        
         $bodyFieldName = ($method === 'get')
             ? 'query'
             : 'form_params';
-
+        
         /**
          * @var ResponseInterface|Promise
          */
         $response = $client->$method(
-            rtrim($this->host.$url, '/'),
-            [$bodyFieldName => $options],
+            rtrim($this->host . $url, '/'),
+            [
+                $bodyFieldName => $parameters,
+                'headers' => $server,
+            ],
             [
                 'decode_content' => 'gzip',
             ]
         );
-
-        return $response instanceof ResponseInterface
+        
+        return ($response instanceof Response)
             ? [
                 'code' => $response->getStatusCode(),
                 'body' => json_decode($response->getBody()->getContents(), true),
             ]
             : [
                 'code' => 200,
-                'body' => 'Work enqueued asynchronously',
-            ];
+                'body' => [
+                    'message' => 'Task enqueued successfully'
+                ]
+            ]
+        ;
     }
 }
