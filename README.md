@@ -1,57 +1,258 @@
 # Search PHP library
 
-> This repository is part of the Search API of the suite Indesky. To get
-> more information about this library integrations, some examples and all the
-> suite APIs, please visit {{ website }}.
+> This repository is part of the ApiSearch project. To get more information
+> about it, please visit http://apisearch.io. This a project created with love
+> by [Puntmig Development SLU](http://puntmig.com)
 
-This library aims to provide a php developer nicely interface to manage all the
-processes related to the Search API using basic domain objects.
+This library aims to provide to any php developer nicely interfaces to manage
+all processes related to Apisearch, using basic >=PHP7.1 classes.
 
-- [Model objects](#model-objects)
-- [Query object](#query-object)
-- [Result object](#result-object)
-- [Index API](#index-api)
-- [Query API](#query-api)
-- [Delete API](#delete-api)
+- [Model](#model)
+    - [Item](#item)
+    - [ItemUUID](#itemUUID)
+    - [Building an Item](#building-an-item)
+    - [Coordinate](#coordinate)
+    - [Located Item](#located-item)
+    - [Item manipulation](#item-manipulation)
+    - [Location Ranges](#location-ranges)
+- [Query](#query-model)
+    - [Building a Query](#building-a-query)
+    - [Filters](#filters)
+    - [Filter types](#filter-types)
+    - [Filtering by type](#filtering-by-type)
+    - [Filtering by id](#filtering-by-id)
+    - [Filtering by location](#filtering-by-location)
+    - [Filtering by range](#filtering-by-range)
+    - [Filtering by field](#filtering-by-field)
+    - [Aggregations](#query-aggregations)
+    - [Sort by field](#sort-by-field)
+    - [Sort by location](#sort-by-location)
+    - [Sort randomly](#sort-randomly)
+    - [Enabling Suggestions](#enabling-suggestions)
+    - [Excluding some items](#excluding-some-items)
+- [Result](#result)
+    - [Reading Aggregations](#result-aggregations)
+    - [Aggregation counter](#aggregation-counter)
+    - [Reading Suggestions](#reading-suggestions)
+- [Event](#event)
+    - [Event object](#event-object)
+- [Repository](#repository)
+    - [HttpRepository](#http-repository)
+    - [TransformableReposittory](#transformable-reposittory)
+    - [InMemoryRepository](#in-memory-repository)
+    - [Reset](#reset)
+    - [Index](#index)
+    - [Delete](#delete)
+    - [Flush](#flush)
+    - [Query](#query-repository)
+- [EventRepository](#event-repository)
+    - [Event](#event)
+- [Special scenarios](#special-scenarios)
+    - [Many-to-many relations](#many-to-many-relations)
 - [Integrations](#integrations)
-- [Examples](#examples)
 
-## Model objects
+## Model
 
-The library provides you a set of model objects. Both the Index and the Query
-Apis will understand these objects and will work with them in both sides (the
-client and the server side), so make sure you know how these objects are built.
+The library provides you a set of model objects. All repositories will work
+using them, so please, be sure you understand every part of the model before any
+integration.
 
 ### Item
 
-A simple view of what a item object is. A item can be anything you
-want, but take in account that this is the object in the middle, and the main
-Query api is going to work mainly against it.
+The Item is the base class for this package. An Item instance represents a
+single row in your read-only model, and can be mapped with any class of your own
+model.
 
-| Field  | Type  | What is that  | Mandatory?  |
-|---|---|---|---|
-| id  | string  | Unique id of the item  | **yes**  |
-| type  | string   | Type of types  | **yes**  |
-| metadata | array | Saved but not indexed item metadata | no |
-| indexed_metadata | array | This data will be saved and indexed for filtering | no |
-| searchable_metadata | string[] | Your item will be searchable by this data with a transformation. See searchable transformation chapter | no |
-| exact_matching_metadata | string[] | Your item will be searchable by this data without transformation | no |
-| suggest | string[] | This item will suggest these strings when this option is enabled | no |
-| coordinate  | Coordinate  | Assign a coordinate to your item in order to filter and facet over location | no  |
+Because this platform allows you to integrate any kind of object with this Item
+object, the internals of the objects are as simple as we could do, in order to
+provide you as much flexibility as we could.
 
-Item's constructor is a private method, so in order to create a new Item
-instance youb can use any of the available static constructor methods.
-This is an example of how you can create a non located item with random data.
-As you can see, both id and type fields are part of a value object called
-ItemUUID.
+Lets take a look at what Items is composed by.
+
+* id - A string representation of the id of the Item. This id is not required to
+be unique in your model universe, bus is required to be unique along all 
+entities of the same type (for example, along products, this id should be
+unique). This parameter is required and cannot be null.
+* type - Because an Item can be mapped by any entity from your model, this
+parameter defined what entity has been mapped. This is parameter is required and
+cannot be null.
+* metadata - An array of data-values. This data will be not processed nor 
+indexed, and will only be accessible once returned results. Values for this
+array can have any format. By default, an empty array is used.
+* indexed_metadata - An array of indexed, filterable and aggregable data-values.
+This data will not be searchable at all. By default, an empty array is used.
+* searchable_metadata - An array of strings used for searching. Each string will
+be decomposed by the engine and used for searching the item. By default, an 
+empty array is used.
+* exact_matching_metadata - An array of strings used for searching. Each string
+will not be decomposed and will be used as it is introduced. Current item will
+be returned as result only if the query string contains one or many introduced
+values. By default, an empty array is used.
+* suggest - An array of strings where each item can propose suggestions for
+searching time. Strings wont be decomposed neither. By default, an empty array 
+is used.
+* Coordinate - An Item can be geolocated in space, so an instance of Coordinate
+can be injected here. This value is not required.
+
+Let's see an example of an item.
+
+``` yml
+id: 4303ui203
+type: product
+metadata:
+    name: "T-shirt blue and red"
+    description: "This is an amazing T-shirt"
+    ean: 7827298738293
+indexed_metadata:
+    sizes:
+        - M
+        - L
+        - XL
+    colors:
+        - Blue
+        - Red
+    price: 10
+    old_price: 15
+    brand: Supershirts
+    created_at: now()
+searchable_metadata:
+    - T-shirt blue and red
+    - This is an amazing T-shirt
+    - Supershirts
+exact_matching_metadata:
+    - 4303ui203
+    - 7827298738293
+suggest:
+    - T-shirt
+```
+
+Let's explain a little better this example
+
+* Our product with ID 4303ui203 is mapped as an Item
+* We have a name, a description and an EAN stored in the item, and because is 
+not filterable not aggregable by these values, we place them in the metadata
+array.
+* We have other values like sizes, colors, price, old_price and brand prepared
+to be filtered and aggregated by. These values will be accessible as well when
+Items are provided as results.
+* When final user searches on our website, this Item will be part of the result
+if the search contains any of the words included as exact_matching_metadata (
+after some transformations, will see later), so when searching by *amazing*,
+this item will be a result. If searching by *Red*, will not.
+* If the final user searches exactly by *4303ui203* or *7827298738293*, this
+Item will be part of the result as well.
+* If you have suggestions enabled, and if the final user start searches by
+string *T-shi*, this item will add a suggestion of *T-shirt*.
+
+Before start building our first Item, let's see another object we need to know
+in order to use the factory methods inside Item object.
+
+### ItemUUID
+
+Remember that we said that the id field in Item only is unique in the universe
+of the entities with same type? Then, we need a representation of this Unique
+id.
+
+And this representation is the object ItemUUID. A simple class that contains an
+id and a type. Let's see how to build one of these.
+
+```php
+$itemUUID = new ItemUUID('4303ui203', 'product');
+```
+
+This is a real Unique Id representation of our model, and this instance should
+be unique in all our universe.
+
+### Building an Item
+
+So let's build our first Item instance. Because an Item can be build by 
+different ways, we will use static factories instead of the private 
+*__construct* method.
+
+If you remember, all data but id and type is not required, so a simple
+implementation of a new Item could be as simple as that.
 
 ``` php
-$itemUUID = new ItemUUID('12345', 'product');
+$itemUUID = new ItemUUID('4303ui203', 'product');
 $item = Item::create($itemUUID);
 ```
 
+This Item would not have any parameter, and would be equivalent to this piece of
+code.
+
+``` php
+$itemUUID = new ItemUUID('4303ui203', 'product');
+$item = Item::create(
+    $itemUUID,
+    [], // Metadata
+    [], // Indexed Metadata
+    [], // Searchable Metadata
+    [], // Exact Matching Metadata
+    []  // Suggest elements
+);
+```
+
+Lets add some extra data to have a nice representation of our first example.
+
+``` php
+$itemUUID = new ItemUUID('4303ui203', 'product');
+$item = Item::create(
+    $itemUUID,
+    [
+        'name' => 'T-shirt blue and red',
+        'description' => 'This is an amazing T-shirt'
+        'ean' => 7827298738293
+    ], 
+    [
+        'sizes' => [
+            'M',
+            'L',
+            'XL',
+        ],
+        'colors' => [
+            'Blue',
+            'Red',
+        ],
+        'price' => 10,
+        'old_price => 15,
+        'brand' => 'Supershirts',
+        'created_at' => new DateTime(),
+    ],
+    [
+        'T-shirt blue and red',
+        'This is an amazing T-shirt',
+        'Supershirts',
+    ],
+    [
+        '4303ui203',
+        '7827298738293'
+    ],
+    [
+        'T-shirt'
+    ]
+);
+```
+
+This Item would map exactly as shown in the first example.
+
+### Coordinate
+
+A simple Coordinate is composed by a latitude and a longitude values. That
+simple. Both values are float formatted.
+
+``` php
+$itemCoordinate = new Coordinate(
+    40.12, 
+    -71.34
+);
+```
+
+### Located Item
+
 If you want to create a located Item, then you can use the static construct
-method `createLocated`.
+method `createLocated`. Because a located item must have a location, otherwise
+this would be a conventional Item, then both an ItemUUID and Coordinate
+instances must be passed as parameters.
 
 ``` php
 $itemUUID = new ItemUUID('12345', 'product');
@@ -65,13 +266,18 @@ $item = Item::createLocated(
 );
 ```
 
-By default, an empty Item is created. You can set any of the desired metadata
-values and suggest data. This example works as well with `createLocated` method.
+As before, this method allow all other parameters to be defined after the
+coordinate.
 
 ``` php
 $itemUUID = new ItemUUID('12345', 'product');
-$item = Item::create(
+$itemCoordinate = new Coordinate(
+    40.12, 
+    -71.34
+);
+$item = Item::createLocated(
     $itemUUID,
+    $itemCoordinate,
     [], // Metadata
     [], // Indexed Metadata
     [], // Searchable Metadata
@@ -80,9 +286,11 @@ $item = Item::create(
 );
 ```
 
+### Item manipulation
+
 After the creation of an Item instance, or even after its retrieval from the
-repository, you can manage all metadata items by using the getters and the
-setters of the class.
+repository, you can manage all metadata (single metadata and indexed metadata)
+values by using the specific getters and setters.
 
 ```php
 $metadata = $item->getMetadata();
@@ -91,15 +299,13 @@ $item->setMetadata($metadata);
 $item->addMetadata('another_thing', 'another_value');
 ```
 
-This works with any of the metadata arrays.
-
 In order to provide an object as much resistant as possible in front of changes,
-you can consider the metadata package as a unique package, even if internally
-you have divided it in four different arrays. For example, if you have a field
-called *price* and at the beginning of your project this value is not going to
-be indexed, then you should store it inside metadata. Then, in your project, you
-will access to this value by using the `getMetadata` getter, and accessing to
-the desired position.
+you can consider all metadata data sets as a unique data set, even if internally
+you have divided it in two different arrays. For example, if you have a field
+called *price* and at the beginning of your project definition this value is not
+going to be indexed, then you should store it inside metadata. Then, in your 
+project, if you will access to this value by using the `getMetadata` getter, and
+accessing to the desired position.
 
 ```php
 $item->getMetadata()['price'];
@@ -111,6 +317,14 @@ should place it as an indexed metadata. So, what happens with all the code
 points where you've been requiring the price value? You should change it
 well, right?
 
+This will not work anymore
+
+```php
+$item->getMetadata()['price'];
+```
+
+Instead of that, you'll need to start using this
+
 ```php
 $item->getIndexedMetadata()['price'];
 ```
@@ -120,19 +334,94 @@ should be something insignificant.
 
 In order to avoid this, you should take some decisions in your model.
 
-* When you index metadata in your Item, even if you place them in different
-metadata packages, don't repeat metadata field names.
+* Don't repeat keys inside your metadata and indexed_metadata arrays.
 * When you request a metadata value, use the `->get($fieldName)` method. This
 will return the metadata value accessing all metadata packages at the same time.
+
+In this example, price will be retrieved both from metadata and
+indexed_metadata, so even if you change price from one to the other, nothing bad
+will happen :)
 
 ```php
 $item->get('price');
 ```
 
-## Query object
+### Location Ranges
+
+When talking about located items, and when retrieving and filtering them, we
+need to know so well a small part of our model called Location Ranges. They are
+related with the Coordinate class, and specifies an area containing many of
+them.
+
+There are three type of area definitions.
+
+#### A center point and a distance
+
+Given a center point, defined as a Coordinate instance, and a distance, defined
+as an integer and a distance unit (km or mi) joined in a string, you can define
+a simple filtering range. You must use an object called `CoordinateAndDistance`.
+
+```php
+$locationRange = new CoordinateAndDistance(
+    new Coordinate(40.9, -70.0),
+    '50km'
+);
+```
+
+> This is useful when using, for example, a website with active localization.
+> The browser can request the localization and send the coordinates to us, so we
+> can provide a better experience to the final user
+
+#### Two square sides
+
+If you have the top-left coordinate and the bottom-right coordinate of a square,
+inside of where you want to locate all the items, you can use this filter
+type. In that case, you need both Coordinate instances.
+
+```php
+$locationRange = new Square(
+    new Coordinate(40.9, -70.0),
+    new Coordinate(39.4, -69.1),
+);
+```
+
+> This is useful when working with maps. Maps are usually presented in a square
+> visualization mode, so when the final user scrolls, having these two
+> coordinates (top-left, bottom-right) we can look the items we want to show
+
+#### A finite set of coordinates (polygon)
+
+You can build your own polygon having a set of coordinates. These coordinates
+will draw a polygon, and all items inside the are of this polygon will be
+considered as valid result.
+
+All coordinates must be Coordinate instances.
+
+```php
+$locationRange = new Polygon(
+    new Coordinate(40.9, -70.0),
+    new Coordinate(40.9, -69.1),
+    new Coordinate(39.4, -69.1),
+    //...
+);
+```
+
+You can add as many coordinates as you need in order to build the desired area.
+
+> This is useful when the final user has any kind of drawing tool, so an
+> specific polygon can be defined by any user. Useful as well when composing
+> maps, for example, defining country areas as polygons.
+
+## Query
 
 Knowing how our model is defined, let's start by knowing how to make a simple
-Query Request.
+Query Request. Query objects will give us the possibility of communication
+between our project and the server by just using some object methods, and by
+using a single pattern called builder.
+
+### Building a Query
+
+Let's start with something really easy.
 
 ```
 $query = Query::create("something");
@@ -146,7 +435,11 @@ Let's make something a little bit harder. Let's take only the first 100 elements
 of the second page (from the result 101 to the 200).
 
 ``` php
-$query = Query::create("something", 2, 100);
+$query = Query::create(
+    "something", // The query string
+    2,           // The page we want to retrieve
+    100          // How many items do we want?
+);
 ```
 
 That's it, that easy :)
@@ -164,11 +457,11 @@ Finally, you can create a query to find one ore more specific elements from your
 database. For this reason, there are two special static factory methods
 specifically create to make these two scenarios so easy.
 
-We will use UUIDs here in both cases.
+We will use [ItemUUIDs](#itemUUID) here in both cases.
 
 ``` php
-$query = Query::createByUUIDs(new ItemUUID('12', 'book'));
-$query = Query::createByReferences([
+$query = Query::createByUUID(new ItemUUID('12', 'book'));
+$query = Query::createByUUIDs([
     new ItemUUID('12', 'book'),
     new ItemUUID('123', 'book'),
     new ItemUUID('332', 'book'),
@@ -194,90 +487,172 @@ example, if we want to filter our results by two categories, we want all the
 results containing all the categories? We want all results containing at least
 one of the defined categories? That's the application type.
 
-Let's see all types
+Let's see all available types
 
 * Filter::MUST_ALL - All results must match all filter elements
 * Filter::MUST_ALL_WITH_LEVELS - All results must match all filter elements, but
 when aggregating, only facets with the minor level encountered will be shown.
 E.j. categories.
 * Filter::AT_LEAST_ONE - At least one element must match.
+* Filter::EXCLUDE - Items should be excluded from results
 
 Every time we create a new filter, we must determine the type of this filter
 application. Depending on that value, the filter will cause different values and
 the resulting aggregation (facet) will change, even on your screen. Let's take a
 look at the different filters we can apply.
 
-#### Filter by
+### Filter types
 
-Generic filter action.
+We will mainly talk about two different filter types, and it is very important
+for you to understand both, why are they important and where to use each one.
 
-```php
-Query::create('')
-    ->filterBy(
-        'uuid.id',
-        ['1', '2', '3'],
-        Filter::AT_LEAST_ONE
-    );
+First of all, we have something called Universe. We will call Universe to the
+total set of Results. No matter the type, no matter the ID. Each Item accessible
+by our API is part of our Universe.
+
+In our website, or in our app, inside each landing page or screen we will want
+to work with the entire Universe or with a subset of it, so this first step will
+require us to use the filterUniverse methods.
+
+``` php
+$query = Query::createMatchAll()
+    ->filterUniverseByTypes(['A', 'B']);
 ```
 
-Common filters are already wrapped by specific methods.
+Once our Universe is properly defined, then we have to let the user navigate
+through this universe by using the standard filters.
 
-#### Filter by meta
-
-Remember that a item can have some indexed metadata? This metadata is stored
-and indexed properly so you can filter by these values using this method.
-
-```php
-Query::create('')
-    ->filterByMeta(
-        'field1',
-        ['value1', 'value2']
-    );
+``` php
+$query = Query::createMatchAll()
+    ->filterUniverseByTypes(['A', 'B'])
+    ->filterBy('brand', 'brand', ['Superbrand']);
 ```
 
-By default, this filter is defined as *AT_LEAST_ONE* but you can change this 
-behavior by adding a third method parameter.
+Each filter strategy is documented for both universe and regular filters. As you
+will see both methods will always change a little bit (regular filters will
+always have a name as first parameter in order to relate later with a possible
+aggregation).
 
-```php
-Query::create('')
-    ->filterByMeta(
-        'field1',
-        ['value1', 'value2'],
-        Filter::MUST_ALL
-    );
+### Filtering by Type
+
+So, try to imagine an environment when, even you have types A, B and C, you only
+want to work with A and B. In this environment C is not welcomed, and you don't
+want C Items to be in any set of results.
+
+Then, all queries inside this environment will need to filter the entire
+universe by types A and B. Let's see how to do it.
+
+``` php
+$query = Query::createMatchAll()
+    ->filterUniverseByTypes(['A', 'B']);
 ```
 
-> This filter works with the indexed_metadata field. Remember that the metadata
-> field stores non-indexable data
+All possible results will only include A and B. Think about this filter as a
+permanent filter executed before all others.
 
-By default, when you filter by meta, specific metadata field aggregation will be
-enabled. Disable this aggregation by adding a fourth and last parameter.
+Then you can use regular Filtering by type by using this method
 
-```php
-Query::create('')
-    ->filterByMeta(
-        'field1',
-        ['value1', 'value2'],
-        Filter::AT_LEAST_ONE,
-        false
-    );
+``` php
+$query = Query::createMatchAll()
+    ->filterUniverseByTypes(['A', 'B'])
+    ->filterByTypes(['A']);
 ```
 
-#### Filter by Types
+But alert ! This seems to be exactly the same, right? Well, in this case we are
+filtering by Types A and B, and then by type A, so results would only include A
+types. That would be completely equivalent to filter the entire universe once by
+type A.
 
-You can filter by item types. Because the type value is part of the UUID, and
-considering that this value will define your different type of entities inside
-a unique repository, this filter will allow you to work with one or several
-object types.
+Well, indeed. This would only work if your application has not aggregations nor
+any kind of interaction with your user, where can filter manually by clicking
+some kind of links.
 
-```php
-Query::create('quijote')
-    ->filterByTypes(
-        ['book']
-    );
+Once Universe is filtered, and if you aggregate your values (in this case,
+types), Results will contain only types A, but aggregations will still contain
+all of them that are actually existing in the filtered Universe, so in this case
+user would see something like this.
+
+```
+[x] Type A
+[ ] Type B
 ```
 
-#### Filter by range
+We could even have something like that
+
+``` php
+$query = Query::createMatchAll()
+    ->filterUniverseByTypes(['A', 'B'])
+    ->filterByTypes(['A', 'B']);
+```
+
+With a result like that
+
+```
+[x] Type A
+[x] Type B
+```
+
+While if we have this implementation, ignoring our Universe filter, considering
+that our filter is already working properly
+
+``` php
+$query = Query::createMatchAll()
+    ->filterByTypes(['A', 'B']);
+```
+
+Then, our result would be something like that, so our Universe is not filtered
+anymore and is composed by the total set of Items, including the C types.
+
+``` php
+[x] Type A
+[x] Type B
+[ ] Type C
+```
+
+### Filtering By Id
+
+You can filter universe as well by ids. In that case, you can image that, no
+matter what or how filters you add. Your result set will be of maximum 3 items.
+
+``` php
+$query = Query::createMatchAll()
+    ->filterUniverseByIds(['10', '11', '12']);
+```
+
+This is only useful if you work with a limited set of Items known by Ids
+
+You can filter your universe as well by range. Depending if the filter uses a
+date range or not, you should use one of these methods. Let's imagine a landing
+page where to list all T-shirts with low price (up to 20 euros). We want to add
+only elements created during last month
+
+``` php
+$from = // Date Atom of start of the month
+$to = // Date Atom of the end of the month
+$query = Query::createMatchAll()
+    ->filterUniverseByRange('price', ['0..20'], Filter::MUST_ALL)
+    ->filterUniverseByDateRange('created_at', ["$from..$to"], Filter::MUST_ALL);
+```
+
+### Filter by location
+
+You can filter your universe as well by Location if your Items are Geolocated.
+This will allow you to work only with some Items positioned in a certain area.
+You can use any of [Location Ranges](#location-ranges) explained previously.
+
+```php
+$query = Query::createMatchAll()
+    ->filterUniverseByLocation(new CoordinateAndDistance(
+        new Coordinate(40.9, -70.0),
+        '50km'
+    ))
+```
+
+Location is something that you should filter by just once. And because you can't
+aggregate by locations, it has'nt make sense at all to have both filters,
+universe and regular, so they both mean exactly the same.
+
+### Filter by range
 
 This filter is considerably useful when filtering by price, by rating or by any
 other numeric value (discount percentage...). Let's work with the example of
@@ -330,96 +705,66 @@ As you can see, this last example would return an empty set of elements as we
 don't have any item with a price lower than 60 euros and, at the same time,
 higher than 90. Basics of logic of sets.
 
-#### Filter by location
+Finally, and of course, you can filter your universe by any value inserted in
+your indexed_metadata array. Let's take our first example, and let's create a
+landing page for only products from brand *Supershirts*. Other brands will not
+be a possibility.
 
-You can filter your results by location as well. Some apps should be able to
-show only the nearest items given a location coordinate, or the items
-located inside an specific zone.
-
-To start using this feature, we must understand what a Coordinate is. Given a
-latitude, specified by a float value, and a longitude, specified as well as a
-simple float value, we can create a new Coordinate instance. This object will be
-important in this filter feature.
-
-```php
-$coordinate = new Coordinate(40.9, -70.0);
+``` php
+$query = Query::createMatchAll()
+    ->filterUniverseBy('brand', ['Supershirts'], Filter::MUST_ALL);
 ```
 
-We can filter our queries in three different ways.
+### Filter by field
 
-##### Filter by location, given a center point and a distance
-
-Given a center point, defined as a Coordinate instance, and a distance, defined
-as an integer and a distance unit (km or mi) joined in a string, you can define
-a simple filtering range. You must use an object called `CoordinateAndDistance`.
+Remember that a item can have some indexed metadata? This metadata is stored
+and indexed properly so you can filter by these values using this method. All
+method have a first parameter called filter name. This should be unique, so two
+filters with same name will just be overridden. You can make two or more filters
+with different name over the same field. This filter name will be used as well
+later when matching with existing aggregations.
 
 ```php
-$locationRange = new CoordinateAndDistance(
-    new Coordinate(40.9, -70.0),
-    '50km'
-);
-
 Query::create('')
-    ->filterByLocation(
-        $locationRange
+    ->filterBy(
+        'filtername',
+        'field1',
+        ['value1', 'value2']
     );
 ```
 
-> This is useful when using, for example, a website with active localization.
-> The browser can request the localization and send the coordinates to us, so we
-> can provide a better experience to the final user
-
-##### Filter by location, given two square sides
-
-If you have the top-left coordinate and the bottom-right coordinate of a square,
-inside of where you want to locate all the items, you can use this filter
-type. In that case, you need both Coordinate instances.
+By default, this filter is defined as *AT_LEAST_ONE* but you can change this 
+behavior by adding a third method parameter.
 
 ```php
-$locationRange = new Square(
-    new Coordinate(40.9, -70.0),
-    new Coordinate(39.4, -69.1),
-);
-
 Query::create('')
-    ->filterByLocation(
-        $locationRange
+    ->filterByMeta(
+        'filtername',
+        'field1',
+        ['value1', 'value2'],
+        Filter::MUST_ALL
     );
 ```
 
-> This is useful when working with maps. Maps are usually presented in a square
-> visualization mode, so when the final user scrolls, having these two
-> coordinates (top-left, bottom-right) we can look the items we want to show
+> This filter works with the indexed_metadata field. Remember that the metadata
+> field stores non-indexable data
 
-##### Filter by location, given a finite set of coordinates (polygon)
-
-You can build your own polygon having a set of coordinates. These coordinates
-will draw a polygon, and all items inside the are of this polygon will be
-considered as valid result.
-
-All coordinates must be Coordinate instances.
+By default, when you filter by meta, specific metadata field aggregation will be
+enabled. Disable this aggregation by adding a fourth and last parameter, or just
+override it later with a more specific aggregation configuration.
 
 ```php
-$locationRange = new Polygon(
-    new Coordinate(40.9, -70.0),
-    new Coordinate(40.9, -69.1),
-    new Coordinate(39.4, -69.1),
-    //...
-);
-
 Query::create('')
-    ->filterByLocation(
-        $locationRange
+    ->filterBy(
+        'filtername',
+        'field1',
+        ['value1', 'value2'],
+        Filter::AT_LEAST_ONE,
+        false
     );
 ```
 
-You can add as many coordinates as you need in order to build the desired area.
-
-> This is useful when the final user has any kind of drawing tool, so an
-> specific polygon can be defined by any user. Useful as well when composing
-> maps, for example, defining country areas as polygons.
-
-### Aggregations
+### Aggregations {#query-aggregations}
 
 Once we have applied our filters, part of the result set is what we call
 aggregations. This concept is usually understood as well as facets and is the
@@ -439,9 +784,83 @@ your result will come with a group called *manufacturers* and with all
 other manufacturers available to be filtered, each one with the elements total
 in your database.
 
-The aggregation object will be explained under the Result object properly.
+You can create aggregations by hand, for example, if you don't really want
+filters, or if the aggregation itself requires an special configuration.
 
-### Sorting
+```php
+Query::create('')
+    ->aggregateBy(
+        'fieldname'
+        'field1'
+    );
+```
+
+Previous filters with name `fieldname` will be searched in order to create the
+Result object.
+You can change the order of the aggregation, so you don't have to do it later in
+your process.
+
+```php
+Query::create('')
+    ->aggregateBy(
+        'fieldname'
+        'field1',
+        Filter::AT_LEAST_ONE,
+        Aggregation::SORT_BY_COUNT_DESC
+    );
+```
+
+You can chose between these values
+
+- Aggregation::SORT_BY_COUNT_DESC
+- Aggregation::SORT_BY_COUNT_ASC
+- Aggregation::SORT_BY_NAME_DESC
+- Aggregation::SORT_BY_NAME_ASC
+
+You can limit as well the number of elements you want to return in the
+aggregation. By default, there's no limit, so if your result aggregation has
+10000 possible values, an array of 10000 counters will be returned. This is
+usually not good for performance.
+
+```php
+Query::create('')
+    ->aggregateBy(
+        'fieldname'
+        'field1',
+        Filter::AT_LEAST_ONE,
+        Aggregation::SORT_BY_COUNT_DESC,
+        Aggregation::NO_LIMIT
+    );
+```
+
+Aggregations can be enabled or disabled by using these flag methods. This flag
+will override all behaviors from all filter methods (remember that when
+filtering by some fields, for example Categories, you can enabled or disable
+specific aggregation). If aggregations are enabled, then the behavior will not
+change and each field specific behavior will be used. If disable, all field
+specific behaviors will be disabled.
+
+```php
+Query::create('')
+    ->enableAggregations()
+    ->disableAggregations()
+;
+```
+
+In this case, aggregations are specifically enabled by Categories, but disabled
+by flag, so no aggregations will be requested.
+
+```php
+Query::create('')
+    ->filterByTypes(
+        ['product'],
+        true
+    )
+    ->disabledAggregations()
+;
+```
+
+### Sort by field
 
 You can sort your results, of course. The Query object provides one method for
 this, and the SortBy object defines a prebuilt set of sorting types ready to be
@@ -480,7 +899,7 @@ Query::create('')
 
 When you define a sort element, you override the existing one.
 
-#### Sorting by location
+### Sort by location
 
 A set of special sorting types can sort as well by location. In order to make
 this sorting work, we must create our Query instance by using the method
@@ -518,7 +937,17 @@ value.
 $item->getDistance();
 ```
 
-### Enabling / disabling suggestions
+### Sort randomly
+
+You can sort your elements in a random way by using the fast predefined value
+
+```php
+Query::create('')
+    ->sortBy(SortBy::RANDOM)
+;
+```
+
+### Enabling suggestions
 
 Suggestions can be enabled or disabled by using these flag methods.
 
@@ -529,34 +958,8 @@ Query::create('')
 ;
 ```
 
-### Enabling / disabling aggregations
-
-Aggregations can be enabled or disabled by using these flag methods. This flag
-will override all behaviors from all filter methods (remember that when
-filtering by some fields, for example Categories, you can enabled or disable
-specific aggregation). If aggregations are enabled, then the behavior will not
-change and each field specific behavior will be used. If disable, all field
-specific behaviors will be disabled.
-
-```php
-Query::create('')
-    ->enableAggregations()
-    ->disableAggregations()
-;
-```
-
-In this case, aggregations are specifically enabled by Categories, but disabled
-by flag, so no aggregations will be requested.
-
-```php
-Query::create('')
-    ->filterByTypes(
-        ['product'],
-        true
-    )
-    ->disabledAggregations()
-;
-```
+Please, read [Reading Suggestions](#reading-suggestions) to know a little bit
+more about suggestions.
 
 ### Excluding some elements
 
@@ -596,7 +999,7 @@ Query::create('')
 ;
 ```
 
-## Result object
+## Result
 
 A Query instance creates a Result instance. A Result is not only a set of basic
 elements from our dataset (Product, Category...) but as well a set of
@@ -631,15 +1034,13 @@ information of your data set.
 - getTotalElements() - get the total items in your data set
 - getTotalHits() - get the total hits produced by your query
 
-### Result Aggregations
+### Reading Aggregations
 
 The other important part of the Result object is the Aggregation set. In order
 to iterate over all Aggregations you can make a simple foreach over the result
 of the `->getAggregations()` result (returns an implementation of the PHP
 interface Traversable). You can access directly to an aggregation by using the
 `->getAggregation($name)` method and the aggregation assigned name.
-
-### Result Aggregation
 
 Let's analyze what a result Aggregation instance is and how useful can be in our
 filtering application.
@@ -685,7 +1086,7 @@ commonly printed in your app.
 This is all you need to know about the Result objects. This objects architecture
 will allow you to print all the final information for your final user.
 
-### Suggests
+### Reading Suggestions
 
 If your query had the suggests enabled, then you will find some suggestions in
 your Result instance by using the getter method.
@@ -696,68 +1097,318 @@ $suggests = $result->getSuggests();
 
 Each suggest is defined as an array of non unique strings.
 
-## Index API
+## Repository
 
-Let's dig into the first available API, the index one.
+OK, so now we know how to manage all our model objects. How they interact
+between them and how we should integrate them with our code.
 
-This API aims to let you add your entities in the database. Of course, to
-understand how easy is to do that, first of all you need to understand how the
-model is modeled (the first chapter of this documentation is about that).
+But how it really works? We need an interface where we can communicate with an
+existing endpoint, so we can really have nice results given a set of pre-indexed
+data.
 
-Both the index API and the query API are managed by a single Repository called
-HttpRepository. Lets check all available methods this repository provides to
-make the Index API possible.
+Let's check the interface `Puntmig\Search\Repository\Repository`
+
+Using an implementation of this main repository, you'll be able to index,
+delete, reset and query your main data set. Each interaction will create an 
+internal event, each one named in a particular way. To query over these events,
+please check the [EventRepository](#event-repository) chapter.
+
+All repository implementations, before being used, need your API secret in order
+to make sure you're using the right repository.
+
+Let's take a look at all our repository interfaces
+
+### HttpRepository {#http-repository}
+
+This is the main implementation of this repository, ready for production
+purposes and defined for pointing to our main servers.
+
+In order to make it work, you'll need a HTTPClient implementation. In that case,
+and because your usage will be maily for production, you can use the
+GuzzleClient implementation.
 
 ```php
-$repository->setKey(string $key);
+$repository = new HttpRepository(
+    new GuzzleClient('http://api.ourhost.xyz:1234')
+);
+$repository->setKey('mysecretkey');
 ```
 
-The HttpRepository works with an API on the cloud. To make it work, you need to
-specify the API key you want to work with. With this method you will be able to
-add it.
+### TransformableRepository {#transformable-repository}
+
+This is a small wrapper of the simple HttpRepository, ready to understand and
+interact with your own Domain, instead of working with Items.
+
+Before understanding how this adapter work, we should understand what a
+transformer is and how can be really useful when integrating our project with
+ApiSearch.
+
+Imagine we have a domain class called Product. Because this class is part of our
+domain, we should never change its composition because of external changes,
+right? So imagine that we want to start using ApiSearch. As reading this
+documentation we can see that ApiSearch understands about Items, and only about
+them, so you could think...
+
+`Oups, I should change my product and only work with Items`
+
+That would be a very very bad decision, so remember that with or without
+ApiSearch, your product will continue being a Product.
+
+Said that, and if you check all available Repository methods, you'll notice that
+you can only use Item related methods (addItem, deleteItem...), so does it mean
+that do I need to work always with items? Not at all.
+
+We must find a way where there is a silent transformation between our model
+(Product) and the ApiSearch model (Item, ItemUUID), and this way is called
+Transformers.
+
+So what is a Transformer? Easy. A class that can convert any of your model
+objects into an Item, by implementing the interface WriteTransformer, and vice
+versa, by implementing the interface ReadTransformer. All Repositories must
+implement WriteTransformer, so it has not sense at all to have a transformer
+that does'nt write, but implementing ReadTransformer is optional.
+
+The difference between both strategies is that by implementing ReadTransformer,
+you will receive your own model objects when making queries. Otherwise, when
+reading from the repository, you will receive only Item instances.
+
+Let's check a Transformer example
+
+```php
+class ProductTransformer implements ReadTransformer, WriteTransformer
+{
+    /**
+     * Is an indexable object.
+     *
+     * @param mixed $object
+     *
+     * @return bool
+     */
+    public function isValidObject($object): bool
+    {
+        return $object instanceof Product;
+    }
+
+    /**
+     * Create item by object.
+     *
+     * @param mixed $object
+     *
+     * @return Item
+     */
+    public function toItem($object): Item
+    {
+        return Item::create(
+            $this->toItemUUID($object),
+            [
+                'name' => $object->getName(),
+                'description' => $object->getDescription(),
+                'ean' => $object->getEan(),
+            ],
+            [
+                'price' => $object->getPrice(),
+                'old_price' => $object->getOldPrice(),
+                'brand' => $object->getBrand()->getName(),
+                'created_at' => $object->getCreatedAt(),
+                'sizes' => array_values($object->getSizes()),
+                'colors' => array_values($object->getColors()),
+            ],
+            [
+                $this->getName(),
+                $this->getDescription(),
+                $this->getBrand()->getName(),
+            ],
+            [
+                $this->getId(),
+                $this->getEan(),
+            ],
+            [
+                'T-shirt',
+            ]
+    }
+
+    /**
+     * Create item UUID by object.
+     *
+     * @param mixed $object
+     *
+     * @return ItemUUID
+     */
+    public function toItemUUID($object): ItemUUID
+    {
+        return new ItemUUID(
+            $object->getId(),
+            'product'
+        );
+    }
+    
+    /**
+     * The item should be converted by this transformer.
+     *
+     * @param Item $item
+     *
+     * @return bool
+     */
+    public function isValidItem(Item $item): bool
+    {
+        return $item->getType() === 'product';
+    }
+
+    /**
+     * Create object by item.
+     *
+     * @param Item $item
+     *
+     * @return mixed
+     */
+    public function fromItem(Item $item)
+    {
+        return new Product(
+            $item->getId(),
+            $item->get('name'),
+            $item->get('description),
+            // ...
+    }
+}
+```
+
+Ok, we have our transformer ready. Then what? Let's see how we can build a 
+TransformableRepository instance.
+
+> Please, check Symfony integration. This is only a small snippet to show how
+> this class is internally built. The Bundle build all these instances by using
+> the dependency injection component.
+
+```php
+$productTransformer = new ProductTransformer();
+$transformer = new Transformer($eventDispatcher);
+$transformer->addReadTransformer($productTransformer);
+$transformer->addWriteTransformer($productTransformer);
+$transformableRepository = new TransformableRepository(
+    $httpRepository,
+    $transformer 
+);
+$transformableRepository->setKey('mysecretkey');
+```
+
+And that's it.
+Discovering a little bit the TransformableRepository we will see that, apart
+of having the natural Item related methods, we will have same methods but with
+Object instead of Item
+
+- ->addObject()
+- ->deleteObject()
+
+And when querying the repository, if your class specific transformer implements
+ReadTransformer, instead of having an Item instance, you'll have a
+transformation.
+
+> Using Read transformation or not should be a project scope decision, so having
+> only a few Transformers implementing ReadTransformer interface is not a goo
+> thing.
+
+### InMemoryRepository {#in-memory-repository}
+
+Only for development and testing purposes. Not all endpoints are available, and
+not all features can be done by using a simple in-memory array, so you'll be
+able to index, delete, reset and perform basic queries (remember, in memory,
+this means that between requests, this won't work at all).
+
+```php
+$repository = new InMemoryRepository();
+$repository->setKey('mysecretkey');
+```
+
+So what can I do with any of these implementations?
+
+### Reset
+
+Do you want to reset your entire index? That easy. One single call and all your
+read-only data will be completely erased.
 
 ```php
 $repository->reset();
 ```
 
-Reset and prepare your database. Think that this API should work as a backup,
-never as a main database. The persistence is not important here, so your
-database should be able to be restored once and again, and the result would be
-the same.
+When a repository is reset, internally this is deleted and created again. An
+index can be created by using a specific language. When this language is
+defined, then some internal improvements are performed in order to provide
+better experience on search time.
 
-This method is the one you must call before loading fixtures and before indexing
-any object. Otherwise, your database will not be created yet, and your queries
-won't work.
+```php
+$repository->reset('en');
+```
+
+### Index
+
+This repository endpoint aims to let you add your entities in the database. Of 
+course, to understand how easy is to do that, first of all you need to 
+understand how the model is modeled (the first chapter of this documentation is
+about that).
 
 ```php
 $repository->addItem(Item $item);
 ```
 
-Adds a new item in the bucket. To understand this it is important
-to understand that at the moment you add a new type through the index API, for
-example addItem(), nothing happens indeed. Until you explicitly flush all
-changes nothing will happen.
-
-Once all your model is inserted, or all your desired instances are now under the
-API control, it's time to flush.
+If you use TransformableRepository, you can use as well the Object related
+method.
 
 ```php
-$repository->flush(int $bulkNumber);
+$repository->addObject(Object $object);
+$repository->addObject($product);
 ```
 
-In order to make small queries to the API (imagine a query with 100K elements at
-the same time...), there is a parameter called $bulkNumber. The default value
-for this element is 500.
+This method only prepares this new item to be added/modified, but does'nt
+change it actually
 
-What does this number means? Well, that simple. It will make packages of 500
-items for sending through the Http API. If the number of elements in the 
-repository is smalled than the defined as bulk, then only one query will be 
-executed.
+### Delete
 
-## Query API
+Deletes an existing element from your repository. In order to use this endpoint,
+you need to work with Item references.
 
-The second API is the query one. This is mainly one method that will allow you
-to make queries against your database.
+```php
+$itemUUID = new ItemUUID('10', 'product');
+$repository->deleteItem($itemUUID);
+```
+
+If you use TransformableRepository, you can use as well the Object related
+method.
+
+```php
+$repository->deleteObject(Object $object);
+$repository->deleteObject($product);
+```
+
+This method only prepares this new item to be deleted, but does'nt change it
+actually
+
+### Flush
+
+Perform real changes by having a stack of additions and deletions.
+
+```php
+$repository->flush();
+```
+
+You can batch items when connecting to the repository in order to minimize the
+number of connections and the size of these. In next example, every connection
+will contain 100 elements maximum. By default this value is set to 500.
+
+```php
+$repository->flush(100);
+```
+
+If we want to only flush if and only if we have a minimum of 500 elements, then
+we can use the second parameter by setting it to true.
+
+```php
+$repository->flush(100, true);
+```
+
+### Query {#query-repository}
+
+This endpoint will be a very important part of your integration, so allow you
+to, given a Query instance, get a Result instance.
 
 ```php
 $result = $repository->query(Query $query) : Result
@@ -766,42 +1417,103 @@ $result = $repository->query(Query $query) : Result
 That's it. The result of the query method is a Result instance. To know a little
 bit more about this object, check the documentation chapter.
 
-## Delete API
+## EventRepository
 
-In order to work with the Delete API we need to work with the same Repository
-than used in the Index API. A key must be defined the same way we did before.
+Do you remember that each Repository interaction creates a simple Event? That is
+because we track every single movement you make to our servers. And this is good
+because if we can know, you can know.
 
-```php
-$repository->setKey(string $key);
-```
-
-### Delete an Item
-
-A item is referenced by its ID and type.
+So let's take a look at how you can retrieve all these events and check as many
+metrics as you want. With this example, we get all first 100 Queries done from
+yesterday at same hour until now.
 
 ```php
-$book = new ItemUUID('10', 'book');
+$eventRepository = new EventRepository(
+    new GuzzleClient('http://api.ourhost.xyz:1234')
+);
+$repository->all(
+    'mysecretkey',
+    'QueryWasMade',
+    (time() - (24 * 60 * 60)),
+    time(),
+    100,
+    0
+);
 ```
 
-And to delete the item
+Let's check as well all different events.
+
+- IndexWasReset
+- ItemsWereIndexed
+- ItemsWereDeleted
+- QueryWasMade
+
+So, what does this endpoint return to us?
+
+### Event
+
+An array of Events. And what is an event? A very simple class that has
+everything we need in order to make metrics, panels and side calculations.
 
 ```php
-$repository->deleteItem(ItemUUID $book);
+/**
+ * Class Event.
+ */
+class Event implements HttpTransportable
+{
+    /**
+     * @var int
+     *
+     * Id
+     */
+    private $id;
+
+    /**
+     * var string.
+     *
+     * Consistency hash
+     */
+    private $consistencyHash;
+
+    /**
+     * @var string
+     *
+     * name
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
+     * Key
+     */
+    private $key;
+
+    /**
+     * @var string
+     *
+     * Payload
+     */
+    private $payload;
+
+    /**
+     * @var int
+     *
+     * Occurred on
+     */
+    private $occurredOn;
+}
 ```
 
-In order to flush all changes, remember to use the flush method.
+When retrieving the payload, you will receive a json encoded array, so make sure
+you decode it if you want to digg into the event content.
 
 ```php
-$repository->flush();
+$payload = json_decode($event->getPayload(), true);
 ```
-
-> The bulkNumber value will not affect when flushing deletions
 
 ## Integrations
 
-This PHP library has these Framework integrations
+You can find some integrations of this library
 
 [Symfony Bundle](https://github.com/puntmig/search-bundle)
-
-With this bundle you will be able to integrate with your Symfony applications in
-a very easy an intuitive way
