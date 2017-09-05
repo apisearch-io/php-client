@@ -21,6 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Puntmig\Search\Query\Filter;
 use Puntmig\Search\Query\SortBy;
+use Puntmig\Search\Result\Aggregation;
 use Puntmig\Search\Result\Counter;
 use Puntmig\Search\Result\Result;
 
@@ -66,6 +67,33 @@ class UrlBuilder
     public function setRoutesDictionary(array $routesDictionary)
     {
         $this->routesDictionary = $routesDictionary;
+    }
+
+    /**
+     * Guess filter value.
+     *
+     * @param Result      $result
+     * @param Aggregation $aggregation
+     * @param Counter     $counter
+     *
+     * @return string
+     */
+    public function guessFilterValue(
+        Result $result,
+        Aggregation $aggregation,
+        Counter $counter
+    ): string {
+        return $counter->isUsed()
+            ? $this->removeFilterValue(
+                $result,
+                $aggregation->getName(),
+                $counter->getId()
+            )
+            : $this->addFilterValue(
+                $result,
+                $aggregation->getName(),
+                $counter->getId()
+            );
     }
 
     /**
@@ -166,6 +194,29 @@ class UrlBuilder
     {
         $urlParameters = $this->generateQueryUrlParameters($result);
         unset($urlParameters['price']);
+
+        return $this->createUrlByUrlParameters(
+            $result,
+            $urlParameters
+        )['route'];
+    }
+
+    /**
+     * Get current.
+     *
+     * @param Result $result
+     * @param bool   $addQuersyStringPlaceholder
+     *
+     * @return string
+     */
+    public function getCurrent(
+        Result $result,
+        bool $addQuersyStringPlaceholder = false
+    ): ? string {
+        $urlParameters = $this->generateQueryUrlParameters($result);
+        if ($addQuersyStringPlaceholder) {
+            $urlParameters['q'] = '{{q}}';
+        }
 
         return $this->createUrlByUrlParameters(
             $result,

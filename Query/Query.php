@@ -70,6 +70,13 @@ class Query implements HttpTransportable
     private $filters = [];
 
     /**
+     * @var ItemUUID[]
+     *
+     * Items Promoted
+     */
+    private $itemsPromoted = [];
+
+    /**
      * @var array
      *
      * Sort
@@ -119,6 +126,13 @@ class Query implements HttpTransportable
     private $aggregationsEnabled = true;
 
     /**
+     * @var bool
+     *
+     * Highlights enabled
+     */
+    private $highlightEnabled = false;
+
+    /**
      * @var string[]
      *
      * Filter fields
@@ -140,14 +154,12 @@ class Query implements HttpTransportable
     private function __construct($queryText)
     {
         $this->sortBy(SortBy::SCORE);
-        if (!empty($queryText)) {
-            $this->filters['_query'] = Filter::create(
-                '',
-                [$queryText],
-                0,
-                Filter::TYPE_QUERY
-            );
-        }
+        $this->filters['_query'] = Filter::create(
+            '',
+            [$queryText],
+            0,
+            Filter::TYPE_QUERY
+        );
     }
 
     /**
@@ -942,6 +954,78 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Enable highlights.
+     *
+     * @return Query
+     */
+    public function enableHighlights()
+    {
+        $this->highlightEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Enable highlights.
+     *
+     * @return Query
+     */
+    public function disableHighlights()
+    {
+        $this->highlightEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Get highlight fields.
+     *
+     * @return bool
+     */
+    public function areHighlightEnabled(): bool
+    {
+        return $this->highlightEnabled;
+    }
+
+    /**
+     * Prioritize some UUIDs.
+     *
+     * @param ItemUUID $itemUUID
+     *
+     * @return Query
+     */
+    public function promoteUUID(ItemUUID $itemUUID): Query
+    {
+        $this->itemsPromoted[] = $itemUUID;
+
+        return $this;
+    }
+
+    /**
+     * Prioritize some UUIDs.
+     *
+     * @param ItemUUID[] $uuids
+     *
+     * @return Query
+     */
+    public function promoteUUIDs(array $uuids): Query
+    {
+        $this->itemsPromoted = $uuids;
+
+        return $this;
+    }
+
+    /**
+     * Get ItemsPromoted.
+     *
+     * @return ItemUUID[]
+     */
+    public function getItemsPromoted(): array
+    {
+        return $this->itemsPromoted;
+    }
+
+    /**
      * Exclude reference.
      *
      * @param ItemUUID[] $uuids
@@ -1049,6 +1133,7 @@ class Query implements HttpTransportable
                 ? null
                 : $this->size,
             'suggestions_enabled' => $this->suggestionsEnabled ?: null,
+            'highlight_enabled' => $this->highlightEnabled ?: null,
             'aggregations_enabled' => $this->aggregationsEnabled
                 ? null
                 : false,
@@ -1056,6 +1141,11 @@ class Query implements HttpTransportable
             'user' => ($this->user instanceof User)
                 ? $this->user->toArray()
                 : null,
+            'items_promoted' => array_filter(
+                array_map(function (ItemUUID $itemUUID) {
+                    return $itemUUID->toArray();
+                }, $this->itemsPromoted)
+            ),
         ], function ($element) {
             return
             !(
@@ -1105,6 +1195,10 @@ class Query implements HttpTransportable
         );
         $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
         $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
+        $query->highlightEnabled = $array['highlight_enabled'] ?? false;
+        $query->itemsPromoted = array_map(function (array $itemUUID) {
+            return ItemUUID::createFromArray($itemUUID);
+        }, $array['items_promoted'] ?? []);
         $query->filterFields = $array['filter_fields'] ?? [];
         if (isset($array['user'])) {
             $query->user = User::createFromArray($array['user']);

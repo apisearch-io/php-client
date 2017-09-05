@@ -81,6 +81,13 @@ class Item implements HttpTransportable, UUIDReference
     private $suggest;
 
     /**
+     * @var array
+     *
+     * Non indexed highlights
+     */
+    private $highlights = [];
+
+    /**
      * Item constructor.
      *
      * @param ItemUUID   $uuid
@@ -395,6 +402,26 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
+     * Get Highlights.
+     *
+     * @return array
+     */
+    public function getHighlights(): array
+    {
+        return $this->highlights;
+    }
+
+    /**
+     * Set Highlights.
+     *
+     * @param array $highlights
+     */
+    public function setHighlights(array $highlights)
+    {
+        $this->highlights = $highlights;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -412,6 +439,7 @@ class Item implements HttpTransportable, UUIDReference
             'searchable_metadata' => $this->searchableMetadata,
             'exact_matching_metadata' => $this->exactMatchingMetadata,
             'suggest' => $this->suggest,
+            'highlights' => $this->highlights,
         ], function ($element) {
             return
             !(
@@ -465,6 +493,10 @@ class Item implements HttpTransportable, UUIDReference
 
         if (isset($array['distance'])) {
             $item->distance = (float) $array['distance'];
+        }
+
+        if (isset($array['highlights'])) {
+            $item->highlights = $array['highlights'];
         }
 
         return $item;
