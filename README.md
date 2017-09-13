@@ -872,8 +872,8 @@ Query::create('')
 ;
 ```
 
-In this case, aggregations are specifically enabled by Types setting the second parameter to `true`, but disabled
-by flag, so no aggregations will be requested.
+In this case, aggregations are specifically enabled by Types setting the second 
+parameter to `true`, but disabled by flag, so no aggregations will be requested.
 
 ```php
 Query::createMatchAll()
