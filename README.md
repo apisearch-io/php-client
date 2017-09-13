@@ -30,6 +30,7 @@ all processes related to Apisearch, using basic >=PHP7.1 classes.
     - [Sort randomly](#sort-randomly)
     - [Enabling Suggestions](#enabling-suggestions)
     - [Excluding some items](#excluding-some-items)
+    - [Enabling highlighting](#enabling-highlighting)
 - [Result](#result)
     - [Reading Aggregations](#result-aggregations)
     - [Aggregation counter](#aggregation-counter)
@@ -663,7 +664,7 @@ from 90 to 100 euros. Let's consider as well that this price value is part of
 the indexed metadata. Let's build the filter.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterByRange(
         'price',
         'price',
@@ -690,7 +691,7 @@ fifth parameter, and we can disable the auto-generated aggregation by changing
 the sixth one.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterByRange(
         'price',
         'real_price',
@@ -725,7 +726,7 @@ with different name over the same field. This filter name will be used as well
 later when matching with existing aggregations.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterBy(
         'filtername',
         'field1',
@@ -737,7 +738,7 @@ By default, this filter is defined as *AT_LEAST_ONE* but you can change this
 behavior by adding a third method parameter.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterByMeta(
         'filtername',
         'field1',
@@ -754,7 +755,7 @@ enabled. Disable this aggregation by adding a fourth and last parameter, or just
 override it later with a more specific aggregation configuration.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterBy(
         'filtername',
         'field1',
@@ -788,7 +789,7 @@ You can create aggregations by hand, for example, if you don't really want
 filters, or if the aggregation itself requires an special configuration.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->aggregateBy(
         'fieldname'
         'field1'
@@ -801,7 +802,7 @@ You can change the order of the aggregation, so you don't have to do it later in
 your process.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->aggregateBy(
         'fieldname'
         'field1',
@@ -823,7 +824,7 @@ aggregation. By default, there's no limit, so if your result aggregation has
 usually not good for performance.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->aggregateBy(
         'fieldname'
         'field1',
@@ -851,7 +852,7 @@ In this case, aggregations are specifically enabled by Categories, but disabled
 by flag, so no aggregations will be requested.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterByTypes(
         ['product'],
         true
@@ -867,17 +868,17 @@ this, and the SortBy object defines a prebuilt set of sorting types ready to be
 used by you. You can define the sorting field and the type by yourself.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->sortBy(
         ['indexed_metadata.manufacturer', 'asc']
     );
 
-Query::create('')
+Query::createMatchAll()
     ->sortBy(
         ['indexed_metadata.name', 'desc']
     );
 
-Query::create('')
+Query::createMatchAll()
     ->sortBy(
         ['indexed_metadata.updated_at', 'desc']
     );
@@ -888,7 +889,7 @@ sorting is defined. The better score given a query, the earlier in results.
 This is the list of all of them.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->sortBy(SortBy::SCORE)
     ->sortBy(SortBy::ID_ASC)
     ->sortBy(SortBy::ID_DESC)
@@ -918,7 +919,7 @@ requesting first of all the elements closer to us, we can only sort them by
 location in an *asc* mode.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->sortBy(SortBy::LOCATION_KM_ASC)
     ->sortBy(SortBy::LOCATION_MI_ASC)
 ;
@@ -942,7 +943,7 @@ $item->getDistance();
 You can sort your elements in a random way by using the fast predefined value
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->sortBy(SortBy::RANDOM)
 ;
 ```
@@ -952,7 +953,7 @@ Query::create('')
 Suggestions can be enabled or disabled by using these flag methods.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->enableSuggestions()
     ->disableSuggestions()
 ;
@@ -971,7 +972,7 @@ In order to do this, we will use UUIDs, so we can filter by any kind of
 element only having the UUID.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterByTypes(
         ['product']
     )
@@ -986,7 +987,7 @@ composition between the ID and the type.
 We can filter by several UUIDs as well.
 
 ```php
-Query::create('')
+Query::createMatchAll()
     ->filterByTypes(
         ['product']
     )
