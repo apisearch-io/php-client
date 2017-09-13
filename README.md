@@ -71,7 +71,7 @@ provide you as much flexibility as we could.
 Lets take a look at what Items is composed by.
 
 * id - A string representation of the id of the Item. This id is not required to
-be unique in your model universe, bus is required to be unique along all 
+be unique in your model universe, but is required to be unique along all 
 entities of the same type (for example, along products, this id should be
 unique). This parameter is required and cannot be null.
 * type - Because an Item can be mapped by any entity from your model, this
@@ -137,7 +137,7 @@ array.
 to be filtered and aggregated by. These values will be accessible as well when
 Items are provided as results.
 * When final user searches on our website, this Item will be part of the result
-if the search contains any of the words included as exact_matching_metadata (
+if the search contains any of the words included as searchable_metadata (
 after some transformations, will see later), so when searching by *amazing*,
 this item will be a result. If searching by *Red*, will not.
 * If the final user searches exactly by *4303ui203* or *7827298738293*, this
@@ -493,7 +493,7 @@ Let's see all available types
 * Filter::MUST_ALL - All results must match all filter elements
 * Filter::MUST_ALL_WITH_LEVELS - All results must match all filter elements, but
 when aggregating, only facets with the minor level encountered will be shown.
-E.j. categories.
+E.g. categories.
 * Filter::AT_LEAST_ONE - At least one element must match.
 * Filter::EXCLUDE - Items should be excluded from results
 
@@ -608,6 +608,30 @@ anymore and is composed by the total set of Items, including the C types.
 [x] Type A
 [x] Type B
 [ ] Type C
+```
+
+On the other hand, if we only want the set of results matching your filter types
+without the aggregations, we can also set a second boolean parameter to disable 
+aggregations (by default is set to `true`).
+
+``` php
+$query = Query::createMatchAll()
+    ->filterByTypes(
+        ['A', 'B']
+        false
+    );
+```
+
+A third and last parameter can be set to sort the aggregations result. By default, 
+this parameter is set to *SORT_BY_COUNT_DESC*.
+
+``` php
+$query = Query::createMatchAll()
+    ->filterByTypes(
+        ['A', 'B']
+        true,
+        Aggregation::SORT_BY_COUNT_ASC
+    );
 ```
 
 ### Filtering By Id
@@ -735,7 +759,7 @@ Query::createMatchAll()
 ```
 
 By default, this filter is defined as *AT_LEAST_ONE* but you can change this 
-behavior by adding a third method parameter.
+behavior by adding a fourth method parameter.
 
 ```php
 Query::createMatchAll()
@@ -751,7 +775,7 @@ Query::createMatchAll()
 > field stores non-indexable data
 
 By default, when you filter by meta, specific metadata field aggregation will be
-enabled. Disable this aggregation by adding a fourth and last parameter, or just
+enabled. Disable this aggregation by adding a fifth and last parameter, or just
 override it later with a more specific aggregation configuration.
 
 ```php
@@ -836,9 +860,9 @@ Query::createMatchAll()
 
 Aggregations can be enabled or disabled by using these flag methods. This flag
 will override all behaviors from all filter methods (remember that when
-filtering by some fields, for example Categories, you can enabled or disable
+filtering by some fields, for example Types, you can enable or disable a
 specific aggregation). If aggregations are enabled, then the behavior will not
-change and each field specific behavior will be used. If disable, all field
+change and each field specific behaviors will be used. If disable, all field
 specific behaviors will be disabled.
 
 ```php
@@ -848,7 +872,7 @@ Query::create('')
 ;
 ```
 
-In this case, aggregations are specifically enabled by Categories, but disabled
+In this case, aggregations are specifically enabled by Types setting the second parameter to `true`, but disabled
 by flag, so no aggregations will be requested.
 
 ```php
@@ -905,7 +929,8 @@ When you define a sort element, you override the existing one.
 A set of special sorting types can sort as well by location. In order to make
 this sorting work, we must create our Query instance by using the method
 `createLocated()` instead of `create()`. The only difference between both is
-that the first one's first parameter is a `Coordinate` instance.
+that the first one's first parameter is a `Coordinate` instance. Therefore, 
+the second parameter is the query text.
 
 ```php
 $query = Query::createLocated(
@@ -919,7 +944,10 @@ requesting first of all the elements closer to us, we can only sort them by
 location in an *asc* mode.
 
 ```php
-Query::createMatchAll()
+$query = Query::createLocated(
+        new Coordinate(40.0, -70.0), 
+        ''
+    )
     ->sortBy(SortBy::LOCATION_KM_ASC)
     ->sortBy(SortBy::LOCATION_MI_ASC)
 ;
@@ -1305,7 +1333,7 @@ ReadTransformer, instead of having an Item instance, you'll have a
 transformation.
 
 > Using Read transformation or not should be a project scope decision, so having
-> only a few Transformers implementing ReadTransformer interface is not a goo
+> only a few Transformers implementing ReadTransformer interface is not a good
 > thing.
 
 ### InMemoryRepository {#in-memory-repository}
