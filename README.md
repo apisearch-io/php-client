@@ -117,9 +117,9 @@ indexed_metadata:
     brand: Supershirts
     created_at: now()
 searchable_metadata:
-    - T-shirt blue and red
-    - This is an amazing T-shirt
-    - Supershirts
+    name: T-shirt blue and red
+    description: This is an amazing T-shirt
+    brand: Supershirts
 exact_matching_metadata:
     - 4303ui203
     - 7827298738293
@@ -139,11 +139,12 @@ Items are provided as results.
 * When final user searches on our website, this Item will be part of the result
 if the search contains any of the words included as searchable_metadata (
 after some transformations, will see later), so when searching by *amazing*,
-this item will be a result. If searching by *Red*, will not.
+this item will be a result. If searching by *Elephant*, will not.
 * If the final user searches exactly by *4303ui203* or *7827298738293*, this
 Item will be part of the result as well.
 * If you have suggestions enabled, and if the final user start searches by
-string *T-shi*, this item will add a suggestion of *T-shirt*.
+string *T-shi*, this item will add a suggestion of *T-shirt*. This is completely
+different from the search fields.
 
 Before start building our first Item, let's see another object we need to know
 in order to use the factory methods inside Item object.
@@ -220,9 +221,9 @@ $item = Item::create(
         'created_at' => new DateTime(),
     ],
     [
-        'T-shirt blue and red',
-        'This is an amazing T-shirt',
-        'Supershirts',
+        'name' => 'T-shirt blue and red',
+        'description', 'This is an amazing T-shirt',
+        'brand', 'Supershirts',
     ],
     [
         '4303ui203',
@@ -429,11 +430,15 @@ $query = Query::create("something");
 ```
 
 That simple. This small query will look for all entities in the repository,
-not containing the word "something" but just scoring each of the results with
-this word and returning them all by scoring, the best the first.
+Scoring each of the results containing the word "something" by hit scoring. The
+best the first.
+
+> Sorting by scoring means that, the best appearance the word "something" has 
+> inside each result, the better punctuation has.
 
 Let's make something a little bit harder. Let's take only the first 100 elements
-of the second page (from the result 101 to the 200).
+of the second page (from the result 101 to the 200). By default, is none of
+these last values are defined, you will request the first 10 results.
 
 ``` php
 $query = Query::create(
@@ -501,6 +506,37 @@ Every time we create a new filter, we must determine the type of this filter
 application. Depending on that value, the filter will cause different values and
 the resulting aggregation (facet) will change, even on your screen. Let's take a
 look at the different filters we can apply.
+
+#### Must all with levels
+
+An special explanation of this aggregation type.
+
+Imagine your item is categorized with a tree-like structure.
+
+- A - A1, A2
+- B - B1, B2, B3
+- C - C1
+
+You item could be related with a first-level category, and with one if its 
+subcategories. For example, your Item is categorized as A and A2 at the same
+time.In that case you should relate your item with both, but adding an extra
+field in your categories called *level*. The level of the category.
+
+When you print these aggregations and you've defined this categorization as 
+MUST_ALL_WITH_LEVELS, you will print only these categories with the current
+level. So, if you don't have any filter applied, you should be able to filter
+only by first level categories.
+
+- [ ] A
+- [ ] B
+- [ ] C
+
+So what happens when we apply the A filter? Then, and because A has two children
+A1 and A2, the aggregations will appear like that.
+
+- [x] A
+- [ ] A1
+- [ ] A2
 
 ### Filter types
 
@@ -644,19 +680,15 @@ $query = Query::createMatchAll()
     ->filterUniverseByIds(['10', '11', '12']);
 ```
 
-This is only useful if you work with a limited set of Items known by Ids
+This is only useful if you work with a limited set of Items known by Ids.
 
-You can filter your universe as well by range. Depending if the filter uses a
-date range or not, you should use one of these methods. Let's imagine a landing
-page where to list all T-shirts with low price (up to 20 euros). We want to add
-only elements created during last month
+Of course, filtering by ID is available as well inside your defined universe.
+This is useful, for example, if you ID is a human readable value, and you want
+to select a set of items from a list.
 
 ``` php
-$from = // Date Atom of start of the month
-$to = // Date Atom of the end of the month
 $query = Query::createMatchAll()
-    ->filterUniverseByRange('price', ['0..20'], Filter::MUST_ALL)
-    ->filterUniverseByDateRange('created_at', ["$from..$to"], Filter::MUST_ALL);
+    ->filterByIds(['10', '11', '12']);
 ```
 
 ### Filter by location
@@ -678,6 +710,22 @@ aggregate by locations, it has'nt make sense at all to have both filters,
 universe and regular, so they both mean exactly the same.
 
 ### Filter by range
+
+You can filter your universe as well by range. Depending if the filter uses a
+date range or not, you should use one of these methods. Let's imagine a landing
+page where to list all T-shirts with low price (up to 20 euros). We want to add
+only elements created during last month
+
+``` php
+$from = // Date Atom of start of the month
+$to = // Date Atom of the end of the month
+$query = Query::createMatchAll()
+    ->filterUniverseByRange('price', ['0..20'], Filter::MUST_ALL)
+    ->filterUniverseByDateRange('created_at', ["$from..$to"], Filter::MUST_ALL);
+```
+
+Furthermore, once defined your subset of available values, you can use the range
+filter the same way as others.
 
 This filter is considerably useful when filtering by price, by rating or by any
 other numeric value (discount percentage...). Let's work with the example of
@@ -730,6 +778,8 @@ As you can see, this last example would return an empty set of elements as we
 don't have any item with a price lower than 60 euros and, at the same time,
 higher than 90. Basics of logic of sets.
 
+### Filter by field
+
 Finally, and of course, you can filter your universe by any value inserted in
 your indexed_metadata array. Let's take our first example, and let's create a
 landing page for only products from brand *Supershirts*. Other brands will not
@@ -740,14 +790,11 @@ $query = Query::createMatchAll()
     ->filterUniverseBy('brand', ['Supershirts'], Filter::MUST_ALL);
 ```
 
-### Filter by field
-
-Remember that a item can have some indexed metadata? This metadata is stored
-and indexed properly so you can filter by these values using this method. All
-method have a first parameter called filter name. This should be unique, so two
-filters with same name will just be overridden. You can make two or more filters
-with different name over the same field. This filter name will be used as well
-later when matching with existing aggregations.
+You can filter by any field as well after universe filtering. This method have 
+a first parameter called filter name. This should be unique, so two filters with 
+same name will just be overridden. You can make two or more filters with 
+different name over the same field. This filter name will be used as well later
+when matching with existing aggregations.
 
 ```php
 Query::createMatchAll()
@@ -867,7 +914,6 @@ specific behaviors will be disabled.
 
 ```php
 Query::create('')
-    ->enableAggregations()
     ->disableAggregations()
 ;
 ```
@@ -981,9 +1027,12 @@ Query::createMatchAll()
 Suggestions can be enabled or disabled by using these flag methods.
 
 ```php
-Query::createMatchAll()
-    ->enableSuggestions()
-    ->disableSuggestions()
+Query::create('')
+    ->disableAggregations()
+;
+
+Query::create('')
+    ->enableAggregations()
 ;
 ```
 
@@ -1060,8 +1109,12 @@ transformers.
 The Result instance have some other interesting methods to retrieve some extra
 information of your data set.
 
-- getTotalElements() - get the total items in your data set
-- getTotalHits() - get the total hits produced by your query
+- getTotalElements() - get the total items in your universe. If you don't have
+applied any universe filter, then you will have all of them. Otherwise, you will
+have the number of elements in your universe.
+- getTotalHits() - get the total hits produced by your query. This is not the
+number of Items you have in your Result object, but the Items you can reach in
+total by paginating along the result hits.
 
 ### Reading Aggregations
 
@@ -1230,11 +1283,13 @@ class ProductTransformer implements ReadTransformer, WriteTransformer
         return Item::create(
             $this->toItemUUID($object),
             [
+                // Metadata 
                 'name' => $object->getName(),
                 'description' => $object->getDescription(),
                 'ean' => $object->getEan(),
             ],
             [
+                // Indexed metadata
                 'price' => $object->getPrice(),
                 'old_price' => $object->getOldPrice(),
                 'brand' => $object->getBrand()->getName(),
@@ -1243,15 +1298,18 @@ class ProductTransformer implements ReadTransformer, WriteTransformer
                 'colors' => array_values($object->getColors()),
             ],
             [
-                $this->getName(),
-                $this->getDescription(),
-                $this->getBrand()->getName(),
+                // Searchable metadata
+                'name' => $this->getName(),
+                'description' => $this->getDescription(),
+                'brand' => $this->getBrand()->getName(),
             ],
             [
+                // Exact matching metadata
                 $this->getId(),
                 $this->getEan(),
             ],
             [
+                // Suggestions
                 'T-shirt',
             ]
     }
@@ -1427,7 +1485,7 @@ will contain 100 elements maximum. By default this value is set to 500.
 $repository->flush(100);
 ```
 
-If we want to only flush if and only if we have a minimum of 500 elements, then
+If we want to only flush if and only if we have a minimum of 100 elements, then
 we can use the second parameter by setting it to true.
 
 ```php
