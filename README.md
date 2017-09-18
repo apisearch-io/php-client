@@ -1068,7 +1068,7 @@ Query::createMatchAll()
     ->filterByTypes(
         ['product']
     )
-    ->excludeReferences([
+    ->excludeUUIDs([
         new ItemUUID('10', 'product'),
         new ItemUUID('5', 'product'),
         new ItemUUID('100', 'product'),
