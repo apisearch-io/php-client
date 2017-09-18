@@ -527,16 +527,16 @@ MUST_ALL_WITH_LEVELS, you will print only these categories with the current
 level. So, if you don't have any filter applied, you should be able to filter
 only by first level categories.
 
-- [ ] A
-- [ ] B
-- [ ] C
+- [ ] Category A
+- [ ] Category B
+- [ ] Category C
 
 So what happens when we apply the A filter? Then, and because A has two children
 A1 and A2, the aggregations will appear like that.
 
-- [x] A
-- [ ] A1
-- [ ] A2
+- [x] Category A
+- [ ] Category A1
+- [ ] Category A2
 
 ### Filter types
 
