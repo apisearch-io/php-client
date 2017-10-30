@@ -76,6 +76,7 @@ class HttpRepository extends Repository
             $this
                 ->httpClient
                 ->get('/items', 'post'.$async, [
+                    'app_id' => $this->getAppId(),
                     'key' => $this->getKey(),
                     'items' => json_encode(
                         array_map(function (Item $item) {
@@ -89,6 +90,7 @@ class HttpRepository extends Repository
             $this
                 ->httpClient
                 ->get('/items', 'delete'.$async, [
+                    'app_id' => $this->getAppId(),
                     'key' => $this->getKey(),
                     'items' => json_encode(
                         array_map(function (ItemUUID $itemUUID) {
@@ -111,6 +113,7 @@ class HttpRepository extends Repository
         $response = $this
             ->httpClient
             ->get('/', 'get', [
+                'app_id' => $this->getAppId(),
                 'key' => $this->getKey(),
                 'query' => json_encode($query->toArray()),
             ]);
@@ -133,6 +136,7 @@ class HttpRepository extends Repository
         $this
             ->httpClient
             ->get('/', 'delete'.$async, [
+                'app_id' => $this->getAppId(),
                 'key' => $this->getKey(),
                 'language' => $language,
             ]);

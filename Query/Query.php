@@ -616,6 +616,8 @@ class Query implements HttpTransportable
     public function setFilterFields(array $filterFields)
     {
         $this->filterFields = $filterFields;
+
+        return $this;
     }
 
     /**

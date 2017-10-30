@@ -44,6 +44,7 @@ class HttpEventRepository implements EventRepository
     /**
      * Get all events.
      *
+     * @param string|null $appId
      * @param string|null $key
      * @param string|null $name
      * @param int|null    $from
@@ -54,6 +55,7 @@ class HttpEventRepository implements EventRepository
      * @return Event[]
      */
     public function all(
+        string $appId = null,
         string $key = null,
         string $name = null,
         ? int $from = null,
@@ -64,6 +66,7 @@ class HttpEventRepository implements EventRepository
         $response = $this
             ->httpClient
             ->get('/events/', 'get', [
+                'app_id' => $appId,
                 'key' => $key,
                 'name' => $name,
                 'from' => $from,

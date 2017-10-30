@@ -418,7 +418,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return string|null
      */
-    public function getHighlight(string $fieldName) : ? string
+    public function getHighlight(string $fieldName): ? string
     {
         return isset($this->highlights[$fieldName])
             ? ((string) $this->highlights[$fieldName])

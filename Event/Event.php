@@ -47,6 +47,13 @@ class Event implements HttpTransportable
     /**
      * @var string
      *
+     * App id
+     */
+    private $appId;
+
+    /**
+     * @var string
+     *
      * Key
      */
     private $key;
@@ -70,6 +77,7 @@ class Event implements HttpTransportable
      *
      * @param string $consistencyHash
      * @param string $name
+     * @param string $appId
      * @param string $key
      * @param string $payload
      * @param int    $occurredOn
@@ -77,12 +85,14 @@ class Event implements HttpTransportable
     private function __construct(
         string $consistencyHash,
         string $name,
+        string $appId,
         string $key,
         string $payload,
         int $occurredOn
     ) {
         $this->consistencyHash = $consistencyHash;
         $this->name = $name;
+        $this->appId = $appId;
         $this->key = $key;
         $this->payload = $payload;
         $this->occurredOn = $occurredOn;
@@ -116,6 +126,16 @@ class Event implements HttpTransportable
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * Get AppId.
+     *
+     * @return string
+     */
+    public function getAppId(): string
+    {
+        return $this->appId;
     }
 
     /**
@@ -159,6 +179,7 @@ class Event implements HttpTransportable
             'id' => $this->id,
             'consistency_hash' => $this->consistencyHash,
             'name' => $this->name,
+            'app_id' => $this->appId,
             'key' => $this->key,
             'payload' => $this->payload,
             'occurred_on' => $this->occurredOn,
@@ -178,6 +199,7 @@ class Event implements HttpTransportable
             (int) $array['id'],
             (string) $array['consistency_hash'],
             (string) $array['name'],
+            (string) $array['app_id'],
             (string) $array['key'],
             (string) $array['payload'],
             (int) $array['occurred_on']
@@ -189,6 +211,7 @@ class Event implements HttpTransportable
      *
      * @param null|Event $previousEvent
      * @param string     $name
+     * @param string     $appId
      * @param string     $key
      * @param string     $payload
      * @param int        $occurredOn
@@ -198,6 +221,7 @@ class Event implements HttpTransportable
     public static function createByPreviousEvent(
         ? Event $previousEvent,
         string $name,
+        string $appId,
         string $key,
         string $payload,
         int $occurredOn
@@ -207,8 +231,9 @@ class Event implements HttpTransportable
             : '';
 
         return new self(
-            hash('sha256', $lastEventUUID.$name.$key.$payload.$occurredOn),
+            hash('sha256', $lastEventUUID.$name.$appId.$key.$payload.$occurredOn),
             $name,
+            $appId,
             $key,
             $payload,
             $occurredOn
@@ -221,6 +246,7 @@ class Event implements HttpTransportable
      * @param int    $id
      * @param string $consistencyHash
      * @param string $name
+     * @param string $appId
      * @param string $key
      * @param string $payload
      * @param int    $occurredOn
@@ -231,6 +257,7 @@ class Event implements HttpTransportable
         int $id,
         string $consistencyHash,
         string $name,
+        string $appId,
         string $key,
         string $payload,
         int $occurredOn
@@ -238,6 +265,7 @@ class Event implements HttpTransportable
         $event = new self(
             $consistencyHash,
             $name,
+            $appId,
             $key,
             $payload,
             $occurredOn

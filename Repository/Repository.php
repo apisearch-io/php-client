@@ -43,6 +43,13 @@ abstract class Repository
     /**
      * @var string
      *
+     * App id
+     */
+    private $appId;
+
+    /**
+     * @var string
+     *
      * Api key
      */
     private $key;
@@ -53,6 +60,26 @@ abstract class Repository
     public function __construct()
     {
         $this->resetCachedElements();
+    }
+
+    /**
+     * Get AppId.
+     *
+     * @return string
+     */
+    public function getAppId(): string
+    {
+        return $this->appId;
+    }
+
+    /**
+     * Set AppId.
+     *
+     * @param string $appId
+     */
+    public function setAppId(string $appId)
+    {
+        $this->appId = $appId;
     }
 
     /**

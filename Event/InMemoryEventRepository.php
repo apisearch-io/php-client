@@ -33,6 +33,7 @@ class InMemoryEventRepository implements EventRepository
     /**
      * Get all events.
      *
+     * @param string|null $appId
      * @param string|null $key
      * @param string|null $name
      * @param int|null    $from
@@ -43,6 +44,7 @@ class InMemoryEventRepository implements EventRepository
      * @return Event[]
      */
     public function all(
+        string $appId = null,
         string $key = null,
         string $name = null,
         ? int $from = null,
@@ -53,8 +55,9 @@ class InMemoryEventRepository implements EventRepository
         return array_slice(
             array_filter(
                 $this->events,
-                function (Event $event) use ($key, $from, $to, $name) {
+                function (Event $event) use ($appId, $key, $from, $to, $name) {
                     return
+                        (is_null($appId) || ($appId === $event->getAppId())) &&
                         (is_null($key) || ($key === $event->getKey())) &&
                         (is_null($name) || ($name === $event->getName())) &&
                         (is_null($from) || ($event->getOccurredOn() >= $from)) &&

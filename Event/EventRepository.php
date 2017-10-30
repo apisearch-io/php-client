@@ -31,6 +31,7 @@ interface EventRepository
     /**
      * Get all events.
      *
+     * @param string|null $appId
      * @param string|null $key
      * @param string|null $name
      * @param int|null    $from
@@ -41,6 +42,7 @@ interface EventRepository
      * @return Event[]
      */
     public function all(
+        string $appId = null,
         string $key = null,
         string $name = null,
         ? int $from = null,
