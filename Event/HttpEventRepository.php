@@ -18,11 +18,12 @@ namespace Puntmig\Search\Event;
 
 use Puntmig\Search\Exception\EventException;
 use Puntmig\Search\Http\HttpClient;
+use Puntmig\Search\Repository\RepositoryWithCredentials;
 
 /**
  * Class HttpEventRepository.
  */
-class HttpEventRepository implements EventRepository
+class HttpEventRepository extends RepositoryWithCredentials implements EventRepository
 {
     /**
      * @var HttpClient
@@ -42,10 +43,18 @@ class HttpEventRepository implements EventRepository
     }
 
     /**
+     * Create repository.
+     *
+     * @param bool $removeIfExists
+     */
+    public function createRepository(bool $removeIfExists = false)
+    {
+        throw EventException::throwEndpointNotAvailable();
+    }
+
+    /**
      * Get all events.
      *
-     * @param string|null $appId
-     * @param string|null $key
      * @param string|null $name
      * @param int|null    $from
      * @param int|null    $to
@@ -55,8 +64,6 @@ class HttpEventRepository implements EventRepository
      * @return Event[]
      */
     public function all(
-        string $appId = null,
-        string $key = null,
         string $name = null,
         ? int $from = null,
         ? int $to = null,
@@ -66,8 +73,8 @@ class HttpEventRepository implements EventRepository
         $response = $this
             ->httpClient
             ->get('/events/', 'get', [
-                'app_id' => $appId,
-                'key' => $key,
+                'app_id' => $this->getAppId(),
+                'key' => $this->getKey(),
                 'name' => $name,
                 'from' => $from,
                 'to' => $to,
@@ -78,6 +85,30 @@ class HttpEventRepository implements EventRepository
         return array_map(function (array $event) {
             return Event::createFromArray($event);
         }, $response['body']);
+    }
+
+    /**
+     * Get stats.
+     *
+     * @param int|null $from
+     * @param int|null $to
+     *
+     * @return Stats
+     */
+    public function stats(
+        ? int $from = null,
+        ? int $to = null
+    ): Stats {
+        $response = $this
+            ->httpClient
+            ->get('/events/stats', 'get', [
+                'app_id' => $this->getAppId(),
+                'key' => $this->getKey(),
+                'from' => $from,
+                'to' => $to,
+            ]);
+
+        return Stats::createFromArray($response['body']);
     }
 
     /**

@@ -34,7 +34,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testBasics()
     {
         $repository = new InMemoryRepository();
-        $repository->setKey('xxx');
+        $repository->setAppId('xxx');
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
         $repository->flush();
         $this->assertEquals(
@@ -45,7 +45,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
                 ->getId()
         );
 
-        $repository->setKey('yyy');
+        $repository->setAppId('yyy');
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~2')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~3')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~4')));
@@ -56,7 +56,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
                 ->query(Query::createMatchAll())
                 ->getItems()
         );
-        $repository->setKey('xxx');
+        $repository->setAppId('xxx');
         $this->assertCount(
             1,
             $repository
@@ -71,21 +71,21 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
                 ->query(Query::createMatchAll())
                 ->getItems()
         );
-        $repository->setKey('yyy');
+        $repository->setAppId('yyy');
         $this->assertCount(
             3,
             $repository
                 ->query(Query::createMatchAll())
                 ->getItems()
         );
-        $repository->setKey('zzz');
+        $repository->setAppId('zzz');
         $this->assertCount(
             0,
             $repository
                 ->query(Query::createMatchAll())
                 ->getItems()
         );
-        $repository->setKey('xxx');
+        $repository->setAppId('xxx');
         $repository->deleteItem(ItemUUID::createByComposedUUID('product~1'));
         $repository->deleteItem(ItemUUID::createByComposedUUID('product~5'));
         $repository->flush();
@@ -102,7 +102,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testAddDeleteAtTheSameTime()
     {
         $repository = new InMemoryRepository();
-        $repository->setKey('xxx');
+        $repository->setAppId('xxx');
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
         $repository->deleteItem(ItemUUID::createByComposedUUID('product~1'));
         $repository->flush();
@@ -119,7 +119,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testReset()
     {
         $repository = new InMemoryRepository();
-        $repository->setKey('xxx');
+        $repository->setAppId('xxx');
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
         $repository->flush();
         $repository->reset(null);
@@ -136,7 +136,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testQueryMultiple()
     {
         $repository = new InMemoryRepository();
-        $repository->setKey('xxx');
+        $repository->setAppId('xxx');
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~2')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~3')));
@@ -178,7 +178,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     public function testInvalidQueries(Query $query)
     {
         $repository = new InMemoryRepository();
-        $repository->setKey('xxx');
+        $repository->setAppId('xxx');
         $repository->query($query);
     }
 

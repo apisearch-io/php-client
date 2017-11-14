@@ -114,6 +114,13 @@ class Query implements HttpTransportable
     /**
      * @var bool
      *
+     * Results enabled
+     */
+    private $resultsEnabled = true;
+
+    /**
+     * @var bool
+     *
      * Suggestions enabled
      */
     private $suggestionsEnabled = false;
@@ -888,6 +895,40 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Enable results.
+     *
+     * @return Query
+     */
+    public function enableResults(): Query
+    {
+        $this->resultsEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable results.
+     *
+     * @return Query
+     */
+    public function disableResults(): Query
+    {
+        $this->resultsEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Are results enabled.
+     *
+     * @return bool
+     */
+    public function areResultsEnabled(): bool
+    {
+        return $this->resultsEnabled;
+    }
+
+    /**
      * Enable suggestions.
      *
      * @return Query
@@ -1134,6 +1175,9 @@ class Query implements HttpTransportable
             'size' => $this->size === self::DEFAULT_SIZE
                 ? null
                 : $this->size,
+            'results_enabled' => $this->resultsEnabled
+                ? null
+                : false,
             'suggestions_enabled' => $this->suggestionsEnabled ?: null,
             'highlight_enabled' => $this->highlightEnabled ?: null,
             'aggregations_enabled' => $this->aggregationsEnabled
@@ -1195,6 +1239,7 @@ class Query implements HttpTransportable
                 return Filter::createFromArray($filter);
             }, $array['universe_filters'] ?? [])
         );
+        $query->resultsEnabled = $array['results_enabled'] ?? true;
         $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
         $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
         $query->highlightEnabled = $array['highlight_enabled'] ?? false;

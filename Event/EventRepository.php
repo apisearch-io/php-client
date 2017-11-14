@@ -22,6 +22,20 @@ namespace Puntmig\Search\Event;
 interface EventRepository
 {
     /**
+     * Set app id.
+     *
+     * @param string $appId
+     */
+    public function setAppId(string $appId);
+
+    /**
+     * Create repository.
+     *
+     * @param bool $removeIfExists
+     */
+    public function createRepository(bool $removeIfExists = false);
+
+    /**
      * Save event.
      *
      * @param Event $event
@@ -31,8 +45,6 @@ interface EventRepository
     /**
      * Get all events.
      *
-     * @param string|null $appId
-     * @param string|null $key
      * @param string|null $name
      * @param int|null    $from
      * @param int|null    $to
@@ -42,8 +54,6 @@ interface EventRepository
      * @return Event[]
      */
     public function all(
-        string $appId = null,
-        string $key = null,
         string $name = null,
         ? int $from = null,
         ? int $to = null,
@@ -57,4 +67,17 @@ interface EventRepository
      * @return Event|null
      */
     public function last(): ? Event;
+
+    /**
+     * Get stats.
+     *
+     * @param int|null $from
+     * @param int|null $to
+     *
+     * @return Stats
+     */
+    public function stats(
+        ? int $from = null,
+        ? int $to = null
+    ): Stats;
 }

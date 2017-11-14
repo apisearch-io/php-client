@@ -136,7 +136,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             return;
         }
 
-        $this->counters[$counter->getId()] = $counter;
+        $this->counters[] = $counter;
     }
 
     /**
@@ -248,16 +248,6 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     }
 
     /**
-     * Sort by value.
-     */
-    public function sortByName()
-    {
-        uasort($this->counters, function (Counter $a, Counter $b) {
-            return $a->getName() > $b->getName();
-        });
-    }
-
-    /**
      * Clean results by level and remove all levels higher than the lowest.
      */
     public function cleanCountersByLevel()
@@ -314,11 +304,11 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             'total_elements' => $this->totalElements === 0
                 ? null
                 : $this->totalElements,
-            'active_elements' => array_map(function ($counter) {
+            'active_elements' => array_values(array_map(function ($counter) {
                 return ($counter instanceof Counter)
                     ? $counter->toArray()
                     : $counter;
-            }, $this->activeElements),
+            }, $this->activeElements)),
             'highest_active_level' => $this->highestActiveLevel === 0
                 ? null
                 : $this->highestActiveLevel,
@@ -341,8 +331,8 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     public static function createFromArray(array $array): self
     {
         $activeElements = [];
-        foreach (($array['active_elements'] ?? []) as $activeElementName => $activeElement) {
-            $activeElements[$activeElementName] = is_array($activeElement)
+        foreach (($array['active_elements'] ?? []) as $activeElement) {
+            $activeElements[] = is_array($activeElement)
                 ? Counter::createFromArray($activeElement)
                 : $activeElement;
         }

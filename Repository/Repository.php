@@ -24,7 +24,7 @@ use Puntmig\Search\Result\Result;
 /**
  * Abstract class Repository.
  */
-abstract class Repository
+abstract class Repository extends RepositoryWithCredentials
 {
     /**
      * @var array
@@ -41,65 +41,11 @@ abstract class Repository
     private $elementsToDelete;
 
     /**
-     * @var string
-     *
-     * App id
-     */
-    private $appId;
-
-    /**
-     * @var string
-     *
-     * Api key
-     */
-    private $key;
-
-    /**
      * Repository constructor.
      */
     public function __construct()
     {
         $this->resetCachedElements();
-    }
-
-    /**
-     * Get AppId.
-     *
-     * @return string
-     */
-    public function getAppId(): string
-    {
-        return $this->appId;
-    }
-
-    /**
-     * Set AppId.
-     *
-     * @param string $appId
-     */
-    public function setAppId(string $appId)
-    {
-        $this->appId = $appId;
-    }
-
-    /**
-     * Set key.
-     *
-     * @param string $key
-     */
-    public function setKey(string $key)
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * Get key.
-     *
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return $this->key;
     }
 
     /**

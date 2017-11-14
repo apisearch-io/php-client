@@ -16,25 +16,39 @@ declare(strict_types=1);
 
 namespace Puntmig\Search\Event;
 
-use Puntmig\Search\Exception\EventException;
+use Puntmig\Search\Repository\RepositoryWithCredentials;
 
 /**
  * Class InMemoryEventRepository.
  */
-class InMemoryEventRepository implements EventRepository
+class InMemoryEventRepository extends RepositoryWithCredentials implements EventRepository
 {
     /**
-     * @var Event[]
+     * @var array
      *
      * Events
      */
     private $events = [];
 
     /**
+     * Create repository.
+     *
+     * @param bool $removeIfExists
+     */
+    public function createRepository(bool $removeIfExists = false)
+    {
+        if ($removeIfExists) {
+            unset($this->events[$this->getAppId()]);
+        }
+
+        if (!isset($this->events[$this->getAppId()])) {
+            $this->events[$this->getAppId()] = [];
+        }
+    }
+
+    /**
      * Get all events.
      *
-     * @param string|null $appId
-     * @param string|null $key
      * @param string|null $name
      * @param int|null    $from
      * @param int|null    $to
@@ -44,21 +58,22 @@ class InMemoryEventRepository implements EventRepository
      * @return Event[]
      */
     public function all(
-        string $appId = null,
-        string $key = null,
         string $name = null,
         ? int $from = null,
         ? int $to = null,
         ? int $length = 10,
         ? int $offset = 0
     ): array {
+        if (!isset($this->events[$this->getAppId()])) {
+            return [];
+        }
+
         return array_slice(
             array_filter(
-                $this->events,
-                function (Event $event) use ($appId, $key, $from, $to, $name) {
+                $this->events[$this->getAppId()],
+                function (Event $event) use ($from, $to, $name) {
                     return
-                        (is_null($appId) || ($appId === $event->getAppId())) &&
-                        (is_null($key) || ($key === $event->getKey())) &&
+                        (is_null($this->getAppId()) || ($this->getAppId() === $event->getAppId())) &&
                         (is_null($name) || ($name === $event->getName())) &&
                         (is_null($from) || ($event->getOccurredOn() >= $from)) &&
                         (is_null($to) || ($event->getOccurredOn() < $to));
@@ -73,12 +88,14 @@ class InMemoryEventRepository implements EventRepository
      * Save event.
      *
      * @param Event $event
-     *
-     * @throws EventException
      */
     public function save(Event $event)
     {
-        $this->events[] = $event;
+        if (!isset($this->events[$this->getAppId()])) {
+            $this->events[$this->getAppId()] = [];
+        }
+
+        $this->events[$this->getAppId()][] = $event;
     }
 
     /**
@@ -88,10 +105,28 @@ class InMemoryEventRepository implements EventRepository
      */
     public function last(): ? Event
     {
-        $lastEvent = end($this->events);
+        if (!isset($this->events[$this->getAppId()])) {
+            return null;
+        }
+
+        $lastEvent = end($this->events[$this->getAppId()]);
 
         return ($lastEvent instanceof Event)
             ? $lastEvent
             : null;
+    }
+
+    /**
+     * Get stats.
+     *
+     * @param int|null $from
+     * @param int|null $to
+     *
+     * @return Stats
+     */
+    public function stats(
+        ? int $from = null,
+        ? int $to = null
+    ): Stats {
     }
 }

@@ -58,20 +58,6 @@ class TransformableRepository extends Repository
     }
 
     /**
-     * Set key.
-     *
-     * @param string $key
-     */
-    public function setKey(string $key)
-    {
-        $this
-            ->repository
-            ->setKey($key);
-
-        parent::setKey($key);
-    }
-
-    /**
      * Set app id.
      *
      * @param string $appId
