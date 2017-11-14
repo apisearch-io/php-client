@@ -136,7 +136,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             return;
         }
 
-        $this->counters[] = $counter;
+        $this->counters[$counter->getId()] = $counter;
     }
 
     /**
@@ -295,9 +295,9 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     {
         return array_filter([
             'name' => $this->name,
-            'counters' => array_map(function (Counter $counter) {
+            'counters' => array_values(array_map(function (Counter $counter) {
                 return $counter->toArray();
-            }, $this->counters),
+            }, $this->counters)),
             'application_type' => $this->applicationType === Filter::AT_LEAST_ONE
                 ? null
                 : $this->applicationType,
@@ -344,9 +344,12 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             []
         );
         $aggregation->activeElements = $activeElements;
-        $aggregation->counters = array_map(function (array $counter) {
+        $counters = array_map(function (array $counter) {
             return Counter::createFromArray($counter);
         }, $array['counters'] ?? []);
+        foreach ($counters as $counter) {
+            $aggregation->counters[$counter->getId()] = $counter;
+        }
 
         $aggregation->highestActiveLevel = $array['highest_active_level'] ?? 0;
 
