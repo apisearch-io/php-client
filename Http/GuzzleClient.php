@@ -34,13 +34,24 @@ class GuzzleClient implements HttpClient
     private $host;
 
     /**
+     * @var string
+     *
+     * Version
+     */
+    private $version;
+
+    /**
      * GuzzleClient constructor.
      *
      * @param string $host
+     * @param string $version
      */
-    public function __construct(string $host)
-    {
+    public function __construct(
+        string $host,
+        string $version
+    ) {
         $this->host = $host;
+        $this->version = trim($version, '/');
     }
 
     /**
@@ -66,6 +77,7 @@ class GuzzleClient implements HttpClient
             ],
         ]);
 
+        $url = trim($url, '/');
         $bodyFieldName = ($method === 'get')
             ? 'query'
             : 'form_params';
@@ -74,7 +86,7 @@ class GuzzleClient implements HttpClient
          * @var ResponseInterface|Promise
          */
         $response = $client->$method(
-            rtrim($this->host.$url, '/'),
+            rtrim("{$this->host}/{$this->version}/$url", '/'),
             [
                 $bodyFieldName => $parameters,
                 'headers' => $server,
