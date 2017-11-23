@@ -27,7 +27,8 @@ interface HttpClient
      *
      * @param string $url
      * @param string $method
-     * @param array  $parameters
+     * @param array  $query
+     * @param array  $body
      * @param array  $server
      *
      * @return array
@@ -35,7 +36,8 @@ interface HttpClient
     public function get(
         string $url,
         string $method,
-        array $parameters,
+        array $query = [],
+        array $body = [],
         array $server = []
     ): array;
 }

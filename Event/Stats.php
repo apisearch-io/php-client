@@ -57,9 +57,15 @@ class Stats implements HttpTransportable
      */
     public function toArray(): array
     {
-        return [
-            'event_counter' => $this->eventCounter,
-        ];
+        return array_filter([
+            'ev' => $this->eventCounter,
+        ], function ($element) {
+            return
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
+        });
     }
 
     /**
@@ -72,7 +78,7 @@ class Stats implements HttpTransportable
     public static function createFromArray(array $array)
     {
         return self::createByPlainData(
-            $array['event_counter']
+            $array['ev'] ?? []
         );
     }
 

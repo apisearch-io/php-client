@@ -60,7 +60,8 @@ class GuzzleClient implements HttpClient
      *
      * @param string $url
      * @param string $method
-     * @param array  $parameters
+     * @param array  $query
+     * @param array  $body
      * @param array  $server
      *
      * @return array
@@ -68,7 +69,8 @@ class GuzzleClient implements HttpClient
     public function get(
         string $url,
         string $method,
-        array $parameters,
+        array $query = [],
+        array $body = [],
         array $server = []
     ): array {
         $client = new Client([
@@ -82,13 +84,29 @@ class GuzzleClient implements HttpClient
             ? 'query'
             : 'form_params';
 
+        /*
+         * If method is GET, then we merge both the query and the body
+         * parameters. Otherwise, the query params will be appended into the url
+         * and the body will be served as the body itself
+         */
+        if ($method === 'get') {
+            $url .= '?'.implode('&', array_walk($query, function ($value, $key) {
+                return "$key=$value";
+            }));
+        } else {
+            $body = array_merge(
+                $query,
+                $body
+            );
+        }
+
         /**
          * @var ResponseInterface|Promise
          */
         $response = $client->$method(
             rtrim("{$this->host}/{$this->version}/$url", '/'),
             [
-                $bodyFieldName => $parameters,
+                $bodyFieldName => $body,
                 'headers' => $server,
             ],
             [

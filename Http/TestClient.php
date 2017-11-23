@@ -46,7 +46,8 @@ class TestClient implements HttpClient
      *
      * @param string $url
      * @param string $method
-     * @param array  $parameters
+     * @param array  $query
+     * @param array  $body
      * @param array  $server
      *
      * @return array
@@ -54,7 +55,8 @@ class TestClient implements HttpClient
     public function get(
         string $url,
         string $method,
-        array $parameters,
+        array $query = [],
+        array $body = [],
         array $server = []
     ): array {
         $method = trim(str_ireplace('async', '', $method));

@@ -28,6 +28,41 @@ use Puntmig\Search\Result\Result;
 class HttpRepository extends Repository
 {
     /**
+     * @var string
+     *
+     * App_id query param field
+     */
+    const APP_ID_FIELD = 'app_id';
+
+    /**
+     * @var string
+     *
+     * Key query param field
+     */
+    const KEY_FIELD = 'key';
+
+    /**
+     * @var string
+     *
+     * Items query param field
+     */
+    const ITEMS_FIELD = 'items';
+
+    /**
+     * @var string
+     *
+     * Query query param field
+     */
+    const QUERY_FIELD = 'query';
+
+    /**
+     * @var string
+     *
+     * Language query param field
+     */
+    const LANGUAGE_FIELD = 'language';
+
+    /**
      * @var HttpClient
      *
      * Http client
@@ -75,29 +110,32 @@ class HttpRepository extends Repository
         if (!empty($itemsToUpdate)) {
             $this
                 ->httpClient
-                ->get('/items', 'post'.$async, [
-                    'app_id' => $this->getAppId(),
-                    'key' => $this->getKey(),
-                    'items' => json_encode(
-                        array_map(function (Item $item) {
-                            return $item->toArray();
-                        }, $itemsToUpdate)
-                    ),
-                ]);
+                ->get(
+                    '/items',
+                    'post'.$async,
+                    $this->getQueryValues(),
+                    [
+                        'items' => json_encode(
+                            array_map(function (Item $item) {
+                                return $item->toArray();
+                            }, $itemsToUpdate)
+                        ),
+                    ]);
         }
 
         if (!empty($itemsToDelete)) {
             $this
                 ->httpClient
-                ->get('/items', 'delete'.$async, [
-                    'app_id' => $this->getAppId(),
-                    'key' => $this->getKey(),
-                    'items' => json_encode(
-                        array_map(function (ItemUUID $itemUUID) {
-                            return $itemUUID->toArray();
-                        }, $itemsToDelete)
-                    ),
-                ]);
+                ->get('/items',
+                    'delete'.$async,
+                    $this->getQueryValues(),
+                    [
+                        'items' => json_encode(
+                            array_map(function (ItemUUID $itemUUID) {
+                                return $itemUUID->toArray();
+                            }, $itemsToDelete)
+                        ),
+                    ]);
         }
     }
 
@@ -112,11 +150,14 @@ class HttpRepository extends Repository
     {
         $response = $this
             ->httpClient
-            ->get('/', 'get', [
-                'app_id' => $this->getAppId(),
-                'key' => $this->getKey(),
-                'query' => json_encode($query->toArray()),
-            ]);
+            ->get(
+                '/',
+                'get',
+                $this->getQueryValues(),
+                [
+                    'query' => json_encode($query->toArray()),
+                ]
+            );
 
         return Result::createFromArray($response['body']);
     }
@@ -135,10 +176,26 @@ class HttpRepository extends Repository
 
         $this
             ->httpClient
-            ->get('/', 'delete'.$async, [
-                'app_id' => $this->getAppId(),
-                'key' => $this->getKey(),
-                'language' => $language,
-            ]);
+            ->get(
+                '/',
+                'post'.$async,
+                $this->getQueryValues(),
+                [
+                    'language' => $language,
+                ]
+            );
+    }
+
+    /**
+     * Get common query values.
+     *
+     * @return string[]
+     */
+    private function getQueryValues(): array
+    {
+        return [
+            'app_id' => $this->getAppId(),
+            'key' => $this->getKey(),
+        ];
     }
 }
