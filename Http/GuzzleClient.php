@@ -80,6 +80,8 @@ class GuzzleClient implements HttpClient
         ]);
 
         $url = trim($url, '/');
+        $url = trim("{$this->host}/{$this->version}/$url", '/');
+
         $bodyFieldName = ($method === 'get')
             ? 'query'
             : 'form_params';
@@ -89,10 +91,12 @@ class GuzzleClient implements HttpClient
          * parameters. Otherwise, the query params will be appended into the url
          * and the body will be served as the body itself
          */
-        if ($method === 'get') {
-            $url .= '?'.implode('&', array_walk($query, function ($value, $key) {
-                return "$key=$value";
-            }));
+        if ($method !== 'get') {
+            array_walk($query, function (&$value, $key) {
+                $value = "$key=$value";
+            });
+
+            $url .= '?' . implode('&', $query);
         } else {
             $body = array_merge(
                 $query,
@@ -104,7 +108,7 @@ class GuzzleClient implements HttpClient
          * @var ResponseInterface|Promise
          */
         $response = $client->$method(
-            rtrim("{$this->host}/{$this->version}/$url", '/'),
+            $url,
             [
                 $bodyFieldName => $body,
                 'headers' => $server,
