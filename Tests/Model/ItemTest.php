@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Search PHP Library.
+ * This file is part of the Apisearch PHP Client.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,13 +14,12 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Tests\Query;
+namespace Apisearch\Tests\Query;
 
+use Apisearch\Model\Coordinate;
+use Apisearch\Model\Item;
+use Apisearch\Model\ItemUUID;
 use PHPUnit_Framework_TestCase;
-
-use Puntmig\Search\Model\Coordinate;
-use Puntmig\Search\Model\Item;
-use Puntmig\Search\Model\ItemUUID;
 
 /**
  * File header placeholder.
@@ -135,7 +134,7 @@ class ItemTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider dataItemBadFormattedUUID
      *
-     * @expectedException \Puntmig\Search\Exception\UUIDException
+     * @expectedException \Apisearch\Exception\UUIDException
      */
     public function testItemBadFormattedUUID($data)
     {
@@ -166,7 +165,7 @@ class ItemTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider dataCoordinateBadFormattedUUID
      *
-     * @expectedException \Puntmig\Search\Exception\CoordinateException
+     * @expectedException \Apisearch\Exception\CoordinateException
      */
     public function testCoordinateFormattedUUID($data)
     {

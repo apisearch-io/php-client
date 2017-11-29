@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Search PHP Library.
+ * This file is part of the Apisearch PHP Client.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,14 +14,13 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Result;
+namespace Apisearch\Result;
 
+use Apisearch\Model\HttpTransportable;
+use Apisearch\Query\Filter;
 use ArrayIterator;
 use IteratorAggregate;
 use Traversable;
-
-use Puntmig\Search\Model\HttpTransportable;
-use Puntmig\Search\Query\Filter;
 
 /**
  * Class Aggregation.

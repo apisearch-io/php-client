@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Search PHP Library.
+ * This file is part of the Apisearch PHP Client.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,11 +14,10 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Geo;
+namespace Apisearch\Geo;
 
+use Apisearch\Model\HttpTransportable;
 use Exception;
-
-use Puntmig\Search\Model\HttpTransportable;
 
 /**
  * Interface LocationRange.
@@ -71,7 +70,7 @@ abstract class LocationRange implements HttpTransportable
         /**
          * @var static
          */
-        $className = 'Puntmig\Search\Geo\\'.$array['type'];
+        $className = 'Apisearch\Geo\\'.$array['type'];
 
         return $className::fromFilterArray($array['data']);
     }

@@ -1188,7 +1188,7 @@ But how it really works? We need an interface where we can communicate with an
 existing endpoint, so we can really have nice results given a set of pre-indexed
 data.
 
-Let's check the interface `Puntmig\Search\Repository\Repository`
+Let's check the interface `Apisearch\Repository\Repository`
 
 Using an implementation of this main repository, you'll be able to index,
 delete, reset and query your main data set. Each interaction will create an 

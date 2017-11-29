@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Search PHP Library.
+ * This file is part of the Apisearch PHP Client.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Http;
+namespace Apisearch\Http;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\Promise;
@@ -96,7 +96,7 @@ class GuzzleClient implements HttpClient
                 $value = "$key=$value";
             });
 
-            $url .= '?' . implode('&', $query);
+            $url .= '?'.implode('&', $query);
         } else {
             $body = array_merge(
                 $query,

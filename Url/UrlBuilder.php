@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Search PHP Library.
+ * This file is part of the Apisearch PHP Client.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,16 +14,15 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Url;
+namespace Apisearch\Url;
 
+use Apisearch\Query\Filter;
+use Apisearch\Query\SortBy;
+use Apisearch\Result\Aggregation;
+use Apisearch\Result\Counter;
+use Apisearch\Result\Result;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-
-use Puntmig\Search\Query\Filter;
-use Puntmig\Search\Query\SortBy;
-use Puntmig\Search\Result\Aggregation;
-use Puntmig\Search\Result\Counter;
-use Puntmig\Search\Result\Result;
 
 /**
  * Class UrlBuilder.

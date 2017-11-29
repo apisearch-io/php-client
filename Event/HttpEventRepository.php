@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Search PHP Library.
+ * This file is part of the Apisearch PHP Client.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,11 +14,11 @@
 
 declare(strict_types=1);
 
-namespace Puntmig\Search\Event;
+namespace Apisearch\Event;
 
-use Puntmig\Search\Exception\EventException;
-use Puntmig\Search\Http\HttpClient;
-use Puntmig\Search\Repository\RepositoryWithCredentials;
+use Apisearch\Exception\EventException;
+use Apisearch\Http\HttpClient;
+use Apisearch\Repository\RepositoryWithCredentials;
 
 /**
  * Class HttpEventRepository.

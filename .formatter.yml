@@ -1,14 +1,13 @@
 use-sort:
     group:
         - _main
-        - Puntmig
     group-type: each
     sort-type: alph
     sort-direction: asc
 strict: true
 header: |
     /*
-     * This file is part of the Search PHP Library.
+     * This file is part of the Apisearch PHP Client.
      *
      * For the full copyright and license information, please view the LICENSE
      * file that was distributed with this source code.
