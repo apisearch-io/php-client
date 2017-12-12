@@ -146,7 +146,7 @@ class Transformer
                 $this
                     ->eventDispatcher
                     ->dispatch(
-                        'puntmig_search.item_transformed',
+                        'apisearch.item_transformed',
                         new ItemTransformed(
                             $item,
                             $object
