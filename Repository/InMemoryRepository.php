@@ -54,11 +54,11 @@ class InMemoryRepository extends Repository
 
                 $itemUUIDs = $filter->getValues();
                 foreach ($itemUUIDs as $itemUUID) {
-                    $resultingItems[$itemUUID] = $this->items[$this->getKey()][$itemUUID] ?? null;
+                    $resultingItems[$itemUUID] = $this->items[$this->getToken()][$itemUUID] ?? null;
                 }
             }
         } else {
-            $resultingItems = $this->items[$this->getKey()];
+            $resultingItems = $this->items[$this->getToken()];
         }
 
         $resultingItems = array_values(
@@ -69,7 +69,7 @@ class InMemoryRepository extends Repository
             )
         );
 
-        $result = new Result($query, count($this->items[$this->getKey()]), count($resultingItems));
+        $result = new Result($query, count($this->items[$this->getToken()]), count($resultingItems));
         foreach ($resultingItems as $resultingItem) {
             $result->addItem($resultingItem);
         }
@@ -84,7 +84,7 @@ class InMemoryRepository extends Repository
      */
     public function reset(? string $language)
     {
-        $this->items[$this->getKey()] = [];
+        $this->items[$this->getToken()] = [];
     }
 
     /**
@@ -99,11 +99,11 @@ class InMemoryRepository extends Repository
     ) {
         $this->normalizeItemsArray();
         foreach ($itemsToUpdate as $itemToUpdate) {
-            $this->items[$this->getKey()][$itemToUpdate->getUUID()->composeUUID()] = $itemToUpdate;
+            $this->items[$this->getToken()][$itemToUpdate->getUUID()->composeUUID()] = $itemToUpdate;
         }
 
         foreach ($itemsToDelete as $itemToDelete) {
-            unset($this->items[$this->getKey()][$itemToDelete->composeUUID()]);
+            unset($this->items[$this->getToken()][$itemToDelete->composeUUID()]);
         }
     }
 
@@ -112,8 +112,8 @@ class InMemoryRepository extends Repository
      */
     private function normalizeItemsArray()
     {
-        if (!array_key_exists($this->getKey(), $this->items)) {
-            $this->items[$this->getKey()] = [];
+        if (!array_key_exists($this->getToken(), $this->items)) {
+            $this->items[$this->getToken()] = [];
         }
     }
 }

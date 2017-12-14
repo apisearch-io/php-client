@@ -37,9 +37,16 @@ class HttpRepository extends Repository
     /**
      * @var string
      *
-     * Key query param field
+     * App_id query param field
      */
-    const KEY_FIELD = 'key';
+    const INDEX_FIELD = 'index';
+
+    /**
+     * @var string
+     *
+     * Token query param field
+     */
+    const TOKEN_FIELD = 'token';
 
     /**
      * @var string
@@ -194,8 +201,9 @@ class HttpRepository extends Repository
     private function getQueryValues(): array
     {
         return [
-            'app_id' => $this->getAppId(),
-            'key' => $this->getKey(),
+            self::APP_ID_FIELD => $this->getAppId(),
+            self::INDEX_FIELD => $this->getIndex(),
+            self::TOKEN_FIELD => $this->getToken(),
         ];
     }
 }

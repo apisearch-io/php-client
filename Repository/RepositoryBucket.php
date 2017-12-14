@@ -32,24 +32,36 @@ class RepositoryBucket
      * Add repository.
      *
      * @param string                  $name
+     * @param string                  $index
      * @param TransformableRepository $repository
      */
     public function addRepository(
         string $name,
+        string $index,
         TransformableRepository $repository
     ) {
-        $this->repositories[$name] = $repository;
+        $this->repositories[$name][$index] = $repository;
     }
 
     /**
-     * Get repository by name.
+     * Get repository by name and index.
      *
      * @param string $name
+     * @param string $index
      *
      * @return TransformableRepository|null
      */
-    public function getRepositoryByName(string $name): ? TransformableRepository
-    {
-        return $this->repositories[$name] ?? null;
+    public function findRepository(
+        string $name,
+        string $index
+    ): ? TransformableRepository {
+        if (
+            !isset($this->repositories[$name]) ||
+            !isset($this->repositories[$name][$index])
+        ) {
+            return null;
+        }
+
+        return $this->repositories[$name][$index];
     }
 }

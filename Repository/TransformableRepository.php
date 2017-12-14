@@ -58,17 +58,16 @@ class TransformableRepository extends Repository
     }
 
     /**
-     * Set app id.
+     * Set repository reference.
      *
-     * @param string $appId
+     * @param RepositoryReference $repositoryReference
      */
-    public function setAppId(string $appId)
+    public function setRepositoryReference(RepositoryReference $repositoryReference)
     {
+        $this->repositoryReference = $repositoryReference;
         $this
             ->repository
-            ->setAppId($appId);
-
-        parent::setAppId($appId);
+            ->setRepositoryReference($repositoryReference);
     }
 
     /**

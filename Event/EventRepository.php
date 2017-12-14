@@ -16,17 +16,19 @@ declare(strict_types=1);
 
 namespace Apisearch\Event;
 
+use Apisearch\Repository\RepositoryReference;
+
 /**
  * Class EventRepository.
  */
 interface EventRepository
 {
     /**
-     * Set app id.
+     * Set repository reference.
      *
-     * @param string $appId
+     * @param RepositoryReference $repositoryReference
      */
-    public function setAppId(string $appId);
+    public function setRepositoryReference(RepositoryReference $repositoryReference);
 
     /**
      * Create repository.

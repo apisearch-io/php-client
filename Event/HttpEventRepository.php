@@ -74,7 +74,8 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
             ->httpClient
             ->get('/events/', 'get', [
                 'app_id' => $this->getAppId(),
-                'key' => $this->getKey(),
+                'index' => $this->getIndex(),
+                'token' => $this->getToken(),
                 'name' => $name,
                 'from' => $from,
                 'to' => $to,
@@ -103,7 +104,8 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
             ->httpClient
             ->get('/events/stats', 'get', [
                 'app_id' => $this->getAppId(),
-                'key' => $this->getKey(),
+                'index' => $this->getIndex(),
+                'token' => $this->getToken(),
                 'from' => $from,
                 'to' => $to,
             ]);

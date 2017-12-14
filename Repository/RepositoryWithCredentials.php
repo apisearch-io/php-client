@@ -21,61 +21,37 @@ namespace Apisearch\Repository;
  */
 abstract class RepositoryWithCredentials
 {
-    /**
-     * @var string
-     *
-     * App id
-     */
-    private $appId;
 
-    /**
+use WithRepositoryReference;
+
+/**
      * @var string
      *
-     * Api key
+     * Api Token
      */
-    private $key;
+    private $token;
 
     /**
      * Set credentials.
      *
-     * @param string $appId
-     * @param string $key
+     * @param RepositoryReference $repositoryReference
+     * @param string              $token
      */
     public function setCredentials(
-        string $appId,
-        string $key
+        RepositoryReference $repositoryReference,
+        string $token
     ) {
-        $this->setAppId($appId);
-        $this->key = $key;
+        $this->token = $token;
+        $this->setRepositoryReference($repositoryReference);
     }
 
     /**
-     * Set app id.
-     *
-     * @param string $appId
-     */
-    public function setAppId(string $appId)
-    {
-        $this->appId = $appId;
-    }
-
-    /**
-     * Get AppId.
-     *
-     * @return string
-     */
-    public function getAppId(): string
-    {
-        return $this->appId;
-    }
-
-    /**
-     * Get key.
+     * Get token.
      *
      * @return string|null
      */
-    public function getKey(): ? string
+    public function getToken(): ? string
     {
-        return $this->key;
+        return $this->token;
     }
 }
