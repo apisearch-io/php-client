@@ -71,7 +71,7 @@ class Metadata
             }
         }
 
-        if (count($values) == 1) {
+        if (1 == count($values)) {
             $firstAndUniqueElement = reset($values);
             $values = [
                 'id' => $firstAndUniqueElement,

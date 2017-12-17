@@ -16,15 +16,15 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
-use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\BrowserKit\Client as BrowserKitClient;
 
 /**
  * Class TestClient.
  */
-class TestClient implements HttpClient
+class TestClient extends Client implements HttpClient
 {
     /**
-     * @var Client
+     * @var BrowserKitClient
      *
      * test client
      */
@@ -33,11 +33,15 @@ class TestClient implements HttpClient
     /**
      * TestClient constructor.
      *
-     * @param Client $client
+     * @param BrowserKitClient $client
+     * @param string           $version
      */
-    public function __construct(Client $client)
-    {
+    public function __construct(
+        BrowserKitClient $client,
+        string $version
+    ) {
         $this->client = $client;
+        parent::__construct($version);
     }
 
     /**
@@ -60,13 +64,21 @@ class TestClient implements HttpClient
         array $server = []
     ): array {
         $method = trim(str_ireplace('async', '', $method));
+        $method = strtolower($method);
+        $requestParts = $this->buildRequestParts(
+            $url,
+            $method,
+            $query,
+            $body,
+            $server
+        );
+
         $this
             ->client
             ->request(
                 $method,
-                $url,
-                $parameters,
-                [],
+                '/'.$requestParts->getUrl(),
+                $requestParts->getParameters()['form_params'],
                 $server
             )
         ;

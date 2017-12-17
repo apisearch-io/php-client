@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -94,6 +96,8 @@ class TransformableRepository extends Repository
      * @param Query $query
      *
      * @return Result
+     *
+     * @throws ResourceNotAvailableException
      */
     public function query(Query $query): Result
     {
@@ -116,15 +120,41 @@ class TransformableRepository extends Repository
     }
 
     /**
-     * Reset the index.
+     * Create an index.
      *
-     * @var null|string
+     * @param null|string $language
+     *
+     * @throws ResourceExistsException
      */
-    public function reset(? string $language)
+    public function createIndex(? string $language)
     {
         $this
             ->repository
-            ->reset($language);
+            ->createIndex($language);
+    }
+
+    /**
+     * Delete an index.
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function deleteIndex()
+    {
+        $this
+            ->repository
+            ->deleteIndex();
+    }
+
+    /**
+     * Reset the index.
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function resetIndex()
+    {
+        $this
+            ->repository
+            ->resetIndex();
     }
 
     /**

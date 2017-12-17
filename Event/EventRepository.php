@@ -16,31 +16,41 @@ declare(strict_types=1);
 
 namespace Apisearch\Event;
 
-use Apisearch\Repository\RepositoryReference;
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Repository\WithRepositoryReference;
 
 /**
  * Class EventRepository.
  */
-interface EventRepository
+interface EventRepository extends WithRepositoryReference
 {
     /**
-     * Set repository reference.
+     * Create index.
      *
-     * @param RepositoryReference $repositoryReference
+     * @param int $shards
+     * @param int $replicas
+     *
+     * @throws ResourceExistsException
      */
-    public function setRepositoryReference(RepositoryReference $repositoryReference);
+    public function createIndex(
+        int $shards,
+        int $replicas
+    );
 
     /**
-     * Create repository.
+     * Delete index.
      *
-     * @param bool $removeIfExists
+     * @throws ResourceNotAvailableException
      */
-    public function createRepository(bool $removeIfExists = false);
+    public function deleteIndex();
 
     /**
      * Save event.
      *
      * @param Event $event
+     *
+     * @throws ResourceNotAvailableException
      */
     public function save(Event $event);
 
@@ -54,6 +64,8 @@ interface EventRepository
      * @param int|null    $offset
      *
      * @return Event[]
+     *
+     * @throws ResourceNotAvailableException
      */
     public function all(
         string $name = null,
@@ -67,6 +79,8 @@ interface EventRepository
      * Get last event.
      *
      * @return Event|null
+     *
+     * @throws ResourceNotAvailableException
      */
     public function last(): ? Event;
 
@@ -77,6 +91,8 @@ interface EventRepository
      * @param int|null $to
      *
      * @return Stats
+     *
+     * @throws ResourceNotAvailableException
      */
     public function stats(
         ? int $from = null,

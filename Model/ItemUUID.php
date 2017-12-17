@@ -60,10 +60,10 @@ class ItemUUID implements HttpTransportable, UUIDReference
      *
      * @throws UUIDException
      */
-    public static function createByComposedUUID(string $composedUUID): ItemUUID
+    public static function createByComposedUUID(string $composedUUID): self
     {
         $parts = explode('~', $composedUUID, 2);
-        if (count($parts) === 1) {
+        if (1 === count($parts)) {
             throw UUIDException::createComposedUUIDBadFormatException($composedUUID);
         }
 

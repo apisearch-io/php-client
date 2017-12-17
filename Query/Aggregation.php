@@ -227,7 +227,7 @@ class Aggregation implements HttpTransportable
         array $subgroup = [],
         array $sort = self::SORT_BY_COUNT_DESC,
         int $limit = self::NO_LIMIT
-    ): Aggregation {
+    ): self {
         return new self(
             $name,
             $field,
@@ -248,22 +248,22 @@ class Aggregation implements HttpTransportable
     {
         return array_filter([
             'name' => $this->name,
-            'field' => $this->field === 'uuid.type'
+            'field' => 'uuid.type' === $this->field
                 ? null
                 : $this->field,
-            'application_type' => $this->applicationType === Filter::AT_LEAST_ONE
+            'application_type' => Filter::AT_LEAST_ONE === $this->applicationType
                 ? null
                 : $this->applicationType,
-            'filter_type' => $this->filterType === Filter::TYPE_FIELD
+            'filter_type' => Filter::TYPE_FIELD === $this->filterType
                 ? null
                 : $this->filterType,
             'subgroup' => empty($this->subgroup)
                 ? null
                 : $this->subgroup,
-            'sort' => $this->sort === self::SORT_BY_COUNT_DESC
+            'sort' => self::SORT_BY_COUNT_DESC === $this->sort
                 ? null
                 : $this->sort,
-            'limit' => $this->limit === self::NO_LIMIT
+            'limit' => self::NO_LIMIT === $this->limit
                 ? null
                 : $this->limit,
         ], function ($element) {
@@ -282,7 +282,7 @@ class Aggregation implements HttpTransportable
      *
      * @return Aggregation
      */
-    public static function createFromArray(array $array): Aggregation
+    public static function createFromArray(array $array): self
     {
         return self::create(
             $array['name'],

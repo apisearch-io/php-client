@@ -145,7 +145,7 @@ class Filter implements HttpTransportable
         array $filterTerms
     ) {
         $this->field = $field;
-        $this->values = $filterType !== self::TYPE_GEO
+        $this->values = self::TYPE_GEO !== $filterType
             ? array_values($values)
             : $values;
         $this->applicationType = $applicationType;
@@ -232,7 +232,7 @@ class Filter implements HttpTransportable
         int $applicationType,
         string $filterType,
         array $filterTerms = []
-    ): Filter {
+    ): self {
         return new self(
             $field,
             $values,
@@ -250,14 +250,14 @@ class Filter implements HttpTransportable
     public function toArray(): array
     {
         return array_filter([
-            'field' => $this->field === 'uuid.type'
+            'field' => 'uuid.type' === $this->field
                 ? null
                 : $this->field,
             'values' => $this->values,
-            'application_type' => $this->applicationType === self::AT_LEAST_ONE
+            'application_type' => self::AT_LEAST_ONE === $this->applicationType
                 ? null
                 : $this->applicationType,
-            'filter_type' => $this->filterType === self::TYPE_FIELD
+            'filter_type' => self::TYPE_FIELD === $this->filterType
                 ? null
                 : $this->filterType,
             'filter_terms' => $this->filterTerms,
@@ -277,7 +277,7 @@ class Filter implements HttpTransportable
      *
      * @return Filter
      */
-    public static function createFromArray(array $array): Filter
+    public static function createFromArray(array $array): self
     {
         return self::create(
             $array['field'] ?? 'uuid.type',

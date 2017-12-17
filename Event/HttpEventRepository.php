@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace Apisearch\Event;
 
 use Apisearch\Exception\EventException;
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\HttpClient;
 use Apisearch\Repository\RepositoryWithCredentials;
 
@@ -25,6 +27,20 @@ use Apisearch\Repository\RepositoryWithCredentials;
  */
 class HttpEventRepository extends RepositoryWithCredentials implements EventRepository
 {
+    /**
+     * @var string
+     *
+     * Shards param field
+     */
+    const SHARDS_FIELD = 'shards';
+
+    /**
+     * @var string
+     *
+     * Replicas param field
+     */
+    const REPLICAS_FIELD = 'replicas';
+
     /**
      * @var HttpClient
      *
@@ -43,13 +59,52 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
     }
 
     /**
-     * Create repository.
+     * Create index.
      *
-     * @param bool $removeIfExists
+     * @param int $shards
+     * @param int $replicas
+     *
+     * @throws EventException
+     * @throws ResourceExistsException
      */
-    public function createRepository(bool $removeIfExists = false)
+    public function createIndex(
+        int $shards,
+        int $replicas
+    ) {
+        $response = $this
+            ->httpClient
+            ->get('/events', 'post', [
+                'app_id' => $this->getAppId(),
+                'index' => $this->getIndex(),
+                'token' => $this->getToken(),
+                self::SHARDS_FIELD => $shards,
+                self::REPLICAS_FIELD => $replicas,
+            ]);
+
+        if ($response['code'] === ResourceExistsException::getTransportableHTTPError()) {
+            throw new ResourceExistsException($response['body']['message']);
+        }
+    }
+
+    /**
+     * Delete index.
+     *
+     * @throws EventException
+     * @throws ResourceNotAvailableException
+     */
+    public function deleteIndex()
     {
-        throw EventException::throwEndpointNotAvailable();
+        $response = $this
+            ->httpClient
+            ->get('/events', 'delete', [
+                'app_id' => $this->getAppId(),
+                'index' => $this->getIndex(),
+                'token' => $this->getToken(),
+            ]);
+
+        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
+            throw new ResourceNotAvailableException($response['body']['message']);
+        }
     }
 
     /**
@@ -62,6 +117,8 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
      * @param int|null    $offset
      *
      * @return Event[]
+     *
+     * @throws ResourceNotAvailableException
      */
     public function all(
         string $name = null,
@@ -72,7 +129,7 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
     ): array {
         $response = $this
             ->httpClient
-            ->get('/events/', 'get', [
+            ->get('/events', 'get', [
                 'app_id' => $this->getAppId(),
                 'index' => $this->getIndex(),
                 'token' => $this->getToken(),
@@ -82,6 +139,10 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
                 'length' => $length,
                 'offset' => $offset,
             ]);
+
+        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
+            throw new ResourceNotAvailableException($response['body']['message']);
+        }
 
         return array_map(function (array $event) {
             return Event::createFromArray($event);
@@ -95,6 +156,8 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
      * @param int|null $to
      *
      * @return Stats
+     *
+     * @throws ResourceNotAvailableException
      */
     public function stats(
         ? int $from = null,
@@ -109,6 +172,10 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
                 'from' => $from,
                 'to' => $to,
             ]);
+
+        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
+            throw new ResourceNotAvailableException($response['body']['message']);
+        }
 
         return Stats::createFromArray($response['body']);
     }

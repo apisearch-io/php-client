@@ -16,18 +16,17 @@ declare(strict_types=1);
 
 namespace Apisearch\Exception;
 
+use RuntimeException;
+
 /**
- * Class CoordinateException.
+ * Class TransportableException.
  */
-class CoordinateException extends ModelException
+abstract class TransportableException extends RuntimeException
 {
     /**
-     * Create Coordinate bad format exception.
+     * Get http error code.
      *
-     * @return CoordinateException
+     * @return int
      */
-    public static function createCoordinateBadFormatException(): self
-    {
-        return new self('A Coordinate should always contain a lat (Latitude) and a lon (Longitude)');
-    }
+    abstract public static function getTransportableHTTPError(): int;
 }

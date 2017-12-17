@@ -16,6 +16,9 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Exception\InvalidFormatException;
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\HttpClient;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
@@ -109,13 +112,14 @@ class HttpRepository extends Repository
         array $itemsToUpdate,
         array $itemsToDelete
     ) {
+        $response = null;
         $async = ($this->writeAsync)
             ? 'Async'
             : ''
         ;
 
         if (!empty($itemsToUpdate)) {
-            $this
+            $response = $this
                 ->httpClient
                 ->get(
                     '/items',
@@ -131,7 +135,7 @@ class HttpRepository extends Repository
         }
 
         if (!empty($itemsToDelete)) {
-            $this
+            $response = $this
                 ->httpClient
                 ->get('/items',
                     'delete'.$async,
@@ -144,6 +148,17 @@ class HttpRepository extends Repository
                         ),
                     ]);
         }
+
+        if (is_null($response)) {
+            return;
+        }
+
+        switch ($response['code']) {
+            case ResourceNotAvailableException::getTransportableHTTPError():
+                throw ResourceNotAvailableException::indexNotAvailable();
+            case InvalidFormatException::getTransportableHTTPError():
+                throw new InvalidFormatException($response['body']['message']);
+        }
     }
 
     /**
@@ -152,6 +167,8 @@ class HttpRepository extends Repository
      * @param Query $query
      *
      * @return Result
+     *
+     * @throws ResourceNotAvailableException
      */
     public function query(Query $query): Result
     {
@@ -166,31 +183,94 @@ class HttpRepository extends Repository
                 ]
             );
 
+        switch ($response['code']) {
+            case ResourceNotAvailableException::getTransportableHTTPError():
+                throw ResourceNotAvailableException::indexNotAvailable();
+            case InvalidFormatException::getTransportableHTTPError():
+                throw new InvalidFormatException($response['body']['message']);
+        }
+
         return Result::createFromArray($response['body']);
     }
 
     /**
-     * Reset the index.
+     * Create an index.
      *
-     * @var null|string
+     * @param null|string $language
+     *
+     * @throws ResourceExistsException
      */
-    public function reset(? string $language)
+    public function createIndex(? string $language)
     {
         $async = ($this->writeAsync)
             ? 'Async'
             : ''
         ;
 
-        $this
+        $response = $this
             ->httpClient
             ->get(
-                '/',
+                '/index',
                 'post'.$async,
                 $this->getQueryValues(),
                 [
                     'language' => $language,
                 ]
             );
+
+        if ($response['code'] === ResourceExistsException::getTransportableHTTPError()) {
+            throw new ResourceExistsException($response['body']['message']);
+        }
+    }
+
+    /**
+     * Delete an index.
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function deleteIndex()
+    {
+        $async = ($this->writeAsync)
+            ? 'Async'
+            : ''
+        ;
+
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index',
+                'delete'.$async,
+                $this->getQueryValues()
+            );
+
+        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
+            throw new ResourceNotAvailableException($response['body']['message']);
+        }
+    }
+
+    /**
+     * Reset the index.
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function resetIndex()
+    {
+        $async = ($this->writeAsync)
+            ? 'Async'
+            : ''
+        ;
+
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index/reset',
+                'post'.$async,
+                $this->getQueryValues()
+            );
+
+        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
+            throw new ResourceNotAvailableException($response['body']['message']);
+        }
     }
 
     /**

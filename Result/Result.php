@@ -110,7 +110,7 @@ class Result implements HttpTransportable
         ? Aggregations $aggregations,
         array $suggests,
         array $items
-    ): Result {
+    ): self {
         $result = new self(
             $query,
             $totalItems,
@@ -359,7 +359,7 @@ class Result implements HttpTransportable
      *
      * @return Result
      */
-    public static function createFromArray(array $array): Result
+    public static function createFromArray(array $array): self
     {
         return self::create(
             Query::createFromArray($array['query']),

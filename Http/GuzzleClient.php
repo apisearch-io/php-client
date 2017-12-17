@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -24,7 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Class GuzzleClient.
  */
-class GuzzleClient implements HttpClient
+class GuzzleClient extends Client implements HttpClient
 {
     /**
      * @var string
@@ -32,13 +32,6 @@ class GuzzleClient implements HttpClient
      * Host
      */
     private $host;
-
-    /**
-     * @var string
-     *
-     * Version
-     */
-    private $version;
 
     /**
      * GuzzleClient constructor.
@@ -51,7 +44,7 @@ class GuzzleClient implements HttpClient
         string $version
     ) {
         $this->host = $host;
-        $this->version = trim($version, '/');
+        parent::__construct($version);
     }
 
     /**
@@ -73,49 +66,28 @@ class GuzzleClient implements HttpClient
         array $body = [],
         array $server = []
     ): array {
-        $client = new Client([
+        $method = strtolower($method);
+        $client = new GuzzleHttpClient([
             'defaults' => [
                 'timeout' => 5,
             ],
         ]);
 
-        $url = trim($url, '/');
-        $url = trim("{$this->host}/{$this->version}/$url", '/');
-
-        $bodyFieldName = ($method === 'get')
-            ? 'query'
-            : 'form_params';
-
-        /*
-         * If method is GET, then we merge both the query and the body
-         * parameters. Otherwise, the query params will be appended into the url
-         * and the body will be served as the body itself
-         */
-        if ($method !== 'get') {
-            array_walk($query, function (&$value, $key) {
-                $value = "$key=$value";
-            });
-
-            $url .= '?'.implode('&', $query);
-        } else {
-            $body = array_merge(
-                $query,
-                $body
-            );
-        }
+        $requestParts = $this->buildRequestParts(
+            $url,
+            $method,
+            $query,
+            $body,
+            $server
+        );
 
         /**
          * @var ResponseInterface|Promise
          */
         $response = $client->$method(
-            $url,
-            [
-                $bodyFieldName => $body,
-                'headers' => $server,
-            ],
-            [
-                'decode_content' => 'gzip',
-            ]
+            rtrim($this->host, '/').'/'.ltrim($requestParts->getUrl(), '/'),
+            $requestParts->getParameters(),
+            $requestParts->getOptions()
         );
 
         return ($response instanceof Response)

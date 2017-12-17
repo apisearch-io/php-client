@@ -102,7 +102,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
         string $name,
         int $counter
     ) {
-        if ($counter == 0) {
+        if (0 == $counter) {
             return;
         }
 
@@ -165,7 +165,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      */
     public function isFilter(): bool
     {
-        return (bool) (($this->applicationType & Filter::MUST_ALL) === true);
+        return (bool) (true === ($this->applicationType & Filter::MUST_ALL));
     }
 
     /**
@@ -297,10 +297,10 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             'counters' => array_values(array_map(function (Counter $counter) {
                 return $counter->toArray();
             }, $this->counters)),
-            'application_type' => $this->applicationType === Filter::AT_LEAST_ONE
+            'application_type' => Filter::AT_LEAST_ONE === $this->applicationType
                 ? null
                 : $this->applicationType,
-            'total_elements' => $this->totalElements === 0
+            'total_elements' => 0 === $this->totalElements
                 ? null
                 : $this->totalElements,
             'active_elements' => array_values(array_map(function ($counter) {
@@ -308,7 +308,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
                     ? $counter->toArray()
                     : $counter;
             }, $this->activeElements)),
-            'highest_active_level' => $this->highestActiveLevel === 0
+            'highest_active_level' => 0 === $this->highestActiveLevel
                 ? null
                 : $this->highestActiveLevel,
         ], function ($element) {

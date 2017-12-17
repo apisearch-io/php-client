@@ -16,18 +16,30 @@ declare(strict_types=1);
 
 namespace Apisearch\Exception;
 
+use RuntimeException;
+
 /**
- * Class CoordinateException.
+ * Class InvalidTokenException.
  */
-class CoordinateException extends ModelException
+class InvalidTokenException extends RuntimeException
 {
     /**
-     * Create Coordinate bad format exception.
+     * Get http error code.
      *
-     * @return CoordinateException
+     * @return int
      */
-    public static function createCoordinateBadFormatException(): self
+    public function getTransportableHTTPError(): int
     {
-        return new self('A Coordinate should always contain a lat (Latitude) and a lon (Longitude)');
+        return 401;
+    }
+
+    /**
+     * Throw an invalid key exception.
+     *
+     * @return InvalidTokenException
+     */
+    public static function create(): self
+    {
+        return new self('Token is not valid');
     }
 }

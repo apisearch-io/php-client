@@ -154,11 +154,11 @@ class Event implements HttpTransportable
      * @return Event
      */
     public static function createByPreviousEvent(
-        ? Event $previousEvent,
+        ? self $previousEvent,
         string $name,
         string $payload,
         int $occurredOn
-    ): Event {
+    ): self {
         $lastEventUUID = $previousEvent instanceof self
             ? $previousEvent->getConsistencyHash()
             : '';
@@ -186,7 +186,7 @@ class Event implements HttpTransportable
         string $name,
         string $payload,
         int $occurredOn
-    ): Event {
+    ): self {
         $event = new self(
             $consistencyHash,
             $name,

@@ -145,7 +145,7 @@ class Counter implements HttpTransportable
         string $name,
         int $n,
         array $activeElements
-    ): ? Counter {
+    ): ? self {
         $values = Metadata::fromMetadata($name);
 
         if (is_null($values)) {
@@ -168,7 +168,7 @@ class Counter implements HttpTransportable
     {
         return [
             'values' => $this->values,
-            'used' => $this->used === false
+            'used' => false === $this->used
                 ? null
                 : true,
             'n' => $this->n,

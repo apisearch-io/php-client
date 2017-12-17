@@ -19,10 +19,10 @@ namespace Apisearch\Repository;
 /**
  * Class RepositoryWithCredentials.
  */
-abstract class RepositoryWithCredentials
+abstract class RepositoryWithCredentials implements WithRepositoryReference
 {
 
-use WithRepositoryReference;
+use WithRepositoryReferenceTrait;
 
 /**
      * @var string

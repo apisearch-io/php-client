@@ -209,7 +209,7 @@ class Query implements HttpTransportable
         string $queryText,
         int $page = self::DEFAULT_PAGE,
         int $size = self::DEFAULT_SIZE
-    ): Query {
+    ): self {
         $page = (int) (max(1, $page));
         $query = new self($queryText);
         $query->from = ($page - 1) * $size;
@@ -240,7 +240,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public static function createByUUID(ItemUUID $uuid): Query
+    public static function createByUUID(ItemUUID $uuid): self
     {
         return self::createByUUIDs([$uuid]);
     }
@@ -252,7 +252,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public static function createByUUIDs(array $uuids): Query
+    public static function createByUUIDs(array $uuids): self
     {
         $ids = array_map(function (ItemUUID $uuid) {
             return $uuid->composeUUID();
@@ -279,7 +279,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function filterUniverseByTypes(array $values): Query
+    public function filterUniverseByTypes(array $values): self
     {
         $fieldPath = Filter::getFilterPathByField('type');
         if (!empty($values)) {
@@ -309,7 +309,7 @@ class Query implements HttpTransportable
         array $values,
         bool $aggregate = true,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
-    ): Query {
+    ): self {
         $fieldPath = Filter::getFilterPathByField('type');
         if (!empty($values)) {
             $this->filters['type'] = Filter::create(
@@ -343,7 +343,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function filterUniverseByIds(array $values): Query
+    public function filterUniverseByIds(array $values): self
     {
         $fieldPath = Filter::getFilterPathByField('id');
         if (!empty($values)) {
@@ -367,7 +367,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function filterByIds(array $values): Query
+    public function filterByIds(array $values): self
     {
         $fieldPath = Filter::getFilterPathByField('id');
         if (!empty($values)) {
@@ -397,7 +397,7 @@ class Query implements HttpTransportable
         string $field,
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE
-    ): Query {
+    ): self {
         $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
             $this->universeFilters[$field] = Filter::create(
@@ -432,7 +432,7 @@ class Query implements HttpTransportable
         int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
-    ): Query {
+    ): self {
         $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
             $this->filters[$filterName] = Filter::create(
@@ -472,7 +472,7 @@ class Query implements HttpTransportable
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE,
         string $rangeType = Filter::TYPE_RANGE
-    ): Query {
+    ): self {
         $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
             $this->universeFilters[$field] = Filter::create(
@@ -501,7 +501,7 @@ class Query implements HttpTransportable
         string $field,
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE
-    ): Query {
+    ): self {
         return $this->filterUniverseByRange(
             $field,
             $values,
@@ -533,7 +533,7 @@ class Query implements HttpTransportable
         string $rangeType = Filter::TYPE_RANGE,
         bool $aggregate = true,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
-    ): Query {
+    ): self {
         $fieldPath = Filter::getFilterPathByField($field);
         if (!empty($values)) {
             $this->filters[$filterName] = Filter::create(
@@ -581,7 +581,7 @@ class Query implements HttpTransportable
         int $applicationType = Filter::AT_LEAST_ONE,
         bool $aggregate = true,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
-    ): Query {
+    ): self {
         return $this->filterByRange(
             $filterName,
             $field,
@@ -601,7 +601,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function filterUniverseByLocation(LocationRange $locationRange): Query
+    public function filterUniverseByLocation(LocationRange $locationRange): self
     {
         $this->universeFilters['coordinate'] = Filter::create(
             'coordinate',
@@ -644,7 +644,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function sortBy(array $sort): Query
+    public function sortBy(array $sort): self
     {
         if (isset($sort['_geo_distance'])) {
             if (!$this->coordinate instanceof Coordinate) {
@@ -683,7 +683,7 @@ class Query implements HttpTransportable
         int $applicationType,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC,
         int $limit = Aggregation::NO_LIMIT
-    ): Query {
+    ): self {
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
             Filter::getFilterPathByField($field),
@@ -718,7 +718,7 @@ class Query implements HttpTransportable
         string $rangeType = Filter::TYPE_RANGE,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC,
         int $limit = Aggregation::NO_LIMIT
-    ): Query {
+    ): self {
         if (empty($options)) {
             return $this;
         }
@@ -755,7 +755,7 @@ class Query implements HttpTransportable
         int $applicationType,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC,
         int $limit = Aggregation::NO_LIMIT
-    ): Query {
+    ): self {
         if (empty($options)) {
             return $this;
         }
@@ -899,7 +899,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function enableResults(): Query
+    public function enableResults(): self
     {
         $this->resultsEnabled = true;
 
@@ -911,7 +911,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function disableResults(): Query
+    public function disableResults(): self
     {
         $this->resultsEnabled = false;
 
@@ -933,7 +933,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function enableSuggestions(): Query
+    public function enableSuggestions(): self
     {
         $this->suggestionsEnabled = true;
 
@@ -945,7 +945,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function disableSuggestions(): Query
+    public function disableSuggestions(): self
     {
         $this->suggestionsEnabled = false;
 
@@ -967,7 +967,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function enableAggregations(): Query
+    public function enableAggregations(): self
     {
         $this->aggregationsEnabled = true;
 
@@ -979,7 +979,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function disableAggregations(): Query
+    public function disableAggregations(): self
     {
         $this->aggregationsEnabled = false;
 
@@ -1037,7 +1037,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function promoteUUID(ItemUUID $itemUUID): Query
+    public function promoteUUID(ItemUUID $itemUUID): self
     {
         $this->itemsPromoted[] = $itemUUID;
 
@@ -1051,7 +1051,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function promoteUUIDs(array $uuids): Query
+    public function promoteUUIDs(array $uuids): self
     {
         $this->itemsPromoted = $uuids;
 
@@ -1075,7 +1075,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function excludeUUIDs(array $uuids): Query
+    public function excludeUUIDs(array $uuids): self
     {
         $this->filters['excluded_ids'] = Filter::create(
             '_id',
@@ -1096,7 +1096,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function excludeUUID(ItemUUID $uuid): Query
+    public function excludeUUID(ItemUUID $uuid): self
     {
         $this->excludeUUIDs([$uuid]);
 
@@ -1110,7 +1110,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function byUser(User $user): Query
+    public function byUser(User $user): self
     {
         $this->user = $user;
 
@@ -1122,7 +1122,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function anonymously(): Query
+    public function anonymously(): self
     {
         $this->user = null;
 
@@ -1153,7 +1153,7 @@ class Query implements HttpTransportable
                 : null,
             'filters' => array_filter(
                 array_map(function (Filter $filter) {
-                    return $filter->getFilterType() !== Filter::TYPE_QUERY
+                    return Filter::TYPE_QUERY !== $filter->getFilterType()
                         ? $filter->toArray()
                         : null;
                 }, $this->filters)
@@ -1166,13 +1166,13 @@ class Query implements HttpTransportable
             'aggregations' => array_map(function (Aggregation $aggregation) {
                 return $aggregation->toArray();
             }, $this->aggregations),
-            'sort' => $this->sort === SortBy::SCORE
+            'sort' => SortBy::SCORE === $this->sort
                 ? null
                 : $this->sort,
-            'page' => $this->page === self::DEFAULT_PAGE
+            'page' => self::DEFAULT_PAGE === $this->page
                 ? null
                 : $this->page,
-            'size' => $this->size === self::DEFAULT_SIZE
+            'size' => self::DEFAULT_SIZE === $this->size
                 ? null
                 : $this->size,
             'results_enabled' => $this->resultsEnabled
@@ -1208,7 +1208,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public static function createFromArray(array $array): Query
+    public static function createFromArray(array $array): self
     {
         $query = isset($array['coordinate'])
             ? self::createLocated(

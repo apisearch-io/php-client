@@ -91,7 +91,7 @@ class Coordinate implements HttpTransportable
      *
      * @return Coordinate
      */
-    public static function createFromArray(array $array): Coordinate
+    public static function createFromArray(array $array): self
     {
         if (
             !isset($array['lat']) ||

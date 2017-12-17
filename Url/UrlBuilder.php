@@ -172,7 +172,7 @@ class UrlBuilder
             !isset($urlParameters[$filterName])
         ) {
             unset($urlParameters[$filterName]);
-        } elseif (($key = array_search($value, $urlParameters[$filterName])) !== false) {
+        } elseif (false !== ($key = array_search($value, $urlParameters[$filterName]))) {
             unset($urlParameters[$filterName][$key]);
         }
 
@@ -360,7 +360,7 @@ class UrlBuilder
             $urlParameters[$currentFilterName] = (
                 !is_null($filterName) &&
                 $currentFilterName === $filterName &&
-                $filter->getApplicationType() === Filter::MUST_ALL_WITH_LEVELS
+                Filter::MUST_ALL_WITH_LEVELS === $filter->getApplicationType()
             )
                 ? []
                 : $filter->getValues();
@@ -378,7 +378,7 @@ class UrlBuilder
         }
 
         $sort = $query->getSortBy();
-        if ($sort !== SortBy::SCORE) {
+        if (SortBy::SCORE !== $sort) {
             $urlParameters['sort_by'] = $sort;
         }
 
@@ -404,7 +404,7 @@ class UrlBuilder
                 !isset($urlParameters[$field]) ||
                 (
                     is_array($urlParameters[$field]) &&
-                    count($urlParameters[$field]) !== 1
+                    1 !== count($urlParameters[$field])
                 )
             ) {
                 continue;

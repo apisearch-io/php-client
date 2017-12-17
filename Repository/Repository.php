@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -116,6 +118,8 @@ abstract class Repository extends RepositoryWithCredentials
      *
      * @param int  $bulkNumber
      * @param bool $skipIfLess
+     *
+     * @throws ResourceNotAvailableException
      */
     public function flush(
         int $bulkNumber = 500,
@@ -165,13 +169,31 @@ abstract class Repository extends RepositoryWithCredentials
      * @param Query $query
      *
      * @return Result
+     *
+     * @throws ResourceNotAvailableException
      */
     abstract public function query(Query $query): Result;
 
     /**
+     * Create an index.
+     *
+     * @param null|string $language
+     *
+     * @throws ResourceExistsException
+     */
+    abstract public function createIndex(? string $language);
+
+    /**
+     * Delete an index.
+     *
+     * @throws ResourceNotAvailableException
+     */
+    abstract public function deleteIndex();
+
+    /**
      * Reset the index.
      *
-     * @var null|string
+     * @throws ResourceNotAvailableException
      */
-    abstract public function reset(? string $language);
+    abstract public function resetIndex();
 }

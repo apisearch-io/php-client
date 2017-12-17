@@ -19,56 +19,19 @@ namespace Apisearch\Repository;
 /**
  * Class WithRepositoryReference.
  */
-trait WithRepositoryReference
+interface WithRepositoryReference
 {
-    /**
-     * @var RepositoryReference
-     *
-     * Repository Reference
-     */
-    private $repositoryReference;
-
     /**
      * Set repository reference.
      *
      * @param RepositoryReference $repositoryReference
      */
-    public function setRepositoryReference(RepositoryReference $repositoryReference)
-    {
-        $this->repositoryReference = $repositoryReference;
-    }
+    public function setRepositoryReference(RepositoryReference $repositoryReference);
 
     /**
      * Get RepositoryReference.
      *
      * @return RepositoryReference
      */
-    public function getRepositoryReference(): RepositoryReference
-    {
-        return $this->repositoryReference;
-    }
-
-    /**
-     * Get AppId.
-     *
-     * @return string
-     */
-    public function getAppId(): string
-    {
-        return $this
-            ->repositoryReference
-            ->getAppId();
-    }
-
-    /**
-     * Get Index.
-     *
-     * @return string
-     */
-    public function getIndex(): string
-    {
-        return $this
-            ->repositoryReference
-            ->getIndex();
-    }
+    public function getRepositoryReference(): RepositoryReference;
 }

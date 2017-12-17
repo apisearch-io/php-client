@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Apisearch\Event;
 
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Repository\RepositoryWithCredentials;
 
 /**
@@ -31,19 +33,36 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     private $events = [];
 
     /**
-     * Create repository.
+     * Create index.
      *
-     * @param bool $removeIfExists
+     * @param int $shards
+     * @param int $replicas
+     *
+     * @throws ResourceExistsException
      */
-    public function createRepository(bool $removeIfExists = false)
-    {
-        if ($removeIfExists) {
-            unset($this->events[$this->getAppId()]);
+    public function createIndex(
+        int $shards,
+        int $replicas
+    ) {
+        if (array_key_exists($this->getIndexKey(), $this->events)) {
+            throw ResourceExistsException::eventsIndexExists();
         }
 
-        if (!isset($this->events[$this->getAppId()])) {
-            $this->events[$this->getAppId()] = [];
+        $this->events[$this->getIndexKey()] = [];
+    }
+
+    /**
+     * Delete index.
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function deleteIndex()
+    {
+        if (!array_key_exists($this->getIndexKey(), $this->events)) {
+            throw ResourceNotAvailableException::eventsIndexNotAvailable();
         }
+
+        unset($this->events[$this->getIndexKey()]);
     }
 
     /**
@@ -56,6 +75,8 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      * @param int|null    $offset
      *
      * @return Event[]
+     *
+     * @throws ResourceNotAvailableException
      */
     public function all(
         string $name = null,
@@ -64,8 +85,8 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
         ? int $length = 10,
         ? int $offset = 0
     ): array {
-        if (!isset($this->events[$this->getAppId()])) {
-            return [];
+        if (!array_key_exists($this->getIndexKey(), $this->events)) {
+            throw ResourceNotAvailableException::eventsIndexNotAvailable();
         }
 
         return array_slice(
@@ -88,11 +109,14 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      * Save event.
      *
      * @param Event $event
+     *
+     * @throws ResourceNotAvailableException
      */
     public function save(Event $event)
     {
-        if (!isset($this->events[$this->getAppId()])) {
-            $this->events[$this->getAppId()] = [];
+        echo 'y';
+        if (!array_key_exists($this->getIndexKey(), $this->events)) {
+            throw ResourceNotAvailableException::eventsIndexNotAvailable();
         }
 
         $this->events[$this->getAppId()][] = $event;
@@ -102,11 +126,13 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      * Get last event.
      *
      * @return Event|null
+     *
+     * @throws ResourceNotAvailableException
      */
     public function last(): ? Event
     {
-        if (!isset($this->events[$this->getAppId()])) {
-            return null;
+        if (!array_key_exists($this->getIndexKey(), $this->events)) {
+            throw ResourceNotAvailableException::eventsIndexNotAvailable();
         }
 
         $lastEvent = end($this->events[$this->getAppId()]);
@@ -123,10 +149,27 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      * @param int|null $to
      *
      * @return Stats
+     *
+     * @throws ResourceNotAvailableException
      */
     public function stats(
         ? int $from = null,
         ? int $to = null
     ): Stats {
+        if (!array_key_exists($this->getIndexKey(), $this->events)) {
+            throw ResourceNotAvailableException::eventsIndexNotAvailable();
+        }
+    }
+
+    /**
+     * Get index key.
+     *
+     * @return string
+     */
+    private function getIndexKey(): string
+    {
+        return $this
+            ->getRepositoryReference()
+            ->compose();
     }
 }

@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -40,25 +42,31 @@ class InMemoryRepository extends Repository
      * @param Query $query
      *
      * @return Result
+     *
+     * @throws ResourceNotAvailableException
      */
     public function query(Query $query): Result
     {
+        if (!array_key_exists($this->getIndexKey(), $this->items)) {
+            throw ResourceNotAvailableException::indexNotAvailable();
+        }
+
         $this->normalizeItemsArray();
         $resultingItems = [];
 
         if (!empty($query->getFilters())) {
             foreach ($query->getFilters() as $filter) {
-                if ($filter->getField() !== '_id') {
+                if ('_id' !== $filter->getField()) {
                     throw new LogicException('Queries by field different than UUID not allowed in InMemoryRepository. Only for testing purposes.');
                 }
 
                 $itemUUIDs = $filter->getValues();
                 foreach ($itemUUIDs as $itemUUID) {
-                    $resultingItems[$itemUUID] = $this->items[$this->getToken()][$itemUUID] ?? null;
+                    $resultingItems[$itemUUID] = $this->items[$this->getIndexKey()][$itemUUID] ?? null;
                 }
             }
         } else {
-            $resultingItems = $this->items[$this->getToken()];
+            $resultingItems = $this->items[$this->getIndexKey()];
         }
 
         $resultingItems = array_values(
@@ -69,7 +77,7 @@ class InMemoryRepository extends Repository
             )
         );
 
-        $result = new Result($query, count($this->items[$this->getToken()]), count($resultingItems));
+        $result = new Result($query, count($this->items[$this->getIndexKey()]), count($resultingItems));
         foreach ($resultingItems as $resultingItem) {
             $result->addItem($resultingItem);
         }
@@ -78,13 +86,43 @@ class InMemoryRepository extends Repository
     }
 
     /**
-     * Reset the index.
+     * Create an index.
      *
-     * @var null|string
+     * @param null|string $language
+     *
+     * @throws ResourceExistsException
      */
-    public function reset(? string $language)
+    public function createIndex(? string $language)
     {
-        $this->items[$this->getToken()] = [];
+        if (array_key_exists($this->getIndexKey(), $this->items)) {
+            throw ResourceExistsException::indexExists();
+        }
+
+        $this->items[$this->getIndexKey()] = [];
+    }
+
+    /**
+     * Delete an index.
+     */
+    public function deleteIndex()
+    {
+        if (!array_key_exists($this->getIndexKey(), $this->items)) {
+            throw ResourceNotAvailableException::indexNotAvailable();
+        }
+
+        unset($this->items[$this->getIndexKey()]);
+    }
+
+    /**
+     * Reset the index.
+     */
+    public function resetIndex()
+    {
+        if (!array_key_exists($this->getIndexKey(), $this->items)) {
+            throw ResourceNotAvailableException::indexNotAvailable();
+        }
+
+        $this->items[$this->getIndexKey()] = [];
     }
 
     /**
@@ -99,11 +137,11 @@ class InMemoryRepository extends Repository
     ) {
         $this->normalizeItemsArray();
         foreach ($itemsToUpdate as $itemToUpdate) {
-            $this->items[$this->getToken()][$itemToUpdate->getUUID()->composeUUID()] = $itemToUpdate;
+            $this->items[$this->getIndexKey()][$itemToUpdate->getUUID()->composeUUID()] = $itemToUpdate;
         }
 
         foreach ($itemsToDelete as $itemToDelete) {
-            unset($this->items[$this->getToken()][$itemToDelete->composeUUID()]);
+            unset($this->items[$this->getIndexKey()][$itemToDelete->composeUUID()]);
         }
     }
 
@@ -112,8 +150,20 @@ class InMemoryRepository extends Repository
      */
     private function normalizeItemsArray()
     {
-        if (!array_key_exists($this->getToken(), $this->items)) {
-            $this->items[$this->getToken()] = [];
+        if (!array_key_exists($this->getIndexKey(), $this->items)) {
+            $this->items[$this->getIndexKey()] = [];
         }
+    }
+
+    /**
+     * Get index position by credentials.
+     *
+     * @return string
+     */
+    private function getIndexKey(): string
+    {
+        return $this
+            ->getRepositoryReference()
+            ->compose();
     }
 }

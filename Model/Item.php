@@ -470,7 +470,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @return Item
      */
-    public static function createFromArray(array $array): Item
+    public static function createFromArray(array $array): self
     {
         if (
             !isset($array['uuid']) ||

@@ -89,7 +89,7 @@ class Stats implements HttpTransportable
      *
      * @return Stats
      */
-    public static function createByPlainData(array $eventCounter): Stats
+    public static function createByPlainData(array $eventCounter): self
     {
         return new self(
             $eventCounter
