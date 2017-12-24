@@ -24,6 +24,13 @@ use Apisearch\Model\Item;
 interface Exporter
 {
     /**
+     * Get parser name.
+     *
+     * @return string
+     */
+    public function getName(): string;
+
+    /**
      * Convert array of Items to string format.
      *
      * @param Item[] $items

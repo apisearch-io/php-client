@@ -25,6 +25,16 @@ use Apisearch\Model\Item;
 class CSVExporter implements Exporter
 {
     /**
+     * Get parser name.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return 'csv';
+    }
+
+    /**
      * Convert array of Items to string format.
      *
      * @param Item[] $items
