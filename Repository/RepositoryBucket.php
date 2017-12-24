@@ -31,37 +31,37 @@ class RepositoryBucket
     /**
      * Add repository.
      *
-     * @param string                  $name
-     * @param string                  $index
+     * @param string                  $appName
+     * @param string                  $indexName
      * @param TransformableRepository $repository
      */
     public function addRepository(
-        string $name,
-        string $index,
+        string $appName,
+        string $indexName,
         TransformableRepository $repository
     ) {
-        $this->repositories[$name][$index] = $repository;
+        $this->repositories[$appName][$indexName] = $repository;
     }
 
     /**
      * Get repository by name and index.
      *
-     * @param string $name
-     * @param string $index
+     * @param string $appName
+     * @param string $indexName
      *
      * @return TransformableRepository|null
      */
     public function findRepository(
-        string $name,
-        string $index
+        string $appName,
+        string $indexName
     ): ? TransformableRepository {
         if (
-            !isset($this->repositories[$name]) ||
-            !isset($this->repositories[$name][$index])
+            !isset($this->repositories[$appName]) ||
+            !isset($this->repositories[$appName][$indexName])
         ) {
             return null;
         }
 
-        return $this->repositories[$name][$index];
+        return $this->repositories[$appName][$indexName];
     }
 }

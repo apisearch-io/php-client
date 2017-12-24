@@ -14,7 +14,7 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\Tests\Query;
+namespace Apisearch\Tests\Model;
 
 use Apisearch\Model\ItemUUID;
 use PHPUnit_Framework_TestCase;

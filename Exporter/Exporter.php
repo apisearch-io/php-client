@@ -14,30 +14,30 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\Model;
+namespace Apisearch\Exporter;
 
-use Apisearch\Exception\InvalidFormatException;
+use Apisearch\Model\Item;
 
 /**
- * Interface HttpTransportable.
+ * Exporter.
  */
-interface HttpTransportable
+interface Exporter
 {
     /**
-     * To array.
+     * Convert array of Items to string format.
      *
-     * @return array
+     * @param Item[] $items
+     *
+     * @return string
      */
-    public function toArray(): array;
+    public function itemsToFormat(array $items): string;
 
     /**
-     * Create from array.
+     * Convert string formatted to array of Items.
      *
-     * @param array $array
+     * @param string $data
      *
-     * @return self
-     *
-     * @throws InvalidFormatException
+     * @return Item[]
      */
-    public static function createFromArray(array $array);
+    public function formatToItems(string $data): array;
 }

@@ -258,6 +258,7 @@ class Query implements HttpTransportable
             return $uuid->composeUUID();
         }, $uuids);
 
+        $ids = array_unique($ids);
         $query = self::create('', self::DEFAULT_PAGE, count($uuids))
             ->disableAggregations()
             ->disableSuggestions();

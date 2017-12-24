@@ -73,6 +73,16 @@ class TransformableRepository extends Repository
     }
 
     /**
+     * Get Repository.
+     *
+     * @return Repository
+     */
+    public function getRepository(): Repository
+    {
+        return $this->repository;
+    }
+
+    /**
      * Flush items.
      *
      * @param Item[]     $itemsToUpdate

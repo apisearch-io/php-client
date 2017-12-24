@@ -91,10 +91,9 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
 
         return array_slice(
             array_filter(
-                $this->events[$this->getAppId()],
+                $this->events[$this->getIndexKey()],
                 function (Event $event) use ($from, $to, $name) {
                     return
-                        (is_null($this->getAppId()) || ($this->getAppId() === $event->getAppId())) &&
                         (is_null($name) || ($name === $event->getName())) &&
                         (is_null($from) || ($event->getOccurredOn() >= $from)) &&
                         (is_null($to) || ($event->getOccurredOn() < $to));
@@ -114,12 +113,11 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      */
     public function save(Event $event)
     {
-        echo 'y';
         if (!array_key_exists($this->getIndexKey(), $this->events)) {
             throw ResourceNotAvailableException::eventsIndexNotAvailable();
         }
 
-        $this->events[$this->getAppId()][] = $event;
+        $this->events[$this->getIndexKey()][] = $event;
     }
 
     /**
@@ -135,7 +133,7 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
             throw ResourceNotAvailableException::eventsIndexNotAvailable();
         }
 
-        $lastEvent = end($this->events[$this->getAppId()]);
+        $lastEvent = end($this->events[$this->getIndexKey()]);
 
         return ($lastEvent instanceof Event)
             ? $lastEvent
@@ -162,7 +160,7 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     }
 
     /**
-     * Get index key.
+     * Get index position by credentials.
      *
      * @return string
      */
