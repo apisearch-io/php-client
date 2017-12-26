@@ -28,20 +28,6 @@ use Apisearch\Repository\RepositoryWithCredentials;
 class HttpEventRepository extends RepositoryWithCredentials implements EventRepository
 {
     /**
-     * @var string
-     *
-     * Shards param field
-     */
-    const SHARDS_FIELD = 'shards';
-
-    /**
-     * @var string
-     *
-     * Replicas param field
-     */
-    const REPLICAS_FIELD = 'replicas';
-
-    /**
      * @var HttpClient
      *
      * Http client
@@ -61,24 +47,17 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
     /**
      * Create index.
      *
-     * @param int $shards
-     * @param int $replicas
-     *
      * @throws EventException
      * @throws ResourceExistsException
      */
-    public function createIndex(
-        int $shards,
-        int $replicas
-    ) {
+    public function createIndex()
+    {
         $response = $this
             ->httpClient
             ->get('/events', 'post', [
                 'app_id' => $this->getAppId(),
                 'index' => $this->getIndex(),
                 'token' => $this->getToken(),
-                self::SHARDS_FIELD => $shards,
-                self::REPLICAS_FIELD => $replicas,
             ]);
 
         if ($response['code'] === ResourceExistsException::getTransportableHTTPError()) {

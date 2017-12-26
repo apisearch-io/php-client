@@ -28,7 +28,14 @@ interface Exporter
      *
      * @return string
      */
-    public function getName(): string;
+    public static function getName(): string;
+
+    /**
+     * Get mime type.
+     *
+     * @return string
+     */
+    public static function getMimeType(): string;
 
     /**
      * Convert array of Items to string format.

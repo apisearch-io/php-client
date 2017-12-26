@@ -29,9 +29,19 @@ class JSONExporter implements Exporter
      *
      * @return string
      */
-    public function getName(): string
+    public static function getName(): string
     {
         return 'json';
+    }
+
+    /**
+     * Get mime type.
+     *
+     * @return string
+     */
+    public static function getMimeType(): string
+    {
+        return 'application/json';
     }
 
     /**

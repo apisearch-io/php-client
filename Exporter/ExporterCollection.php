@@ -52,7 +52,10 @@ class ExporterCollection
     public function getExporterByName(string $exporterName)
     {
         foreach ($this->exporters as $exporter) {
-            if ($exporterName === $exporter->getName()) {
+            if (
+                $exporterName === $exporter::getName() ||
+                $exporterName === $exporter::getMimeType()
+            ) {
                 return $exporter;
             }
         }

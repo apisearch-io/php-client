@@ -28,15 +28,9 @@ interface EventRepository extends WithRepositoryReference
     /**
      * Create index.
      *
-     * @param int $shards
-     * @param int $replicas
-     *
      * @throws ResourceExistsException
      */
-    public function createIndex(
-        int $shards,
-        int $replicas
-    );
+    public function createIndex();
 
     /**
      * Delete index.

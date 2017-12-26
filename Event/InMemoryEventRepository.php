@@ -35,15 +35,10 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     /**
      * Create index.
      *
-     * @param int $shards
-     * @param int $replicas
-     *
      * @throws ResourceExistsException
      */
-    public function createIndex(
-        int $shards,
-        int $replicas
-    ) {
+    public function createIndex()
+    {
         if (array_key_exists($this->getIndexKey(), $this->events)) {
             throw ResourceExistsException::eventsIndexExists();
         }

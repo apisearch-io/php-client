@@ -29,9 +29,19 @@ class CSVExporter implements Exporter
      *
      * @return string
      */
-    public function getName(): string
+    public static function getName(): string
     {
         return 'csv';
+    }
+
+    /**
+     * Get mime type.
+     *
+     * @return string
+     */
+    public static function getMimeType(): string
+    {
+        return 'text/csv';
     }
 
     /**
