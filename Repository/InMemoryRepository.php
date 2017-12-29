@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Config\Config;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Item;
@@ -102,11 +103,9 @@ class InMemoryRepository extends Repository
     /**
      * Create an index.
      *
-     * @param null|string $language
-     *
      * @throws ResourceExistsException
      */
-    public function createIndex(? string $language)
+    public function createIndex()
     {
         if (array_key_exists($this->getIndexKey(), $this->items)) {
             throw ResourceExistsException::indexExists();
@@ -239,6 +238,18 @@ class InMemoryRepository extends Repository
         foreach ($itemsToDelete as $itemToDelete) {
             unset($this->items[$this->getIndexKey()][$itemToDelete->composeUUID()]);
         }
+    }
+
+    /**
+     * Config the index.
+     *
+     * @param Config $config
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function configureIndex(Config $config)
+    {
+        throw new LogicException('Config logic cannot be tested against memory implementation, but only in final implementation');
     }
 
     /**

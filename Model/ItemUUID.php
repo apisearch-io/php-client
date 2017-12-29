@@ -67,7 +67,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
             throw UUIDException::createComposedUUIDBadFormatException($composedUUID);
         }
 
-        return new self($parts[1], $parts[0]);
+        return new self($parts[0], $parts[1]);
     }
 
     /**
@@ -134,6 +134,6 @@ class ItemUUID implements HttpTransportable, UUIDReference
      */
     public function composeUUID(): string
     {
-        return "{$this->type}~{$this->id}";
+        return "{$this->id}~{$this->type}";
     }
 }

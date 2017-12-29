@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Config\Config;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Item;
@@ -177,11 +178,9 @@ abstract class Repository extends RepositoryWithCredentials
     /**
      * Create an index.
      *
-     * @param null|string $language
-     *
      * @throws ResourceExistsException
      */
-    abstract public function createIndex(? string $language);
+    abstract public function createIndex();
 
     /**
      * Delete an index.
@@ -196,4 +195,13 @@ abstract class Repository extends RepositoryWithCredentials
      * @throws ResourceNotAvailableException
      */
     abstract public function resetIndex();
+
+    /**
+     * Config the index.
+     *
+     * @param Config $config
+     *
+     * @throws ResourceNotAvailableException
+     */
+    abstract public function configureIndex(Config $config);
 }

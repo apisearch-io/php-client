@@ -78,4 +78,20 @@ class InvalidFormatException extends TransportableException
             100
         )));
     }
+
+    /**
+     * Config format not valid.
+     *
+     * @param mixed $configBeforeHydration
+     *
+     * @return InvalidFormatException
+     */
+    public static function configFormatNotValid($configBeforeHydration): self
+    {
+        return new self(sprintf('Config Format not valid. Expecting a Config serialized but found "%s" before hydration', substr(
+            (string) $configBeforeHydration,
+            0,
+            100
+        )));
+    }
 }

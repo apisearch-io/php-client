@@ -856,6 +856,25 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Get filter.
+     *
+     * @param string $fieldName
+     *
+     * @return null|Filter
+     */
+    public function getFilterByField(string $fieldName): ? Filter
+    {
+        $fieldName = 'indexed_metadata.'.$fieldName;
+        foreach ($this->getFilters() as $filter) {
+            if ($fieldName === $filter->getField()) {
+                return $filter;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get sort by.
      *
      * @return array

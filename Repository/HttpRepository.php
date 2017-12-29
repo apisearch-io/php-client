@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Config\Config;
 use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
@@ -64,6 +65,13 @@ class HttpRepository extends Repository
      * Query query param field
      */
     const QUERY_FIELD = 'query';
+
+    /**
+     * @var string
+     *
+     * Config param field
+     */
+    const CONFIG_FIELD = 'config';
 
     /**
      * @var string
@@ -179,7 +187,7 @@ class HttpRepository extends Repository
                 'get',
                 $this->getQueryValues(),
                 [
-                    'query' => json_encode($query->toArray()),
+                    self::QUERY_FIELD => json_encode($query->toArray()),
                 ]
             );
 
@@ -196,11 +204,9 @@ class HttpRepository extends Repository
     /**
      * Create an index.
      *
-     * @param null|string $language
-     *
      * @throws ResourceExistsException
      */
-    public function createIndex(? string $language)
+    public function createIndex()
     {
         $async = ($this->writeAsync)
             ? 'Async'
@@ -213,9 +219,7 @@ class HttpRepository extends Repository
                 '/index',
                 'post'.$async,
                 $this->getQueryValues(),
-                [
-                    'language' => $language,
-                ]
+                []
             );
 
         if ($response['code'] === ResourceExistsException::getTransportableHTTPError()) {
@@ -270,6 +274,43 @@ class HttpRepository extends Repository
 
         if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
             throw new ResourceNotAvailableException($response['body']['message']);
+        }
+    }
+
+    /**
+     * Config the index.
+     *
+     * @param Config $config
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function configureIndex(Config $config)
+    {
+        $async = ($this->writeAsync)
+            ? 'Async'
+            : ''
+        ;
+
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index/config',
+                'post'.$async,
+                $this->getQueryValues(),
+                [
+                    self::CONFIG_FIELD => json_encode($config->toArray()),
+                ]
+            );
+
+        if (is_null($response)) {
+            return;
+        }
+
+        switch ($response['code']) {
+            case ResourceNotAvailableException::getTransportableHTTPError():
+                throw ResourceNotAvailableException::indexNotAvailable();
+            case InvalidFormatException::getTransportableHTTPError():
+                throw new InvalidFormatException($response['body']['message']);
         }
     }
 
