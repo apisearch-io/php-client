@@ -55,7 +55,7 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
     public function testComposeUUID()
     {
         $uuid = new ItemUUID('1', 'product');
-        $this->assertEquals('product~1', $uuid->composeUUID());
+        $this->assertEquals('1~product', $uuid->composeUUID());
     }
 
     /**
@@ -63,7 +63,7 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateByComposedUUID()
     {
-        $itemUUID = ItemUUID::createByComposedUUID('type~1');
+        $itemUUID = ItemUUID::createByComposedUUID('1~type');
         $this->assertSame('type', $itemUUID->getType());
         $this->assertSame('1', $itemUUID->getId());
     }

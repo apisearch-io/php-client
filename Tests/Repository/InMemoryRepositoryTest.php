@@ -37,21 +37,21 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
         $repository->createIndex(null);
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
         $repository->flush();
         $this->assertEquals(
             '1',
             $repository
-                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('product~1')))
+                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('1~product')))
                 ->getFirstItem()
                 ->getId()
         );
 
         $repository->setRepositoryReference(RepositoryReference::create('yyy', 'yyy'));
         $repository->createIndex(null);
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~2')));
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~3')));
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~4')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('2~product')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('3~roduct')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('4~product')));
         $repository->flush();
         $this->assertCount(
             3,
@@ -67,7 +67,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
                 ->query(Query::createMatchAll())
                 ->getItems()
         );
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~5')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('5~product')));
         $repository->flush();
         $this->assertCount(
             2,
@@ -83,12 +83,12 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
                 ->getItems()
         );
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->deleteItem(ItemUUID::createByComposedUUID('product~1'));
-        $repository->deleteItem(ItemUUID::createByComposedUUID('product~5'));
+        $repository->deleteItem(ItemUUID::createByComposedUUID('1~product'));
+        $repository->deleteItem(ItemUUID::createByComposedUUID('5~product'));
         $repository->flush();
         $this->assertEmpty(
             $repository
-                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('product~1')))
+                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('1~product')))
                 ->getItems()
         );
     }
@@ -121,12 +121,12 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
             ],
             [
                 function (Repository $repository) {
-                    $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~3')));
+                    $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
                 },
             ],
             [
                 function (Repository $repository) {
-                    $repository->deleteItem(ItemUUID::createByComposedUUID('1~3'));
+                    $repository->deleteItem(ItemUUID::createByComposedUUID('1~product'));
                 },
             ],
             [
@@ -136,7 +136,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
             ],
             [
                 function (Repository $repository) {
-                    $repository->deleteItems([ItemUUID::createByComposedUUID('1~3')]);
+                    $repository->deleteItems([ItemUUID::createByComposedUUID('1~product')]);
                 },
             ],
             [
@@ -190,12 +190,12 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
         $repository->createIndex(null);
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
-        $repository->deleteItem(ItemUUID::createByComposedUUID('product~1'));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
+        $repository->deleteItem(ItemUUID::createByComposedUUID('1~product'));
         $repository->flush();
         $this->assertEmpty(
             $repository
-                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('product~1')))
+                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('1~product')))
                 ->getItems()
         );
     }
@@ -208,12 +208,12 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
         $repository->createIndex(null);
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
         $repository->flush();
         $repository->resetIndex();
         $this->assertEmpty(
             $repository
-                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('product~1')))
+                ->query(Query::createByUUID(ItemUUID::createByComposedUUID('1~product')))
                 ->getItems()
         );
     }
@@ -226,21 +226,21 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
         $repository->createIndex(null);
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~2')));
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~3')));
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('article~1')));
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('article~2')));
-        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('article~3')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('2~product')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('3~product')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~article')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('2~article')));
+        $repository->addItem(Item::create(ItemUUID::createByComposedUUID('3~article')));
         $repository->flush();
         $this->assertCount(
             4,
             $repository
                 ->query(Query::createByUUIDs([
-                    ItemUUID::createByComposedUUID('product~1'),
-                    ItemUUID::createByComposedUUID('product~2'),
-                    ItemUUID::createByComposedUUID('article~2'),
-                    ItemUUID::createByComposedUUID('article~3'),
+                    ItemUUID::createByComposedUUID('1~product'),
+                    ItemUUID::createByComposedUUID('2~product'),
+                    ItemUUID::createByComposedUUID('2~article'),
+                    ItemUUID::createByComposedUUID('3~article'),
                 ]))
                 ->getItems()
         );
@@ -249,9 +249,9 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
             2,
             $repository
                 ->query(Query::createByUUIDs([
-                    ItemUUID::createByComposedUUID('product~1'),
-                    ItemUUID::createByComposedUUID('product~2'),
-                    ItemUUID::createByComposedUUID('product~2'),
+                    ItemUUID::createByComposedUUID('1~product'),
+                    ItemUUID::createByComposedUUID('2~product'),
+                    ItemUUID::createByComposedUUID('2~product'),
                 ]))
                 ->getItems()
         );

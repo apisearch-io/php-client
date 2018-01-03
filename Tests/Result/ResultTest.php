@@ -52,11 +52,11 @@ class ResultTest extends PHPUnit_Framework_TestCase
             1, 1
         );
 
-        $result->addItem(Item::create(ItemUUID::createByComposedUUID('type1~1')));
-        $result->addItem(Item::create(ItemUUID::createByComposedUUID('type2~3')));
-        $result->addItem(Item::create(ItemUUID::createByComposedUUID('type3~1')));
-        $result->addItem(Item::create(ItemUUID::createByComposedUUID('type2~4')));
-        $result->addItem(Item::create(ItemUUID::createByComposedUUID('type1~10')));
+        $result->addItem(Item::create(ItemUUID::createByComposedUUID('1~type1')));
+        $result->addItem(Item::create(ItemUUID::createByComposedUUID('3~type2')));
+        $result->addItem(Item::create(ItemUUID::createByComposedUUID('1~type3')));
+        $result->addItem(Item::create(ItemUUID::createByComposedUUID('4~type2')));
+        $result->addItem(Item::create(ItemUUID::createByComposedUUID('10~type1')));
 
         $this->assertCount(2, $result->getItemsByType('type1'));
         $this->assertCount(2, $result->getItemsByType('type2'));
