@@ -94,6 +94,7 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
      * @param int|null    $to
      * @param int|null    $length
      * @param int|null    $offset
+     * @param string|null $sortBy
      *
      * @return Event[]
      *
@@ -104,7 +105,8 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
         ? int $from = null,
         ? int $to = null,
         ? int $length = 10,
-        ? int $offset = 0
+        ? int $offset = 0,
+        ? string $sortBy = SortBy::OCCURRED_ON_DESC
     ): array {
         $response = $this
             ->httpClient
@@ -117,6 +119,7 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
                 'to' => $to,
                 'length' => $length,
                 'offset' => $offset,
+                'sort_by' => $sortBy,
             ]);
 
         if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {

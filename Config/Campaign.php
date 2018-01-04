@@ -278,8 +278,12 @@ class Campaign implements HttpTransportable
 
         $campaign = new self(
             $array['name'],
-            $array['from'] ? Carbon::createFromTimestampUTC($array['from']) : null,
-            $array['to'] ? Carbon::createFromTimestampUTC($array['to']) : null
+            isset($array['from'])
+                ? Carbon::createFromTimestampUTC($array['from'])
+                : null,
+            isset($array['to'])
+                ? Carbon::createFromTimestampUTC($array['to'])
+                : null
         );
 
         $campaign->setEnvironment(

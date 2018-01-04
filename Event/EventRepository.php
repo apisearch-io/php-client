@@ -56,6 +56,7 @@ interface EventRepository extends WithRepositoryReference
      * @param int|null    $to
      * @param int|null    $length
      * @param int|null    $offset
+     * @param string|null $sortBy
      *
      * @return Event[]
      *
@@ -66,7 +67,8 @@ interface EventRepository extends WithRepositoryReference
         ? int $from = null,
         ? int $to = null,
         ? int $length = 10,
-        ? int $offset = 0
+        ? int $offset = 0,
+        ? string $sortBy = SortBy::OCCURRED_ON_DESC
     ): array;
 
     /**

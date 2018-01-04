@@ -102,6 +102,16 @@ class Event implements HttpTransportable
     }
 
     /**
+     * Get Decoded Payload.
+     *
+     * @return mixed
+     */
+    public function getDecodedPayload()
+    {
+        return json_decode($this->payload, true);
+    }
+
+    /**
      * Get OccurredOn.
      *
      * @return int

@@ -44,10 +44,12 @@ class ResourceNotAvailableException extends TransportableException
     /**
      * Events index is not available.
      *
+     * @param string $message
+     *
      * @return ResourceNotAvailableException
      */
-    public static function eventsIndexNotAvailable(): self
+    public static function eventsIndexNotAvailable(string $message): self
     {
-        return new self('Events index not available');
+        return new self(sprintf('Events index not available - %s', $message));
     }
 }

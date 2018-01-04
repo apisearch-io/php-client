@@ -68,6 +68,7 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      * @param int|null    $to
      * @param int|null    $length
      * @param int|null    $offset
+     * @param string|null $sortBy
      *
      * @return Event[]
      *
@@ -78,7 +79,8 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
         ? int $from = null,
         ? int $to = null,
         ? int $length = 10,
-        ? int $offset = 0
+        ? int $offset = 0,
+        ? string $sortBy = SortBy::OCCURRED_ON_DESC
     ): array {
         if (!array_key_exists($this->getIndexKey(), $this->events)) {
             throw ResourceNotAvailableException::eventsIndexNotAvailable();
