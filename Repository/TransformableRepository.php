@@ -67,7 +67,7 @@ class TransformableRepository extends Repository
      */
     public function setRepositoryReference(RepositoryReference $repositoryReference)
     {
-        $this->setRepositoryReference($repositoryReference);
+        parent::setRepositoryReference($repositoryReference);
         $this
             ->repository
             ->setRepositoryReference($repositoryReference);
