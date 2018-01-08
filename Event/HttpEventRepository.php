@@ -90,7 +90,7 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
     }
 
     /**
-     * Query over events
+     * Query over events.
      *
      * @param Query    $query
      * @param int|null $from
@@ -114,7 +114,7 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
                 [
                     Http::QUERY_FIELD => json_encode($query->toArray()),
                     Http::FROM_FIELD => $from,
-                    Http::TO_FIELD => $to
+                    Http::TO_FIELD => $to,
                 ]
             );
 

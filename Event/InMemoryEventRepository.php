@@ -63,7 +63,7 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     }
 
     /**
-     * Query over events
+     * Query over events.
      *
      * @param Query    $query
      * @param int|null $from
@@ -77,8 +77,7 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
         Query $query,
         ? int $from = null,
         ? int $to = null
-    ): Events
-    {
+    ): Events {
         if (!array_key_exists($this->getIndexKey(), $this->events)) {
             throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
         }

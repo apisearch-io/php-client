@@ -1,0 +1,26 @@
+language: php
+
+## Cache composer bits
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+  - nightly
+
+# also test lowest dependencies on PHP 7
+matrix:
+  allow_failures:
+    - php: nightly
+
+sudo: false
+
+install:
+  - composer install --no-interaction
+  - if [ "$DEPENDENCIES" = "lowest" ]; then composer update --prefer-lowest -n; fi
+
+script:
+  - ./vendor/bin/phpunit --coverage-text

@@ -112,7 +112,7 @@ class Event implements HttpTransportable
     }
 
     /**
-     * Get IndexablePayload
+     * Get IndexablePayload.
      *
      * @return array
      */

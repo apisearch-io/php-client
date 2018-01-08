@@ -51,7 +51,7 @@ interface EventRepository extends WithRepositoryReference
     public function save(Event $event);
 
     /**
-     * Query over events
+     * Query over events.
      *
      * @param Query    $query
      * @param int|null $from

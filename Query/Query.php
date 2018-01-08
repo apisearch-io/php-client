@@ -224,7 +224,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public static function createMatchAll() : self
+    public static function createMatchAll(): self
     {
         return self::create(
             '',
