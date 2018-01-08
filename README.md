@@ -2,6 +2,8 @@
 
 This library is part of the Apisearch project.
 
+[![Build Status](https://travis-ci.org/apisearch-io/php-client.svg?branch=master)](https://travis-ci.org/apisearch-io/php-client)
+
 Apisearch is a search engine fully based on open source technologies.
 The project provides an *in cresciendo* set of language integration libraries
 for her clients, as well as some third party projects integration bundles,
