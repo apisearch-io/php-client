@@ -19,8 +19,11 @@ namespace Apisearch\Event;
 use Apisearch\Exception\EventException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Http\Http;
 use Apisearch\Http\HttpClient;
+use Apisearch\Query\Query;
 use Apisearch\Repository\RepositoryWithCredentials;
+use Apisearch\Result\Events;
 
 /**
  * Class HttpEventRepository.
@@ -87,79 +90,39 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
     }
 
     /**
-     * Get all events.
+     * Query over events
      *
-     * @param string|null $name
-     * @param int|null    $from
-     * @param int|null    $to
-     * @param int|null    $length
-     * @param int|null    $offset
-     * @param string|null $sortBy
-     *
-     * @return Event[]
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function all(
-        string $name = null,
-        ? int $from = null,
-        ? int $to = null,
-        ? int $length = 10,
-        ? int $offset = 0,
-        ? string $sortBy = SortBy::OCCURRED_ON_DESC
-    ): array {
-        $response = $this
-            ->httpClient
-            ->get('/events', 'get', [
-                'app_id' => $this->getAppId(),
-                'index' => $this->getIndex(),
-                'token' => $this->getToken(),
-                'name' => $name,
-                'from' => $from,
-                'to' => $to,
-                'length' => $length,
-                'offset' => $offset,
-                'sort_by' => $sortBy,
-            ]);
-
-        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
-            throw new ResourceNotAvailableException($response['body']['message']);
-        }
-
-        return array_map(function (array $event) {
-            return Event::createFromArray($event);
-        }, $response['body']);
-    }
-
-    /**
-     * Get stats.
-     *
+     * @param Query    $query
      * @param int|null $from
      * @param int|null $to
      *
-     * @return Stats
+     * @return Events
      *
      * @throws ResourceNotAvailableException
      */
-    public function stats(
+    public function query(
+        Query $query,
         ? int $from = null,
         ? int $to = null
-    ): Stats {
+    ): Events {
         $response = $this
             ->httpClient
-            ->get('/events/stats', 'get', [
-                'app_id' => $this->getAppId(),
-                'index' => $this->getIndex(),
-                'token' => $this->getToken(),
-                'from' => $from,
-                'to' => $to,
-            ]);
+            ->get(
+                '/events',
+                'get',
+                Http::getQueryValues($this),
+                [
+                    Http::QUERY_FIELD => json_encode($query->toArray()),
+                    Http::FROM_FIELD => $from,
+                    Http::TO_FIELD => $to
+                ]
+            );
 
         if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
             throw new ResourceNotAvailableException($response['body']['message']);
         }
 
-        return Stats::createFromArray($response['body']);
+        return Events::createFromArray($response['body']);
     }
 
     /**

@@ -18,7 +18,9 @@ namespace Apisearch\Event;
 
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Query\Query;
 use Apisearch\Repository\WithRepositoryReference;
+use Apisearch\Result\Events;
 
 /**
  * Class EventRepository.
@@ -49,27 +51,21 @@ interface EventRepository extends WithRepositoryReference
     public function save(Event $event);
 
     /**
-     * Get all events.
+     * Query over events
      *
-     * @param string|null $name
-     * @param int|null    $from
-     * @param int|null    $to
-     * @param int|null    $length
-     * @param int|null    $offset
-     * @param string|null $sortBy
+     * @param Query    $query
+     * @param int|null $from
+     * @param int|null $to
      *
-     * @return Event[]
+     * @return Events
      *
      * @throws ResourceNotAvailableException
      */
-    public function all(
-        string $name = null,
+    public function query(
+        Query $query,
         ? int $from = null,
-        ? int $to = null,
-        ? int $length = 10,
-        ? int $offset = 0,
-        ? string $sortBy = SortBy::OCCURRED_ON_DESC
-    ): array;
+        ? int $to = null
+    ): Events;
 
     /**
      * Get last event.
@@ -79,19 +75,4 @@ interface EventRepository extends WithRepositoryReference
      * @throws ResourceNotAvailableException
      */
     public function last(): ? Event;
-
-    /**
-     * Get stats.
-     *
-     * @param int|null $from
-     * @param int|null $to
-     *
-     * @return Stats
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function stats(
-        ? int $from = null,
-        ? int $to = null
-    ): Stats;
 }

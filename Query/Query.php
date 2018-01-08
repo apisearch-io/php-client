@@ -156,9 +156,9 @@ class Query implements HttpTransportable
     /**
      * Construct.
      *
-     * @param $queryText
+     * @param string $queryText
      */
-    private function __construct($queryText)
+    private function __construct(string $queryText)
     {
         $this->sortBy(SortBy::SCORE);
         $this->filters['_query'] = Filter::create(
@@ -224,7 +224,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public static function createMatchAll()
+    public static function createMatchAll() : self
     {
         return self::create(
             '',
@@ -864,9 +864,9 @@ class Query implements HttpTransportable
      */
     public function getFilterByField(string $fieldName): ? Filter
     {
-        $fieldName = 'indexed_metadata.'.$fieldName;
+        $fieldPath = Filter::getFilterPathByField($fieldName);
         foreach ($this->getFilters() as $filter) {
-            if ($fieldName === $filter->getField()) {
+            if ($fieldPath === $filter->getField()) {
                 return $filter;
             }
         }

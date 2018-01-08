@@ -18,7 +18,9 @@ namespace Apisearch\Event;
 
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Query\Query;
 use Apisearch\Repository\RepositoryWithCredentials;
+use Apisearch\Result\Events;
 
 /**
  * Class InMemoryEventRepository.
@@ -54,51 +56,34 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     public function deleteIndex()
     {
         if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable();
+            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
         }
 
         unset($this->events[$this->getIndexKey()]);
     }
 
     /**
-     * Get all events.
+     * Query over events
      *
-     * @param string|null $name
-     * @param int|null    $from
-     * @param int|null    $to
-     * @param int|null    $length
-     * @param int|null    $offset
-     * @param string|null $sortBy
+     * @param Query    $query
+     * @param int|null $from
+     * @param int|null $to
      *
-     * @return Event[]
+     * @return Events
      *
      * @throws ResourceNotAvailableException
      */
-    public function all(
-        string $name = null,
+    public function query(
+        Query $query,
         ? int $from = null,
-        ? int $to = null,
-        ? int $length = 10,
-        ? int $offset = 0,
-        ? string $sortBy = SortBy::OCCURRED_ON_DESC
-    ): array {
+        ? int $to = null
+    ): Events
+    {
         if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable();
+            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
         }
 
-        return array_slice(
-            array_filter(
-                $this->events[$this->getIndexKey()],
-                function (Event $event) use ($from, $to, $name) {
-                    return
-                        (is_null($name) || ($name === $event->getName())) &&
-                        (is_null($from) || ($event->getOccurredOn() >= $from)) &&
-                        (is_null($to) || ($event->getOccurredOn() < $to));
-                }
-            ),
-            $offset,
-            $length
-        );
+        throw new \Exception('Endpoint not implemented');
     }
 
     /**
@@ -111,7 +96,7 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     public function save(Event $event)
     {
         if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable();
+            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
         }
 
         $this->events[$this->getIndexKey()][] = $event;
@@ -127,7 +112,7 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     public function last(): ? Event
     {
         if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable();
+            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
         }
 
         $lastEvent = end($this->events[$this->getIndexKey()]);
@@ -135,25 +120,6 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
         return ($lastEvent instanceof Event)
             ? $lastEvent
             : null;
-    }
-
-    /**
-     * Get stats.
-     *
-     * @param int|null $from
-     * @param int|null $to
-     *
-     * @return Stats
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function stats(
-        ? int $from = null,
-        ? int $to = null
-    ): Stats {
-        if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable();
-        }
     }
 
     /**

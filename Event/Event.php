@@ -45,6 +45,13 @@ class Event implements HttpTransportable
     private $payload;
 
     /**
+     * @var array
+     *
+     * Indexable payload
+     */
+    private $indexablePayload;
+
+    /**
      * @var int
      *
      * Occurred on
@@ -57,17 +64,20 @@ class Event implements HttpTransportable
      * @param string $consistencyHash
      * @param string $name
      * @param string $payload
+     * @param array  $indexablePayload
      * @param int    $occurredOn
      */
     private function __construct(
         string $consistencyHash,
         string $name,
         string $payload,
+        array $indexablePayload,
         int $occurredOn
     ) {
         $this->consistencyHash = $consistencyHash;
         $this->name = $name;
         $this->payload = $payload;
+        $this->indexablePayload = $indexablePayload;
         $this->occurredOn = $occurredOn;
     }
 
@@ -102,6 +112,16 @@ class Event implements HttpTransportable
     }
 
     /**
+     * Get IndexablePayload
+     *
+     * @return array
+     */
+    public function getIndexablePayload(): array
+    {
+        return $this->indexablePayload;
+    }
+
+    /**
      * Get Decoded Payload.
      *
      * @return mixed
@@ -132,6 +152,7 @@ class Event implements HttpTransportable
             'consistency_hash' => $this->consistencyHash,
             'name' => $this->name,
             'payload' => $this->payload,
+            'indexable_payload' => $this->indexablePayload,
             'occurred_on' => $this->occurredOn,
         ];
     }
@@ -149,6 +170,7 @@ class Event implements HttpTransportable
             (string) $array['consistency_hash'],
             (string) $array['name'],
             (string) $array['payload'],
+            $array['indexable_payload'],
             (int) $array['occurred_on']
         );
     }
@@ -159,6 +181,7 @@ class Event implements HttpTransportable
      * @param null|Event $previousEvent
      * @param string     $name
      * @param string     $payload
+     * @param array      $indexablePayload
      * @param int        $occurredOn
      *
      * @return Event
@@ -167,6 +190,7 @@ class Event implements HttpTransportable
         ? self $previousEvent,
         string $name,
         string $payload,
+        array $indexablePayload,
         int $occurredOn
     ): self {
         $lastEventUUID = $previousEvent instanceof self
@@ -177,6 +201,7 @@ class Event implements HttpTransportable
             hash('sha256', $lastEventUUID.$name.$payload.$occurredOn),
             $name,
             $payload,
+            $indexablePayload,
             $occurredOn
         );
     }
@@ -187,6 +212,7 @@ class Event implements HttpTransportable
      * @param string $consistencyHash
      * @param string $name
      * @param string $payload
+     * @param array  $indexablePayload
      * @param int    $occurredOn
      *
      * @return Event
@@ -195,12 +221,14 @@ class Event implements HttpTransportable
         string $consistencyHash,
         string $name,
         string $payload,
+        array $indexablePayload,
         int $occurredOn
     ): self {
         $event = new self(
             $consistencyHash,
             $name,
             $payload,
+            $indexablePayload,
             $occurredOn
         );
 

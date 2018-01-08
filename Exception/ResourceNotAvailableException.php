@@ -34,11 +34,13 @@ class ResourceNotAvailableException extends TransportableException
     /**
      * Index is not available.
      *
+     * @param string $message
+     *
      * @return ResourceNotAvailableException
      */
-    public static function indexNotAvailable(): self
+    public static function indexNotAvailable(string $message): self
     {
-        return new self('Index not available');
+        return new self(sprintf('Index not available - %s', $message));
     }
 
     /**

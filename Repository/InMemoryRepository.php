@@ -50,7 +50,7 @@ class InMemoryRepository extends Repository
     public function query(Query $query): Result
     {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         $this->normalizeItemsArray();
@@ -120,7 +120,7 @@ class InMemoryRepository extends Repository
     public function deleteIndex()
     {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         unset($this->items[$this->getIndexKey()]);
@@ -132,7 +132,7 @@ class InMemoryRepository extends Repository
     public function resetIndex()
     {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         $this->items[$this->getIndexKey()] = [];
@@ -146,7 +146,7 @@ class InMemoryRepository extends Repository
     public function addItem(Item $item)
     {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         parent::addItem($item);
@@ -160,7 +160,7 @@ class InMemoryRepository extends Repository
     public function addItems(array $items)
     {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         parent::addItems($items);
@@ -174,7 +174,7 @@ class InMemoryRepository extends Repository
     public function deleteItem(ItemUUID $uuid)
     {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         parent::deleteItem($uuid);
@@ -188,7 +188,7 @@ class InMemoryRepository extends Repository
     public function deleteItems(array $uuids)
     {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         parent::deleteItems($uuids);
@@ -210,7 +210,7 @@ class InMemoryRepository extends Repository
         bool $skipIfLess = false
     ) {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         parent::flush();
@@ -227,7 +227,7 @@ class InMemoryRepository extends Repository
         array $itemsToDelete
     ) {
         if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            throw ResourceNotAvailableException::indexNotAvailable();
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
         $this->normalizeItemsArray();

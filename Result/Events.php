@@ -16,14 +16,14 @@ declare(strict_types=1);
 
 namespace Apisearch\Result;
 
+use Apisearch\Event\Event;
 use Apisearch\Model\HttpTransportable;
-use Apisearch\Model\Item;
 use Apisearch\Query\Query;
 
 /**
- * Class Result.
+ * Class Events.
  */
-class Result implements HttpTransportable
+class Events implements HttpTransportable
 {
     /**
      * @var Query
@@ -33,18 +33,11 @@ class Result implements HttpTransportable
     private $query;
 
     /**
-     * @var Item[]
+     * @var Event[]
      *
-     * Items
+     * Events
      */
-    private $items = [];
-
-    /**
-     * @var array
-     *
-     * Suggests
-     */
-    private $suggests = [];
+    private $events = [];
 
     /**
      * @var null|Aggregations
@@ -54,13 +47,6 @@ class Result implements HttpTransportable
     private $aggregations;
 
     /**
-     * Total items.
-     *
-     * @var int
-     */
-    private $totalItems;
-
-    /**
      * Total hits.
      *
      * @var int
@@ -68,26 +54,16 @@ class Result implements HttpTransportable
     private $totalHits;
 
     /**
-     * Items grouped by types cache.
-     *
-     * @var array
-     */
-    private $itemsGroupedByTypeCache;
-
-    /**
      * Result constructor.
      *
      * @param Query $query
-     * @param int   $totalItems
      * @param int   $totalHits
      */
     public function __construct(
         Query $query,
-        int $totalItems,
         int $totalHits
     ) {
         $this->query = $query;
-        $this->totalItems = $totalItems;
         $this->totalHits = $totalHits;
     }
 
@@ -95,128 +71,65 @@ class Result implements HttpTransportable
      * Create by.
      *
      * @param Query             $query
-     * @param int               $totalItems
      * @param int               $totalHits
      * @param Aggregations|null $aggregations
-     * @param string[]          $suggests
-     * @param Item[]            $items
+     * @param Event[]           $events
      *
-     * @return Result
+     * @return Events
      */
     public static function create(
         Query $query,
-        int $totalItems,
         int $totalHits,
         ? Aggregations $aggregations,
-        array $suggests,
-        array $items
+        array $events
     ): self {
         $result = new self(
             $query,
-            $totalItems,
             $totalHits
         );
 
         $result->aggregations = $aggregations;
-        $result->suggests = $suggests;
-        $result->items = $items;
+        $result->events = $events;
 
         return $result;
     }
 
     /**
-     * Add item.
+     * Add event.
      *
-     * @param Item $item
+     * @param Event $event
      */
-    public function addItem(Item $item)
+    public function addEvent(Event $event)
     {
-        $this->items[] = $item;
+        $this->events[] = $event;
     }
 
     /**
-     * Get items.
+     * Get events.
      *
-     * @return Item[]
+     * @return Event[]
      */
-    public function getItems(): array
+    public function getEvents(): array
     {
-        return $this->items;
-    }
-
-    /**
-     * Get items grouped by type.
-     *
-     * @return array
-     */
-    public function getItemsGroupedByTypes(): array
-    {
-        if (is_array($this->itemsGroupedByTypeCache)) {
-            return $this->itemsGroupedByTypeCache;
-        }
-
-        $items = $this->getItems();
-        $itemsGroupedByType = [];
-        foreach ($items as $item) {
-            if (!isset($itemsGroupedByType[$item->getType()])) {
-                $itemsGroupedByType[$item->getType()] = [];
-            }
-            $itemsGroupedByType[$item->getType()][] = $item;
-        }
-
-        $this->itemsGroupedByTypeCache = $itemsGroupedByType;
-
-        return $itemsGroupedByType;
-    }
-
-    /**
-     * Get Items by a certain type.
-     *
-     * @param string $type
-     *
-     * @return Item[]
-     */
-    public function getItemsByType(string $type): array
-    {
-        return $this->getItemsGroupedByTypes()[$type] ?? [];
-    }
-
-    /**
-     * Get Items by a certain types.
-     *
-     * @param array $types
-     *
-     * @return Item[]
-     */
-    public function getItemsByTypes(array $types): array
-    {
-        return array_filter(
-            $this->getItems(),
-            function (Item $item) use ($types) {
-                return in_array(
-                    $item->getType(),
-                    $types
-                );
-            }
-        );
+        return $this->events;
     }
 
     /**
      * Get first result.
      *
-     * @return null|Item
+     * @return null|Event
      */
-    public function getFirstItem()
+    public function getFirstEvent()
     {
-        $results = $this->getItems();
+        $results = $this->getEvents();
 
         if (empty($results)) {
             return null;
         }
 
-        $firstItem = reset($results);
+        $firstEvent = reset($results);
 
-        return $firstItem;
+        return $firstEvent;
     }
 
     /**
@@ -276,26 +189,6 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Add suggest.
-     *
-     * @param string $suggest
-     */
-    public function addSuggest(string $suggest)
-    {
-        $this->suggests[$suggest] = $suggest;
-    }
-
-    /**
-     * Get suggests.
-     *
-     * @return string[]
-     */
-    public function getSuggests(): array
-    {
-        return array_values($this->suggests);
-    }
-
-    /**
      * Get query.
      *
      * @return Query
@@ -303,16 +196,6 @@ class Result implements HttpTransportable
     public function getQuery(): Query
     {
         return $this->query;
-    }
-
-    /**
-     * Total items.
-     *
-     * @return int
-     */
-    public function getTotalItems(): int
-    {
-        return $this->totalItems;
     }
 
     /**
@@ -334,15 +217,13 @@ class Result implements HttpTransportable
     {
         return array_filter([
             'query' => $this->query->toArray(),
-            'total_items' => $this->totalItems,
             'total_hits' => $this->totalHits,
-            'items' => array_map(function (Item $item) {
-                return $item->toArray();
-            }, $this->items),
+            'events' => array_map(function (Event $event) {
+                return $event->toArray();
+            }, $this->events),
             'aggregations' => $this->aggregations instanceof Aggregations
                 ? $this->aggregations->toArray()
                 : null,
-            'suggests' => $this->suggests,
         ], function ($element) {
             return
             !(
@@ -357,21 +238,19 @@ class Result implements HttpTransportable
      *
      * @param array $array
      *
-     * @return Result
+     * @return Events
      */
     public static function createFromArray(array $array): self
     {
         return self::create(
             Query::createFromArray($array['query']),
-            $array['total_items'] ?? 0,
             $array['total_hits'] ?? 0,
             isset($array['aggregations'])
                 ? Aggregations::createFromArray($array['aggregations'])
                 : null,
-            $array['suggests'] ?? [],
-            array_map(function (array $item) {
-                return Item::createFromArray($item);
-            }, $array['items'] ?? [])
+            array_map(function (array $event) {
+                return Event::createFromArray($event);
+            }, $array['events'] ?? [])
         );
     }
 }

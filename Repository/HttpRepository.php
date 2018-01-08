@@ -20,6 +20,7 @@ use Apisearch\Config\Config;
 use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Http\Http;
 use Apisearch\Http\HttpClient;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
@@ -31,55 +32,6 @@ use Apisearch\Result\Result;
  */
 class HttpRepository extends Repository
 {
-    /**
-     * @var string
-     *
-     * App_id query param field
-     */
-    const APP_ID_FIELD = 'app_id';
-
-    /**
-     * @var string
-     *
-     * App_id query param field
-     */
-    const INDEX_FIELD = 'index';
-
-    /**
-     * @var string
-     *
-     * Token query param field
-     */
-    const TOKEN_FIELD = 'token';
-
-    /**
-     * @var string
-     *
-     * Items query param field
-     */
-    const ITEMS_FIELD = 'items';
-
-    /**
-     * @var string
-     *
-     * Query query param field
-     */
-    const QUERY_FIELD = 'query';
-
-    /**
-     * @var string
-     *
-     * Config param field
-     */
-    const CONFIG_FIELD = 'config';
-
-    /**
-     * @var string
-     *
-     * Language query param field
-     */
-    const LANGUAGE_FIELD = 'language';
-
     /**
      * @var HttpClient
      *
@@ -132,7 +84,7 @@ class HttpRepository extends Repository
                 ->get(
                     '/items',
                     'post'.$async,
-                    $this->getQueryValues(),
+                    Http::getQueryValues($this),
                     [
                         'items' => json_encode(
                             array_map(function (Item $item) {
@@ -147,7 +99,7 @@ class HttpRepository extends Repository
                 ->httpClient
                 ->get('/items',
                     'delete'.$async,
-                    $this->getQueryValues(),
+                    Http::getQueryValues($this),
                     [
                         'items' => json_encode(
                             array_map(function (ItemUUID $itemUUID) {
@@ -163,7 +115,7 @@ class HttpRepository extends Repository
 
         switch ($response['code']) {
             case ResourceNotAvailableException::getTransportableHTTPError():
-                throw ResourceNotAvailableException::indexNotAvailable();
+                throw ResourceNotAvailableException::indexNotAvailable($response['body']['message']);
             case InvalidFormatException::getTransportableHTTPError():
                 throw new InvalidFormatException($response['body']['message']);
         }
@@ -185,15 +137,15 @@ class HttpRepository extends Repository
             ->get(
                 '/',
                 'get',
-                $this->getQueryValues(),
+                Http::getQueryValues($this),
                 [
-                    self::QUERY_FIELD => json_encode($query->toArray()),
+                    Http::QUERY_FIELD => json_encode($query->toArray()),
                 ]
             );
 
         switch ($response['code']) {
             case ResourceNotAvailableException::getTransportableHTTPError():
-                throw ResourceNotAvailableException::indexNotAvailable();
+                throw ResourceNotAvailableException::indexNotAvailable($response['body']['message']);
             case InvalidFormatException::getTransportableHTTPError():
                 throw new InvalidFormatException($response['body']['message']);
         }
@@ -218,7 +170,7 @@ class HttpRepository extends Repository
             ->get(
                 '/index',
                 'post'.$async,
-                $this->getQueryValues(),
+                Http::getQueryValues($this),
                 []
             );
 
@@ -244,7 +196,7 @@ class HttpRepository extends Repository
             ->get(
                 '/index',
                 'delete'.$async,
-                $this->getQueryValues()
+                Http::getQueryValues($this)
             );
 
         if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
@@ -269,7 +221,7 @@ class HttpRepository extends Repository
             ->get(
                 '/index/reset',
                 'post'.$async,
-                $this->getQueryValues()
+                Http::getQueryValues($this)
             );
 
         if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
@@ -296,9 +248,9 @@ class HttpRepository extends Repository
             ->get(
                 '/index/config',
                 'post'.$async,
-                $this->getQueryValues(),
+                Http::getQueryValues($this),
                 [
-                    self::CONFIG_FIELD => json_encode($config->toArray()),
+                    Http::CONFIG_FIELD => json_encode($config->toArray()),
                 ]
             );
 
@@ -308,23 +260,9 @@ class HttpRepository extends Repository
 
         switch ($response['code']) {
             case ResourceNotAvailableException::getTransportableHTTPError():
-                throw ResourceNotAvailableException::indexNotAvailable();
+                throw ResourceNotAvailableException::indexNotAvailable($response['body']['message']);
             case InvalidFormatException::getTransportableHTTPError():
                 throw new InvalidFormatException($response['body']['message']);
         }
-    }
-
-    /**
-     * Get common query values.
-     *
-     * @return string[]
-     */
-    private function getQueryValues(): array
-    {
-        return [
-            self::APP_ID_FIELD => $this->getAppId(),
-            self::INDEX_FIELD => $this->getIndex(),
-            self::TOKEN_FIELD => $this->getToken(),
-        ];
     }
 }

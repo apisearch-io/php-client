@@ -26,12 +26,12 @@ class SortBy
      *
      * Sort by id ASC
      */
-    const OCCURRED_ON_ASC = 'asc';
+    const OCCURRED_ON_ASC = ['indexed_metadata.occurred_on' => ['order' => 'asc']];
 
     /**
      * @var array
      *
      * Sort by id DESC
      */
-    const OCCURRED_ON_DESC = 'desc';
+    const OCCURRED_ON_DESC = ['indexed_metadata.occurred_on' => ['order' => 'desc']];
 }
