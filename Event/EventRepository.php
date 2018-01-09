@@ -66,13 +66,4 @@ interface EventRepository extends WithRepositoryReference
         ? int $from = null,
         ? int $to = null
     ): Events;
-
-    /**
-     * Get last event.
-     *
-     * @return Event|null
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function last(): ? Event;
 }

@@ -178,37 +178,6 @@ class Event implements HttpTransportable
     /**
      * Event constructor.
      *
-     * @param null|Event $previousEvent
-     * @param string     $name
-     * @param string     $payload
-     * @param array      $indexablePayload
-     * @param int        $occurredOn
-     *
-     * @return Event
-     */
-    public static function createByPreviousEvent(
-        ? self $previousEvent,
-        string $name,
-        string $payload,
-        array $indexablePayload,
-        int $occurredOn
-    ): self {
-        $lastEventUUID = $previousEvent instanceof self
-            ? $previousEvent->getConsistencyHash()
-            : '';
-
-        return new self(
-            hash('sha256', $lastEventUUID.$name.$payload.$occurredOn),
-            $name,
-            $payload,
-            $indexablePayload,
-            $occurredOn
-        );
-    }
-
-    /**
-     * Event constructor.
-     *
      * @param string $consistencyHash
      * @param string $name
      * @param string $payload

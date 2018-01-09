@@ -136,16 +136,4 @@ class HttpEventRepository extends RepositoryWithCredentials implements EventRepo
     {
         throw EventException::throwEndpointNotAvailable();
     }
-
-    /**
-     * Get last event.
-     *
-     * @return Event|null
-     *
-     * @throws EventException
-     */
-    public function last(): ? Event
-    {
-        throw EventException::throwEndpointNotAvailable();
-    }
 }

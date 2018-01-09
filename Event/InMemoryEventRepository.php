@@ -102,26 +102,6 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
     }
 
     /**
-     * Get last event.
-     *
-     * @return Event|null
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function last(): ? Event
-    {
-        if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
-        }
-
-        $lastEvent = end($this->events[$this->getIndexKey()]);
-
-        return ($lastEvent instanceof Event)
-            ? $lastEvent
-            : null;
-    }
-
-    /**
      * Get index position by credentials.
      *
      * @return string
