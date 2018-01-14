@@ -23,6 +23,7 @@ use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
 use Apisearch\Result\Result;
+use Exception;
 
 /**
  * Abstract class Repository.
@@ -134,22 +135,34 @@ abstract class Repository extends RepositoryWithCredentials
         }
 
         $offset = 0;
-        while (true) {
-            $items = array_slice(
-                $this->elementsToUpdate,
-                $offset,
-                $bulkNumber
-            );
 
-            if (empty($items)) {
-                break;
+        try {
+            while (true) {
+                $items = array_slice(
+                    $this->elementsToUpdate,
+                    $offset,
+                    $bulkNumber
+                );
+
+                if (empty($items)) {
+                    break;
+                }
+
+                $this->flushItems($items, []);
+                $offset += $bulkNumber;
             }
 
-            $this->flushItems($items, []);
-            $offset += $bulkNumber;
+            $this->flushItems([], $this->elementsToDelete);
+        } catch (Exception $exception) {
+            /*
+             * No matter the exception is thrown, cached elements should be
+             * deleted
+             */
+            $this->resetCachedElements();
+
+            throw $exception;
         }
 
-        $this->flushItems([], $this->elementsToDelete);
         $this->resetCachedElements();
     }
 
