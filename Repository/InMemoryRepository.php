@@ -139,6 +139,16 @@ class InMemoryRepository extends Repository
     }
 
     /**
+     * Checks the index.
+     *
+     * @return bool
+     */
+    public function checkIndex(): bool
+    {
+        return isset($this->items[$this->getIndexKey()]);
+    }
+
+    /**
      * Generate item document.
      *
      * @param Item $item

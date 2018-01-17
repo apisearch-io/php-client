@@ -210,6 +210,13 @@ abstract class Repository extends RepositoryWithCredentials
     abstract public function resetIndex();
 
     /**
+     * Checks the index.
+     *
+     * @return bool
+     */
+    abstract public function checkIndex(): bool;
+
+    /**
      * Config the index.
      *
      * @param Config $config

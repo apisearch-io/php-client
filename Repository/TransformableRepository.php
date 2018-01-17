@@ -167,6 +167,18 @@ class TransformableRepository extends Repository
     }
 
     /**
+     * Checks the index.
+     *
+     * @return bool
+     */
+    public function checkIndex(): bool
+    {
+        return $this
+            ->repository
+            ->checkIndex();
+    }
+
+    /**
      * Config the index.
      *
      * @param Config $config
