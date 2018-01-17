@@ -26,6 +26,7 @@ use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
 use Apisearch\Result\Result;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class HttpRepository.
@@ -227,6 +228,29 @@ class HttpRepository extends Repository
         if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
             throw new ResourceNotAvailableException($response['body']['message']);
         }
+    }
+
+    /**
+     * Checks the index.
+     *
+     * @return bool
+     */
+    public function checkIndex(): bool
+    {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index',
+                'head',
+                Http::getQueryValues($this),
+                []
+            );
+
+        if (is_null($response)) {
+            return false;
+        }
+
+        return Response::HTTP_OK === $response['code'];
     }
 
     /**
