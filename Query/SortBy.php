@@ -83,4 +83,17 @@ class SortBy
      * Sort by location ASC using Miles
      */
     const LOCATION_MI_ASC = ['_geo_distance' => ['order' => 'asc', 'unit' => 'mi']];
+    /**
+     * @var array
+     *
+     * Sort by id ASC
+     */
+    const OCCURRED_ON_ASC = ['indexed_metadata.occurred_on' => ['order' => 'asc']];
+
+    /**
+     * @var array
+     *
+     * Sort by id DESC
+     */
+    const OCCURRED_ON_DESC = ['indexed_metadata.occurred_on' => ['order' => 'desc']];
 }

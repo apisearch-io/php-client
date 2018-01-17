@@ -14,26 +14,26 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\Event;
+namespace Apisearch\Log;
 
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Query\Query;
 use Apisearch\Repository\RepositoryWithCredentials;
-use Apisearch\Result\Events;
+use Apisearch\Result\Logs;
 use Exception;
 
 /**
- * Class InMemoryEventRepository.
+ * Class InMemoryLogRepository.
  */
-class InMemoryEventRepository extends RepositoryWithCredentials implements EventRepository
+class InMemoryLogRepository extends RepositoryWithCredentials implements LogRepository
 {
     /**
      * @var array
      *
-     * Events
+     * Logs
      */
-    private $events = [];
+    private $logs = [];
 
     /**
      * Create index.
@@ -42,11 +42,11 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      */
     public function createIndex()
     {
-        if (array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceExistsException::eventsIndexExists();
+        if (array_key_exists($this->getIndexKey(), $this->logs)) {
+            throw ResourceExistsException::logsIndexExists();
         }
 
-        $this->events[$this->getIndexKey()] = [];
+        $this->logs[$this->getIndexKey()] = [];
     }
 
     /**
@@ -56,21 +56,21 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      */
     public function deleteIndex()
     {
-        if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
+        if (!array_key_exists($this->getIndexKey(), $this->logs)) {
+            throw ResourceNotAvailableException::logsIndexNotAvailable('Index not found in InMemoryLogRepository');
         }
 
-        unset($this->events[$this->getIndexKey()]);
+        unset($this->logs[$this->getIndexKey()]);
     }
 
     /**
-     * Query over events.
+     * Query over logs.
      *
      * @param Query    $query
      * @param int|null $from
      * @param int|null $to
      *
-     * @return Events
+     * @return Logs
      *
      * @throws Exception
      */
@@ -78,28 +78,28 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
         Query $query,
         ? int $from = null,
         ? int $to = null
-    ): Events {
-        if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
+    ): Logs {
+        if (!array_key_exists($this->getIndexKey(), $this->logs)) {
+            throw ResourceNotAvailableException::logsIndexNotAvailable('Index not found in InMemoryLogRepository');
         }
 
         throw new \Exception('Endpoint not implemented');
     }
 
     /**
-     * Save event.
+     * Save log.
      *
-     * @param Event $event
+     * @param Log $log
      *
      * @throws ResourceNotAvailableException
      */
-    public function save(Event $event)
+    public function save(Log $log)
     {
-        if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
+        if (!array_key_exists($this->getIndexKey(), $this->logs)) {
+            throw ResourceNotAvailableException::logsIndexNotAvailable('Index not found in InMemoryLogRepository');
         }
 
-        $this->events[$this->getIndexKey()][] = $event;
+        $this->logs[$this->getIndexKey()][] = $log;
     }
 
     /**

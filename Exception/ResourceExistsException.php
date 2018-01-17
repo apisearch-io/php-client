@@ -50,4 +50,14 @@ class ResourceExistsException extends TransportableException
     {
         return new self('Events index exists and cannot be created again');
     }
+
+    /**
+     * Logs Index exists.
+     *
+     * @return ResourceExistsException
+     */
+    public static function logsIndexExists(): self
+    {
+        return new self('Logs index exists and cannot be created again');
+    }
 }
