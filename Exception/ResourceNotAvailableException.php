@@ -54,4 +54,16 @@ class ResourceNotAvailableException extends TransportableException
     {
         return new self(sprintf('Events index not available - %s', $message));
     }
+
+    /**
+     * Logs index is not available.
+     *
+     * @param string $message
+     *
+     * @return ResourceNotAvailableException
+     */
+    public static function logsIndexNotAvailable(string $message): self
+    {
+        return new self(sprintf('Logs index not available - %s', $message));
+    }
 }
