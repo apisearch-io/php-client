@@ -53,7 +53,6 @@ class InMemoryRepository extends Repository
             throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
-        $this->normalizeItemsArray();
         $resultingItems = $this->items[$this->getIndexKey()];
 
         if (!empty($query->getFilters())) {
@@ -240,7 +239,6 @@ class InMemoryRepository extends Repository
             throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
         }
 
-        $this->normalizeItemsArray();
         foreach ($itemsToUpdate as $itemToUpdate) {
             $this->items[$this->getIndexKey()][$itemToUpdate->getUUID()->composeUUID()] = $itemToUpdate;
         }
@@ -260,16 +258,6 @@ class InMemoryRepository extends Repository
     public function configureIndex(Config $config)
     {
         throw new LogicException('Config logic cannot be tested against memory implementation, but only in final implementation');
-    }
-
-    /**
-     * Normalize items array.
-     */
-    private function normalizeItemsArray()
-    {
-        if (!array_key_exists($this->getIndexKey(), $this->items)) {
-            $this->items[$this->getIndexKey()] = [];
-        }
     }
 
     /**

@@ -36,10 +36,12 @@ class InvalidTokenException extends RuntimeException
     /**
      * Throw an invalid key exception.
      *
+     * @param string $tokenReference
+     *
      * @return InvalidTokenException
      */
-    public static function create(): self
+    public static function createInvalidTokenPermissions(string $tokenReference): self
     {
-        return new self('Token is not valid');
+        return new self(sprintf('Token %s not valid', $tokenReference));
     }
 }

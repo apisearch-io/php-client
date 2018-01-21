@@ -41,26 +41,15 @@ class HttpRepository extends Repository
     private $httpClient;
 
     /**
-     * @var bool
-     *
-     * Write (Post/Delete) Asynchronous
-     */
-    private $writeAsync;
-
-    /**
      * HttpAdapter constructor.
      *
      * @param HttpClient $httpClient
-     * @param bool       $writeAsync
      */
-    public function __construct(
-        HttpClient $httpClient,
-        bool $writeAsync = false
-    ) {
+    public function __construct(HttpClient $httpClient)
+    {
         parent::__construct();
 
         $this->httpClient = $httpClient;
-        $this->writeAsync = $writeAsync;
     }
 
     /**
@@ -74,17 +63,13 @@ class HttpRepository extends Repository
         array $itemsToDelete
     ) {
         $response = null;
-        $async = ($this->writeAsync)
-            ? 'Async'
-            : ''
-        ;
 
         if (!empty($itemsToUpdate)) {
             $response = $this
                 ->httpClient
                 ->get(
                     '/items',
-                    'post'.$async,
+                    'post',
                     Http::getQueryValues($this),
                     [
                         'items' => json_encode(
@@ -99,7 +84,7 @@ class HttpRepository extends Repository
             $response = $this
                 ->httpClient
                 ->get('/items',
-                    'delete'.$async,
+                    'delete',
                     Http::getQueryValues($this),
                     [
                         'items' => json_encode(
@@ -114,12 +99,7 @@ class HttpRepository extends Repository
             return;
         }
 
-        switch ($response['code']) {
-            case ResourceNotAvailableException::getTransportableHTTPError():
-                throw ResourceNotAvailableException::indexNotAvailable($response['body']['message']);
-            case InvalidFormatException::getTransportableHTTPError():
-                throw new InvalidFormatException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -144,12 +124,7 @@ class HttpRepository extends Repository
                 ]
             );
 
-        switch ($response['code']) {
-            case ResourceNotAvailableException::getTransportableHTTPError():
-                throw ResourceNotAvailableException::indexNotAvailable($response['body']['message']);
-            case InvalidFormatException::getTransportableHTTPError():
-                throw new InvalidFormatException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
 
         return Result::createFromArray($response['body']);
     }
@@ -161,23 +136,16 @@ class HttpRepository extends Repository
      */
     public function createIndex()
     {
-        $async = ($this->writeAsync)
-            ? 'Async'
-            : ''
-        ;
-
         $response = $this
             ->httpClient
             ->get(
                 '/index',
-                'post'.$async,
+                'post',
                 Http::getQueryValues($this),
                 []
             );
 
-        if ($response['code'] === ResourceExistsException::getTransportableHTTPError()) {
-            throw new ResourceExistsException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -187,22 +155,15 @@ class HttpRepository extends Repository
      */
     public function deleteIndex()
     {
-        $async = ($this->writeAsync)
-            ? 'Async'
-            : ''
-        ;
-
         $response = $this
             ->httpClient
             ->get(
                 '/index',
-                'delete'.$async,
+                'delete',
                 Http::getQueryValues($this)
             );
 
-        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
-            throw new ResourceNotAvailableException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -212,22 +173,15 @@ class HttpRepository extends Repository
      */
     public function resetIndex()
     {
-        $async = ($this->writeAsync)
-            ? 'Async'
-            : ''
-        ;
-
         $response = $this
             ->httpClient
             ->get(
                 '/index/reset',
-                'post'.$async,
+                'post',
                 Http::getQueryValues($this)
             );
 
-        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
-            throw new ResourceNotAvailableException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -262,16 +216,11 @@ class HttpRepository extends Repository
      */
     public function configureIndex(Config $config)
     {
-        $async = ($this->writeAsync)
-            ? 'Async'
-            : ''
-        ;
-
         $response = $this
             ->httpClient
             ->get(
                 '/index/config',
-                'post'.$async,
+                'post',
                 Http::getQueryValues($this),
                 [
                     Http::CONFIG_FIELD => json_encode($config->toArray()),
@@ -282,9 +231,21 @@ class HttpRepository extends Repository
             return;
         }
 
+        $this->throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
+     * Transform transportable http errors to exceptions.
+     *
+     * @param array $response
+     *
+     * @throw TransportableException
+     */
+    private function throwTransportableExceptionIfNeeded(array $response)
+    {
         switch ($response['code']) {
             case ResourceNotAvailableException::getTransportableHTTPError():
-                throw ResourceNotAvailableException::indexNotAvailable($response['body']['message']);
+                throw new ResourceNotAvailableException($response['body']['message']);
             case InvalidFormatException::getTransportableHTTPError():
                 throw new InvalidFormatException($response['body']['message']);
         }
