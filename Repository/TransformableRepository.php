@@ -74,6 +74,22 @@ class TransformableRepository extends Repository
     }
 
     /**
+     * Set repository credentials.
+     *
+     * @param RepositoryReference $repositoryReference
+     * @param string              $token
+     */
+    public function setCredentials(
+        RepositoryReference $repositoryReference,
+        string $token
+    ) {
+        parent::setCredentials($repositoryReference, $token);
+        $this
+            ->repository
+            ->setCredentials($repositoryReference, $token);
+    }
+
+    /**
      * Get Repository.
      *
      * @return Repository

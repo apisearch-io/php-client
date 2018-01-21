@@ -94,4 +94,36 @@ class InvalidFormatException extends TransportableException
             100
         )));
     }
+
+    /**
+     * Token format not valid.
+     *
+     * @param mixed $tokenBeforeHydration
+     *
+     * @return InvalidFormatException
+     */
+    public static function tokenFormatNotValid($tokenBeforeHydration): self
+    {
+        return new self(sprintf('Token Format not valid. Expecting a Token serialized but found "%s" before hydration', substr(
+            (string) $tokenBeforeHydration,
+            0,
+            100
+        )));
+    }
+
+    /**
+     * Token uuid format not valid.
+     *
+     * @param mixed $tokenUUIDBeforeHydration
+     *
+     * @return InvalidFormatException
+     */
+    public static function tokenUUIDFormatNotValid($tokenUUIDBeforeHydration): self
+    {
+        return new self(sprintf('Token UUID Format not valid. Expecting a TokenUUID serialized but found "%s" before hydration', substr(
+            (string) $tokenUUIDBeforeHydration,
+            0,
+            100
+        )));
+    }
 }
