@@ -37,7 +37,7 @@ class TokenUUID implements HttpTransportable, UUIDReference
      *
      * @param string $id
      */
-    private function __construct($id)
+    private function __construct(string $id)
     {
         $this->id = $id;
     }

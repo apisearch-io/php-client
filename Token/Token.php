@@ -33,6 +33,13 @@ class Token implements HttpTransportable
     private $tokenUUID;
 
     /**
+     * @var string
+     *
+     * App id
+     */
+    private $appId;
+
+    /**
      * @var int
      *
      * Created at
@@ -85,6 +92,7 @@ class Token implements HttpTransportable
      * PushToken constructor.
      *
      * @param TokenUUID $tokenUUID
+     * @param string    $appId
      * @param string[]  $indices
      * @param int       $secondsValid
      * @param int       $maxHitsPerQuery
@@ -93,6 +101,7 @@ class Token implements HttpTransportable
      */
     public function __construct(
         TokenUUID $tokenUUID,
+        string $appId,
         array $indices = [],
         int $secondsValid = 0,
         int $maxHitsPerQuery = 0,
@@ -100,13 +109,14 @@ class Token implements HttpTransportable
         array $endpoints = []
     ) {
         $this->tokenUUID = $tokenUUID;
+        $this->appId = $appId;
         $this->createdAt = Carbon::now('UTC')->timestamp;
         $this->updatedAt = $this->createdAt;
-        $this->indices = $indices;
+        $this->setIndices($indices);
         $this->secondsValid = $secondsValid;
         $this->maxHitsPerQuery = $maxHitsPerQuery;
-        $this->httpReferrers = $httpReferrers;
-        $this->endpoints = $endpoints;
+        $this->setHttpReferrers($httpReferrers);
+        $this->setEndpoints($endpoints);
     }
 
     /**
@@ -117,6 +127,16 @@ class Token implements HttpTransportable
     public function getTokenUUID(): TokenUUID
     {
         return $this->tokenUUID;
+    }
+
+    /**
+     * Get AppId
+     *
+     * @return string
+     */
+    public function getAppId(): string
+    {
+        return $this->appId;
     }
 
     /**
@@ -268,6 +288,7 @@ class Token implements HttpTransportable
     {
         return [
             'uuid' => $this->tokenUUID->toArray(),
+            'app_id' => $this->appId,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
             'indices' => $this->indices,
@@ -289,8 +310,16 @@ class Token implements HttpTransportable
      */
     public static function createFromArray(array $array)
     {
+        if (
+            !isset($array['uuid']) ||
+            !isset($array['app_id'])
+        ) {
+            throw InvalidFormatException::tokenFormatNotValid(json_encode($array));
+        }
+
         $token = new self(
             TokenUUID::createFromArray($array['uuid']),
+            $array['app_id'],
             $array['indices'] ?? [],
             $array['seconds_valid'] ?? 0,
             $array['max_hits_per_query'] ?? 0,
