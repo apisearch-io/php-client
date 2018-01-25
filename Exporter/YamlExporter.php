@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Exporter;
 
+use Apisearch\Exception\ExporterNotAvailableException;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\Item;
 use Symfony\Component\Yaml\Yaml;
@@ -73,6 +74,8 @@ class YamlExporter implements Exporter
      */
     public function itemsToFormat(array $items): string
     {
+        $this->checkDependencies();
+
         $headers = [
             'metadata' => [],
             'indexed_metadata' => [],
@@ -125,6 +128,8 @@ class YamlExporter implements Exporter
      */
     public function formatToItems(string $data): array
     {
+        $this->checkDependencies();
+
         $data = Yaml::parse($data);
         $header = $data['header'];
         unset($data['header']);
@@ -221,5 +226,21 @@ class YamlExporter implements Exporter
             $item,
             array_flip($header[$section] ?? [])
         );
+    }
+
+    /**
+     * Check dependency.
+     *
+     * @throw ExporterNotAvailableException
+     */
+    private function checkDependencies()
+    {
+        if (!class_exists(Yaml::class)) {
+            throw ExporterNotAvailableException::createForMissingDependency(
+                'yml',
+                Yaml::class,
+                'symfony/yaml'
+            );
+        }
     }
 }

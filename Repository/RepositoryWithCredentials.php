@@ -21,9 +21,10 @@ namespace Apisearch\Repository;
  */
 abstract class RepositoryWithCredentials implements WithRepositoryReference
 {
-    use WithRepositoryReferenceTrait;
 
-    /**
+use WithRepositoryReferenceTrait;
+
+/**
      * @var string
      *
      * Api Token

@@ -26,7 +26,6 @@ use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
 use Apisearch\Result\Result;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class HttpRepository.
@@ -204,7 +203,7 @@ class HttpRepository extends Repository
             return false;
         }
 
-        return Response::HTTP_OK === $response['code'];
+        return 200 === $response['code'];
     }
 
     /**
