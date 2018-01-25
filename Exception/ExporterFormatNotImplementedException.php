@@ -16,11 +16,11 @@ declare(strict_types=1);
 
 namespace Apisearch\Exception;
 
-use RunTimeException;
+use RuntimeException;
 
 /**
  * Class ExporterFormatNotImplementedException.
  */
-class ExporterFormatNotImplementedException extends RunTimeException
+class ExporterFormatNotImplementedException extends RuntimeException
 {
 }

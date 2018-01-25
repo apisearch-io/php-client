@@ -130,7 +130,7 @@ class Token implements HttpTransportable
     }
 
     /**
-     * Get AppId
+     * Get AppId.
      *
      * @return string
      */
