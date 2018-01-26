@@ -14,54 +14,48 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\App;
+namespace Apisearch\User;
 
 use Apisearch\Http\Http;
 use Apisearch\Http\HttpRepositoryWithCredentials;
-use Apisearch\Token\Token;
-use Apisearch\Token\TokenUUID;
 
 /**
- * Class HttpAppRepository.
+ * Class HttpUserRepository.
  */
-class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepository
+class HttpUserRepository extends HttpRepositoryWithCredentials implements UserRepository
 {
     /**
-     * Add token.
+     * Add interaction.
      *
-     * @param Token $token
+     * @param Interaction $interaction
      */
-    public function addToken(Token $token)
+    public function addInteraction(Interaction $interaction)
     {
         $response = $this
             ->httpClient
             ->get(
-                '/token',
-                'post',
+                '/interaction',
+                'get',
                 Http::getQueryValues($this),
                 [
-                    'token' => json_encode($token->toArray()),
+                    'interaction' => json_encode($interaction->toArray()),
                 ]);
 
         $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
-     * Delete token.
-     *
-     * @param TokenUUID $tokenUUID
+     * Delete all interactions.
      */
-    public function deleteToken(TokenUUID $tokenUUID)
+    public function deleteAllInteractions()
     {
         $response = $this
             ->httpClient
             ->get(
-                '/token',
+                '/interactions',
                 'delete',
-                Http::getQueryValues($this),
-                [
-                    'token' => json_encode($tokenUUID->toArray()),
-                ]);
+                Http::getQueryValues($this)
+            );
 
         $this->throwTransportableExceptionIfNeeded($response);
     }

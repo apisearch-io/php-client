@@ -14,9 +14,7 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\Query;
-
-use Apisearch\Model\HttpTransportable;
+namespace Apisearch\Model;
 
 /**
  * Class User.

@@ -20,33 +20,15 @@ use Apisearch\Exception\EventException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\Http;
-use Apisearch\Http\HttpClient;
+use Apisearch\Http\HttpRepositoryWithCredentials;
 use Apisearch\Query\Query;
-use Apisearch\Repository\RepositoryWithCredentials;
 use Apisearch\Result\Logs;
 
 /**
  * Class HttpLogRepository.
  */
-class HttpLogRepository extends RepositoryWithCredentials implements LogRepository
+class HttpLogRepository extends HttpRepositoryWithCredentials implements LogRepository
 {
-    /**
-     * @var HttpClient
-     *
-     * Http client
-     */
-    private $httpClient;
-
-    /**
-     * HttpAdapter constructor.
-     *
-     * @param HttpClient $httpClient
-     */
-    public function __construct(HttpClient $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
-
     /**
      * Create index.
      *
@@ -63,9 +45,7 @@ class HttpLogRepository extends RepositoryWithCredentials implements LogReposito
                 'token' => $this->getToken(),
             ]);
 
-        if ($response['code'] === ResourceExistsException::getTransportableHTTPError()) {
-            throw new ResourceExistsException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -84,9 +64,7 @@ class HttpLogRepository extends RepositoryWithCredentials implements LogReposito
                 'token' => $this->getToken(),
             ]);
 
-        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
-            throw new ResourceNotAvailableException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -118,9 +96,7 @@ class HttpLogRepository extends RepositoryWithCredentials implements LogReposito
                 ]
             );
 
-        if ($response['code'] === ResourceNotAvailableException::getTransportableHTTPError()) {
-            throw new ResourceNotAvailableException($response['body']['message']);
-        }
+        $this->throwTransportableExceptionIfNeeded($response);
 
         return Logs::createFromArray($response['body']);
     }
