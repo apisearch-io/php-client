@@ -88,6 +88,13 @@ class Item implements HttpTransportable, UUIDReference
     private $highlights = [];
 
     /**
+     * @var bool
+     *
+     * Promoted
+     */
+    private $promoted = false;
+
+    /**
      * Item constructor.
      *
      * @param ItemUUID   $uuid
@@ -436,6 +443,24 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
+     * Set is promoted.
+     */
+    public function setPromoted()
+    {
+        $this->promoted = true;
+    }
+
+    /**
+     * Is promoted.
+     *
+     * @return bool
+     */
+    public function isPromoted(): bool
+    {
+        return $this->promoted;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -454,6 +479,7 @@ class Item implements HttpTransportable, UUIDReference
             'exact_matching_metadata' => $this->exactMatchingMetadata,
             'suggest' => $this->suggest,
             'highlights' => $this->highlights,
+            'is_promoted' => $this->promoted,
         ], function ($element) {
             return
             !(
@@ -511,6 +537,10 @@ class Item implements HttpTransportable, UUIDReference
 
         if (isset($array['highlights'])) {
             $item->highlights = $array['highlights'];
+        }
+
+        if (isset($array['is_promoted']) && true === $array['is_promoted']) {
+            $item->setPromoted();
         }
 
         return $item;

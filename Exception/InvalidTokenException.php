@@ -44,4 +44,19 @@ class InvalidTokenException extends RuntimeException
     {
         return new self(sprintf('Token %s not valid', $tokenReference));
     }
+
+    /**
+     * Throw an invalid key exception.
+     *
+     * @param string $tokenReference
+     * @param int    $maxHitsPerQuery
+     *
+     * @return InvalidTokenException
+     */
+    public static function createInvalidTokenMaxHitsPerQuery(
+        string $tokenReference,
+        int $maxHitsPerQuery
+    ): self {
+        return new self(sprintf('Token %s not valid. Max %d hits allowed', $tokenReference, $maxHitsPerQuery));
+    }
 }

@@ -21,6 +21,7 @@ use Apisearch\Geo\LocationRange;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\HttpTransportable;
 use Apisearch\Model\ItemUUID;
+use Apisearch\Model\User;
 
 /**
  * Class Query.

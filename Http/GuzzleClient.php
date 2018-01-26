@@ -86,7 +86,7 @@ class GuzzleClient extends Client implements HttpClient
          */
         $response = $client->$method(
             rtrim($this->host, '/').'/'.ltrim($requestParts->getUrl(), '/'),
-            $requestParts->getParameters(),
+            $requestParts->getParameters() + ['http_errors' => false],
             $requestParts->getOptions()
         );
 
