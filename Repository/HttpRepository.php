@@ -17,11 +17,11 @@ declare(strict_types=1);
 namespace Apisearch\Repository;
 
 use Apisearch\Config\Config;
-use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\Http;
 use Apisearch\Http\HttpClient;
+use Apisearch\Http\HttpResponsesToException;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -32,6 +32,8 @@ use Apisearch\Result\Result;
  */
 class HttpRepository extends Repository
 {
+    use HttpResponsesToException;
+
     /**
      * @var HttpClient
      *
@@ -231,22 +233,5 @@ class HttpRepository extends Repository
         }
 
         $this->throwTransportableExceptionIfNeeded($response);
-    }
-
-    /**
-     * Transform transportable http errors to exceptions.
-     *
-     * @param array $response
-     *
-     * @throw TransportableException
-     */
-    private function throwTransportableExceptionIfNeeded(array $response)
-    {
-        switch ($response['code']) {
-            case ResourceNotAvailableException::getTransportableHTTPError():
-                throw new ResourceNotAvailableException($response['body']['message']);
-            case InvalidFormatException::getTransportableHTTPError():
-                throw new InvalidFormatException($response['body']['message']);
-        }
     }
 }

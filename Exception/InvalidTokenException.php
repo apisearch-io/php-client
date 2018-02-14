@@ -16,19 +16,17 @@ declare(strict_types=1);
 
 namespace Apisearch\Exception;
 
-use RuntimeException;
-
 /**
  * Class InvalidTokenException.
  */
-class InvalidTokenException extends RuntimeException
+class InvalidTokenException extends TransportableException
 {
     /**
      * Get http error code.
      *
      * @return int
      */
-    public function getTransportableHTTPError(): int
+    public static function getTransportableHTTPError(): int
     {
         return 401;
     }
