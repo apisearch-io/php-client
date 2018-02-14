@@ -17,8 +17,6 @@ declare(strict_types=1);
 namespace Apisearch\Http;
 
 use GuzzleHttp\Client as GuzzleHttpClient;
-use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -82,7 +80,7 @@ class GuzzleClient extends Client implements HttpClient
         );
 
         /**
-         * @var ResponseInterface|Promise
+         * @var ResponseInterface
          */
         $response = $client->$method(
             rtrim($this->host, '/').'/'.ltrim($requestParts->getUrl(), '/'),
@@ -90,17 +88,9 @@ class GuzzleClient extends Client implements HttpClient
             $requestParts->getOptions()
         );
 
-        return ($response instanceof Response)
-            ? [
-                'code' => $response->getStatusCode(),
-                'body' => json_decode($response->getBody()->getContents(), true),
-            ]
-            : [
-                'code' => 200,
-                'body' => [
-                    'message' => 'Task enqueued successfully',
-                ],
-            ]
-        ;
+        return [
+            'code' => $response->getStatusCode(),
+            'body' => json_decode($response->getBody()->getContents(), true),
+        ];
     }
 }

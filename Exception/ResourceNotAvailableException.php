@@ -66,4 +66,16 @@ class ResourceNotAvailableException extends TransportableException
     {
         return new self(sprintf('Logs index not available - %s', $message));
     }
+
+    /**
+     * Engine is not available.
+     *
+     * @param string $engineName
+     *
+     * @return ResourceNotAvailableException
+     */
+    public static function engineNotAvailable(string $engineName): self
+    {
+        return new self(sprintf('Engine %s not available', $engineName));
+    }
 }

@@ -16,9 +16,6 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
-use Apisearch\Exception\InvalidFormatException;
-use Apisearch\Exception\ResourceExistsException;
-use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Repository\RepositoryWithCredentials;
 
 /**
@@ -26,6 +23,8 @@ use Apisearch\Repository\RepositoryWithCredentials;
  */
 abstract class HttpRepositoryWithCredentials extends RepositoryWithCredentials
 {
+    use HttpResponsesToException;
+
     /**
      * @var HttpClient
      *
@@ -41,24 +40,5 @@ abstract class HttpRepositoryWithCredentials extends RepositoryWithCredentials
     public function __construct(HttpClient $httpClient)
     {
         $this->httpClient = $httpClient;
-    }
-
-    /**
-     * Transform transportable http errors to exceptions.
-     *
-     * @param array $response
-     *
-     * @throw TransportableException
-     */
-    protected function throwTransportableExceptionIfNeeded(array $response)
-    {
-        switch ($response['code']) {
-            case ResourceNotAvailableException::getTransportableHTTPError():
-                throw new ResourceNotAvailableException($response['body']['message']);
-            case InvalidFormatException::getTransportableHTTPError():
-                throw new InvalidFormatException($response['body']['message']);
-            case ResourceExistsException::getTransportableHTTPError():
-                throw new ResourceExistsException($response['body']['message']);
-        }
     }
 }

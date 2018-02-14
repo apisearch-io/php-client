@@ -273,7 +273,7 @@ class Campaign implements HttpTransportable
     public static function createFromArray(array $array)
     {
         if (!isset($array['name'])) {
-            throw new InvalidFormatException();
+            throw InvalidFormatException::campaignFormatNotValid(json_encode($array));
         }
 
         $campaign = new self(

@@ -40,7 +40,7 @@ class InvalidFormatException extends TransportableException
      */
     public static function itemsRepresentationNotValid($itemsBeforeHydration): self
     {
-        return new self(sprintf('Items representation not valid. Expecting Item array serialized but found "%s" before hydration', substr(
+        return new static(sprintf('Items representation not valid. Expecting Item array serialized but found "%s" before hydration', substr(
             (string) $itemsBeforeHydration,
             0,
             100
@@ -56,7 +56,7 @@ class InvalidFormatException extends TransportableException
      */
     public static function itemsUUIDRepresentationNotValid($itemsUUIDBeforeHydration): self
     {
-        return new self(sprintf('Items UUID representation not valid. Expecting UUID array serialized but found "%s" before hydration', substr(
+        return new static(sprintf('Items UUID representation not valid. Expecting UUID array serialized but found "%s" before hydration', substr(
             (string) $itemsUUIDBeforeHydration,
             0,
             100
@@ -72,7 +72,7 @@ class InvalidFormatException extends TransportableException
      */
     public static function queryFormatNotValid($queryBeforeHydration): self
     {
-        return new self(sprintf('Query Format not valid. Expecting a Query serialized but found "%s" before hydration', substr(
+        return new static(sprintf('Query Format not valid. Expecting a Query serialized but found "%s" before hydration', substr(
             (string) $queryBeforeHydration,
             0,
             100
@@ -88,7 +88,7 @@ class InvalidFormatException extends TransportableException
      */
     public static function configFormatNotValid($configBeforeHydration): self
     {
-        return new self(sprintf('Config Format not valid. Expecting a Config serialized but found "%s" before hydration', substr(
+        return new static(sprintf('Config Format not valid. Expecting a Config serialized but found "%s" before hydration', substr(
             (string) $configBeforeHydration,
             0,
             100
@@ -104,8 +104,40 @@ class InvalidFormatException extends TransportableException
      */
     public static function tokenFormatNotValid($tokenBeforeHydration): self
     {
-        return new self(sprintf('Token Format not valid. Expecting a Token serialized but found "%s" before hydration', substr(
+        return new static(sprintf('Token Format not valid. Expecting a Token serialized but found "%s" before hydration', substr(
             (string) $tokenBeforeHydration,
+            0,
+            100
+        )));
+    }
+
+    /**
+     * Campaign format not valid.
+     *
+     * @param mixed $campaignBeforeHydration
+     *
+     * @return InvalidFormatException
+     */
+    public static function campaignFormatNotValid($campaignBeforeHydration): self
+    {
+        return new static(sprintf('Campaign Format not valid. Expecting a Campaign serialized but found "%s" before hydration', substr(
+            (string) $campaignBeforeHydration,
+            0,
+            100
+        )));
+    }
+
+    /**
+     * Boost clause format not valid.
+     *
+     * @param mixed $boostClauseBeforeHydration
+     *
+     * @return InvalidFormatException
+     */
+    public static function boostClauseFormatNotValid($boostClauseBeforeHydration): self
+    {
+        return new static(sprintf('Boost clause Format not valid. Expecting a Boost clause serialized but found "%s" before hydration', substr(
+            (string) $boostClauseBeforeHydration,
             0,
             100
         )));
@@ -120,7 +152,7 @@ class InvalidFormatException extends TransportableException
      */
     public static function tokenUUIDFormatNotValid($tokenUUIDBeforeHydration): self
     {
-        return new self(sprintf('Token UUID Format not valid. Expecting a TokenUUID serialized but found "%s" before hydration', substr(
+        return new static(sprintf('Token UUID Format not valid. Expecting a TokenUUID serialized but found "%s" before hydration', substr(
             (string) $tokenUUIDBeforeHydration,
             0,
             100

@@ -121,7 +121,7 @@ class BoostClause implements HttpTransportable
             !isset($array['field']) ||
             !isset($array['values'])
         ) {
-            throw new InvalidFormatException();
+            throw InvalidFormatException::boostClauseFormatNotValid(json_encode($array));
         }
 
         return new self(
