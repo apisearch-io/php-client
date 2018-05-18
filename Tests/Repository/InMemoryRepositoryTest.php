@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Repository;
 
+use Apisearch\Config\ImmutableConfig;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -36,7 +37,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
         $repository->flush();
         $this->assertEquals(
@@ -48,7 +49,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
         );
 
         $repository->setRepositoryReference(RepositoryReference::create('yyy', 'yyy'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('2~product')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('3~roduct')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('4~product')));
@@ -162,7 +163,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('aaa', 'a'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $action($repository);
     }
 
@@ -176,7 +177,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
         return [
             [
                 function (Repository $repository) {
-                    $repository->createIndex(null);
+                    $repository->createIndex(ImmutableConfig::createEmpty());
                 },
             ],
         ];
@@ -189,7 +190,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
         $repository->deleteItem(ItemUUID::createByComposedUUID('1~product'));
         $repository->flush();
@@ -207,7 +208,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
         $repository->flush();
         $repository->resetIndex();
@@ -225,7 +226,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('2~product')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('3~product')));
@@ -268,7 +269,7 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $repository->query($query);
     }
 
