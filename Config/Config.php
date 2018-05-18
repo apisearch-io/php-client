@@ -25,20 +25,6 @@ use Apisearch\Model\HttpTransportable;
 class Config implements HttpTransportable
 {
     /**
-     * @var string
-     *
-     * null|Language
-     */
-    private $language;
-
-    /**
-     * @var Synonym[]
-     *
-     * Synonyms
-     */
-    private $synonyms = [];
-
-    /**
      * @var Campaigns
      *
      * Campaigns
@@ -47,43 +33,10 @@ class Config implements HttpTransportable
 
     /**
      * Config constructor.
-     *
-     * @param null|string $language
      */
-    public function __construct(?string $language)
+    public function __construct()
     {
-        $this->language = $language;
         $this->campaigns = new Campaigns();
-    }
-
-    /**
-     * Get language.
-     *
-     * @return null|string
-     */
-    public function getLanguage(): ? string
-    {
-        return $this->language;
-    }
-
-    /**
-     * Add synonym.
-     *
-     * @param Synonym $synonym
-     */
-    public function addSynonym(Synonym $synonym)
-    {
-        $this->synonyms = $synonym;
-    }
-
-    /**
-     * get synonyms.
-     *
-     * @return Synonym[]
-     */
-    public function getSynonyms(): array
-    {
-        return $this->synonyms;
     }
 
     /**
@@ -116,10 +69,6 @@ class Config implements HttpTransportable
     public function toArray(): array
     {
         return array_filter([
-            'language' => $this->language,
-            'synonyms' => array_map(function (Synonym $synonym) {
-                return $synonym->toArray();
-            }, $this->synonyms),
             'campaigns' => $this
                 ->campaigns
                 ->toArray(),
@@ -137,14 +86,7 @@ class Config implements HttpTransportable
      */
     public static function createFromArray(array $array)
     {
-        $config = new self(
-            ($array['language'] ?? null)
-        );
-
-        $config->synonyms = array_map(function (array $synonym) {
-            return Synonym::createFromArray($synonym);
-        }, $array['synonyms'] ?? []);
-
+        $config = new self();
         $config->campaigns = Campaigns::createFromArray($array['campaigns'] ?? []);
 
         return $config;
