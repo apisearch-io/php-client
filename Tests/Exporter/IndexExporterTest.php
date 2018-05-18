@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Exporter;
 
+use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exporter\ExporterCollection;
 use Apisearch\Exporter\IndexExporter;
 use Apisearch\Exporter\JSONExporter;
@@ -37,7 +38,7 @@ class IndexExporterTest extends \PHPUnit_Framework_TestCase
     {
         $repository = new InMemoryRepository();
         $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->createIndex(null);
+        $repository->createIndex(ImmutableConfig::createEmpty());
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~2')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~3')));
