@@ -72,4 +72,14 @@ class Synonym implements HttpTransportable
     {
         return new self($array['words'] ?? []);
     }
+
+    /**
+     * Expand.
+     *
+     * @return string
+     */
+    public function expand(): string
+    {
+        return implode(', ', $this->words);
+    }
 }

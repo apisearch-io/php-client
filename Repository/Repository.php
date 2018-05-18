@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Apisearch\Repository;
 
 use Apisearch\Config\Config;
+use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Item;
@@ -191,9 +192,11 @@ abstract class Repository extends RepositoryWithCredentials
     /**
      * Create an index.
      *
+     * @param ImmutableConfig $config
+     *
      * @throws ResourceExistsException
      */
-    abstract public function createIndex();
+    abstract public function createIndex(ImmutableConfig $config);
 
     /**
      * Delete an index.
