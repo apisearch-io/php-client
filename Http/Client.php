@@ -29,13 +29,24 @@ abstract class Client
     protected $version;
 
     /**
+     * @var RetryMap
+     *
+     * Retry map
+     */
+    protected $retryMap;
+
+    /**
      * Client constructor.
      *
-     * @param string $version
+     * @param string   $version
+     * @param RetryMap $retryMap
      */
-    public function __construct(string $version)
-    {
+    public function __construct(
+        string $version,
+        RetryMap $retryMap
+    ) {
         $this->version = trim($version, '/');
+        $this->retryMap = $retryMap;
     }
 
     /**
