@@ -8,12 +8,6 @@ cache:
 php:
   - 7.1
   - 7.2
-  - nightly
-
-# also test lowest dependencies on PHP 7
-matrix:
-  allow_failures:
-    - php: nightly
 
 sudo: false
 
