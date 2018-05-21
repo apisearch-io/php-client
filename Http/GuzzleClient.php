@@ -32,17 +32,33 @@ class GuzzleClient extends Client implements HttpClient
     private $host;
 
     /**
+     * @var GuzzleHttpClient
+     *
+     * Client
+     */
+    private $client;
+
+    /**
      * GuzzleClient constructor.
      *
-     * @param string $host
-     * @param string $version
+     * @param GuzzleHttpClient $client
+     * @param string           $host
+     * @param string           $version
+     * @param RetryMap         $retryMap
      */
     public function __construct(
+        GuzzleHttpClient $client,
         string $host,
-        string $version
+        string $version,
+        RetryMap $retryMap
     ) {
+        $this->client = $client;
         $this->host = $host;
-        parent::__construct($version);
+
+        parent::__construct(
+            $version,
+            $retryMap
+        );
     }
 
     /**
@@ -65,12 +81,6 @@ class GuzzleClient extends Client implements HttpClient
         array $server = []
     ): array {
         $method = strtolower($method);
-        $client = new GuzzleHttpClient([
-            'defaults' => [
-                'timeout' => 5,
-            ],
-        ]);
-
         $requestParts = $this->buildRequestParts(
             $url,
             $method,
@@ -82,15 +92,58 @@ class GuzzleClient extends Client implements HttpClient
         /**
          * @var ResponseInterface
          */
-        $response = $client->$method(
-            rtrim($this->host, '/').'/'.ltrim($requestParts->getUrl(), '/'),
-            $requestParts->getParameters() + ['http_errors' => false],
-            $requestParts->getOptions()
+        $response = $this->tryRequest(function () use ($method, $requestParts) {
+            return $this
+                ->client
+                ->$method(
+                    rtrim($this->host, '/').'/'.ltrim($requestParts->getUrl(), '/'),
+                    $requestParts->getParameters() + ['http_errors' => false],
+                    $requestParts->getOptions()
+                );
+        }, $this
+            ->retryMap
+            ->getRetry(
+                $url,
+                $method
+            )
         );
 
         return [
             'code' => $response->getStatusCode(),
             'body' => json_decode($response->getBody()->getContents(), true),
         ];
+    }
+
+    /**
+     * Try connection and return result.
+     *
+     * Retry n times this connection before returning response.
+     *
+     * @param callable   $callable
+     * @param null|Retry $retry
+     *
+     * @return ResponseInterface
+     *
+     * @throws \Exception
+     */
+    private function tryRequest(
+        callable $callable,
+        ?Retry $retry
+    ): ResponseInterface {
+        $tries = $retry instanceof Retry
+            ? $retry->getRetries()
+            : 0;
+
+        while (true) {
+            try {
+                return $callable();
+            } catch (\Exception $e) {
+                if ($tries-- <= 0) {
+                    throw $e;
+                }
+
+                usleep($retry->getMicrosecondsBetweenRetries());
+            }
+        }
     }
 }
