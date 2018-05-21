@@ -35,13 +35,18 @@ class TestClient extends Client implements HttpClient
      *
      * @param BrowserKitClient $client
      * @param string           $version
+     * @param RetryMap         $retryMap
      */
     public function __construct(
         BrowserKitClient $client,
-        string $version
+        string $version,
+        RetryMap $retryMap
     ) {
         $this->client = $client;
-        parent::__construct($version);
+        parent::__construct(
+            $version,
+            $retryMap
+        );
     }
 
     /**
