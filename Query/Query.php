@@ -148,6 +148,13 @@ class Query implements HttpTransportable
     private $filterFields = [];
 
     /**
+     * @var ScoreStrategy
+     *
+     * Score strategy
+     */
+    private $scoreStrategy;
+
+    /**
      * @var User
      *
      * User associated to query
@@ -1125,6 +1132,30 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Get score strategy.
+     *
+     * @return ScoreStrategy|null
+     */
+    public function getScoreStrategy(): ? ScoreStrategy
+    {
+        return $this->scoreStrategy;
+    }
+
+    /**
+     * Set score strategy.
+     *
+     * @param ScoreStrategy $scoreStrategy
+     *
+     * @return Query
+     */
+    public function setScoreStrategy(ScoreStrategy $scoreStrategy)
+    {
+        $this->scoreStrategy = $scoreStrategy;
+
+        return $this;
+    }
+
+    /**
      * Query by user.
      *
      * @param User $user
@@ -1205,6 +1236,9 @@ class Query implements HttpTransportable
                 ? null
                 : false,
             'filter_fields' => $this->filterFields,
+            'score_strategy' => $this->scoreStrategy instanceof ScoreStrategy
+                ? $this->scoreStrategy->toArray()
+                : null,
             'user' => ($this->user instanceof User)
                 ? $this->user->toArray()
                 : null,
@@ -1268,6 +1302,10 @@ class Query implements HttpTransportable
             return ItemUUID::createFromArray($itemUUID);
         }, $array['items_promoted'] ?? []);
         $query->filterFields = $array['filter_fields'] ?? [];
+        $query->scoreStrategy = isset($array['score_strategy'])
+            ? ScoreStrategy::createFromArray($array['score_strategy'])
+            : null;
+
         if (isset($array['user'])) {
             $query->user = User::createFromArray($array['user']);
         }
