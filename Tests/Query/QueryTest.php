@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Query;
 
 use Apisearch\Query\Query;
+use Apisearch\Query\ScoreStrategy;
 use Apisearch\Query\SortBy;
 use PHPUnit_Framework_TestCase;
 
@@ -36,6 +37,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(array_key_exists('aggregations', $queryArray));
         $this->assertFalse(array_key_exists('filter_fields', $queryArray));
         $this->assertFalse(array_key_exists('user', $queryArray));
+        $this->assertFalse(array_key_exists('score_strategy', $queryArray));
     }
 
     /**
@@ -68,5 +70,38 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(Query::DEFAULT_SIZE, $query->getSize());
         $this->assertEquals(SortBy::SCORE, $query->getSortBy());
         $this->assertNull($query->getUser());
+        $this->assertNull($query->getScoreStrategy());
+    }
+
+    /**
+     * Test score strategy object.
+     */
+    public function testScoreStrategyObject()
+    {
+        $function = 'xxx';
+        $scoreStrategy = ScoreStrategy::createCustomFunction($function);
+        $query = Query::createMatchAll()->setScoreStrategy($scoreStrategy);
+
+        $this->assertInstanceOf(
+            ScoreStrategy::class,
+            $query->getScoreStrategy()
+        );
+
+        $query = Query::createFromArray($query->toArray());
+
+        $scoreStrategy = $query->getScoreStrategy();
+        $this->assertInstanceOf(
+            ScoreStrategy::class,
+            $scoreStrategy
+        );
+
+        $this->assertEquals(
+            ScoreStrategy::CUSTOM_FUNCTION,
+            $scoreStrategy->getType()
+        );
+        $this->assertEquals(
+            $function,
+            $scoreStrategy->getFunction()
+        );
     }
 }
