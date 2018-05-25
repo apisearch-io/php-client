@@ -128,6 +128,22 @@ class InvalidFormatException extends TransportableException
     }
 
     /**
+     * Changes format not valid.
+     *
+     * @param mixed $changesBeforeHydration
+     *
+     * @return InvalidFormatException
+     */
+    public static function changesFormatNotValid($changesBeforeHydration): self
+    {
+        return new static(sprintf('Changes Format not valid. Expecting a Changes serialized but found "%s" before hydration', substr(
+            (string) $changesBeforeHydration,
+            0,
+            100
+        )));
+    }
+
+    /**
      * Boost clause format not valid.
      *
      * @param mixed $boostClauseBeforeHydration

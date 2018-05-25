@@ -20,6 +20,7 @@ use Apisearch\Config\Config;
 use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Model\Changes;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -123,6 +124,7 @@ abstract class Repository extends RepositoryWithCredentials
      * @param bool $skipIfLess
      *
      * @throws ResourceNotAvailableException
+     * @throws Exception
      */
     public function flush(
         int $bulkNumber = 500,
@@ -188,6 +190,17 @@ abstract class Repository extends RepositoryWithCredentials
      * @throws ResourceNotAvailableException
      */
     abstract public function query(Query $query): Result;
+
+    /**
+     * Update items.
+     *
+     * @param Query   $query
+     * @param Changes $changes
+     */
+    abstract public function updateItems(
+        Query $query,
+        Changes $changes
+    );
 
     /**
      * Create an index.

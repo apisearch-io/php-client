@@ -21,6 +21,7 @@ use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\MockException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Model\Changes;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -55,6 +56,19 @@ class MockRepository extends Repository
      */
     public function query(Query $query): Result
     {
+        $this->throwMockException();
+    }
+
+    /**
+     * Update items.
+     *
+     * @param Query   $query
+     * @param Changes $changes
+     */
+    public function updateItems(
+        Query $query,
+        Changes $changes
+    ) {
         $this->throwMockException();
     }
 

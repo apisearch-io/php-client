@@ -54,6 +54,13 @@ class Http
     /**
      * @var string
      *
+     * Changes query param field
+     */
+    const CHANGES_FIELD = 'changes';
+
+    /**
+     * @var string
+     *
      * Query query param field
      */
     const QUERY_FIELD = 'query';

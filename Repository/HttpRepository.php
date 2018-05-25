@@ -23,6 +23,7 @@ use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\Http;
 use Apisearch\Http\HttpClient;
 use Apisearch\Http\HttpResponsesToException;
+use Apisearch\Model\Changes;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -129,6 +130,31 @@ class HttpRepository extends Repository
         $this->throwTransportableExceptionIfNeeded($response);
 
         return Result::createFromArray($response['body']);
+    }
+
+    /**
+     * Update items.
+     *
+     * @param Query   $query
+     * @param Changes $changes
+     */
+    public function updateItems(
+        Query $query,
+        Changes $changes
+    ) {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/',
+                'put',
+                Http::getQueryValues($this),
+                [
+                    Http::QUERY_FIELD => json_encode($query->toArray()),
+                    Http::CHANGES_FIELD => json_encode($changes->toArray()),
+                ]
+            );
+
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
