@@ -20,6 +20,7 @@ use Apisearch\Config\Config;
 use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Model\Changes;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Filter;
@@ -88,6 +89,19 @@ class InMemoryRepository extends Repository
         }
 
         return $result;
+    }
+
+    /**
+     * Update items.
+     *
+     * @param Query   $query
+     * @param Changes $changes
+     */
+    public function updateItems(
+        Query $query,
+        Changes $changes
+    ) {
+        throw new LogicException('Update endpoint cannot be tested against memory implementation, but only in final implementation');
     }
 
     /**
