@@ -29,13 +29,24 @@ class User implements HttpTransportable
     private $id;
 
     /**
+     * @var array
+     *
+     * Attributes
+     */
+    private $attributes;
+
+    /**
      * User constructor.
      *
      * @param string $id
+     * @param array  $attributes
      */
-    public function __construct(string $id)
-    {
+    public function __construct(
+        string $id,
+        array $attributes = []
+    ) {
         $this->id = $id;
+        $this->attributes = $attributes;
     }
 
     /**
@@ -49,6 +60,16 @@ class User implements HttpTransportable
     }
 
     /**
+     * Get Attributes.
+     *
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -57,6 +78,7 @@ class User implements HttpTransportable
     {
         return [
             'id' => $this->id,
+            'attributes' => $this->attributes,
         ];
     }
 
@@ -69,6 +91,9 @@ class User implements HttpTransportable
      */
     public static function createFromArray(array $array)
     {
-        return new self($array['id']);
+        return new self(
+            $array['id'],
+            $array['attributes'] ?? []
+        );
     }
 }
