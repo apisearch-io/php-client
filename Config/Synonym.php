@@ -50,6 +50,18 @@ class Synonym implements HttpTransportable
     }
 
     /**
+     * Create Synonyms by array of words
+     *
+     * @param array $words
+     *
+     * @return self
+     */
+    public static function createByWords(array $words)
+    {
+        return new self($words);
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -80,6 +92,6 @@ class Synonym implements HttpTransportable
      */
     public function expand(): string
     {
-        return implode(', ', $this->words);
+        return implode(',', $this->words);
     }
 }

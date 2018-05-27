@@ -147,7 +147,7 @@ class HttpRepository extends Repository
                 'post',
                 Http::getQueryValues($this),
                 [
-                    'config' => $config->toArray(),
+                    Http::CONFIG_FIELD => json_encode($config->toArray()),
                 ]
             );
 
