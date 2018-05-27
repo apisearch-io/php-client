@@ -107,11 +107,17 @@ class ImmutableConfig implements HttpTransportable
     {
         return array_filter([
             'language' => $this->language,
-            'store_searchable_metadata' => $this->storeSearchableMetadata,
+            'store_searchable_metadata' => ($this->storeSearchableMetadata ? null : false),
             'synonyms' => array_map(function (Synonym $synonym) {
                 return $synonym->toArray();
             }, $this->synonyms),
-        ]);
+        ], function ($element) {
+            return
+            !(
+                is_null($element) ||
+                (is_array($element) && empty($element))
+            );
+        });
     }
 
     /**
@@ -121,7 +127,7 @@ class ImmutableConfig implements HttpTransportable
      *
      * @return self
      */
-    public static function createFromArray(array $array)
+    public static function createFromArray(array $array): self
     {
         $config = new self(
             ($array['language'] ?? null),

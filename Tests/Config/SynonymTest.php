@@ -1,7 +1,18 @@
 <?php
-/**
- * File header placeholder
+
+/*
+ * This file is part of the Apisearch PHP Client.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * Feel free to edit as you please, and have fun.
+ *
+ * @author Marc Morera <yuhu@mmoreram.com>
+ * @author PuntMig Technologies
  */
+
+declare(strict_types=1);
 
 namespace Apisearch\Tests\Config;
 
@@ -18,7 +29,7 @@ class SynonymTest extends PHPUnit_Framework_TestCase
     private $words = ['a', 'b', 'c'];
 
     /**
-     * Test creation by array
+     * Test creation by array.
      */
     public function testCreate()
     {
@@ -30,7 +41,7 @@ class SynonymTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test expand
+     * Test expand.
      */
     public function testExpand()
     {
@@ -42,7 +53,7 @@ class SynonymTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test create from array
+     * Test create from array.
      */
     public function testCreateFromArray()
     {
