@@ -88,6 +88,18 @@ class Endpoints
                 'path' => '/v1/events/stream',
                 'verb' => 'get',
             ],
+            'v1-logs' => [
+                'name' => 'Logs',
+                'description' => 'Query your logs',
+                'path' => '/v1/logs',
+                'verb' => 'get',
+            ],
+            'v1-logs-stream' => [
+                'name' => 'Logs real-time',
+                'description' => 'Logs stream',
+                'path' => '/v1/logs/stream',
+                'verb' => 'get',
+            ],
             'v1-config' => [
                 'name' => 'Config',
                 'description' => 'Configure your index',
