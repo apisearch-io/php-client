@@ -50,7 +50,7 @@ class Synonym implements HttpTransportable
     }
 
     /**
-     * Create Synonyms by array of words
+     * Create Synonyms by array of words.
      *
      * @param array $words
      *

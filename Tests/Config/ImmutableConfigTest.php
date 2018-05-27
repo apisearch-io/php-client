@@ -36,7 +36,7 @@ class ImmutableConfigTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test null language
+     * Test null language.
      */
     public function testCreateNullLanguage()
     {
@@ -45,7 +45,21 @@ class ImmutableConfigTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test synonyms
+     * Test null language.
+     */
+    public function testCreateSearchableMetadataStoreDisabled()
+    {
+        $config = new ImmutableConfig(null, false);
+        $this->assertFalse($config->shouldSearchableMetadataBeStored());
+
+        $config = ImmutableConfig::createFromArray([
+            'store_searchable_metadata' => false,
+        ]);
+        $this->assertFalse($config->shouldSearchableMetadataBeStored());
+    }
+
+    /**
+     * Test synonyms.
      */
     public function testSynonyms()
     {
@@ -55,14 +69,14 @@ class ImmutableConfigTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 Synonym::createByWords(['a', 'b']),
-                Synonym::createByWords(['c', 'd'])
+                Synonym::createByWords(['c', 'd']),
             ],
             $config->getSynonyms()
         );
     }
 
     /**
-     * Test default values
+     * Test default values.
      */
     public function testDefaultValues()
     {
@@ -73,21 +87,38 @@ class ImmutableConfigTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test http transport
+     * Test http transport.
      */
     public function testHttpTransport()
     {
         $config = [
             'language' => 'es',
-            'store_searchable_metadata' => true,
+            'store_searchable_metadata' => false,
             'synonyms' => [
                 ['words' => ['a', 'b']],
                 ['words' => ['c', 'd']],
-            ]
+            ],
         ];
 
         $this->assertEquals(
             $config,
+            ImmutableConfig::createFromArray($config)->toArray()
+        );
+    }
+
+    /**
+     * Test http transport.
+     */
+    public function testHttpTransportDefaultParameters()
+    {
+        $config = [
+            'language' => null,
+            'store_searchable_metadata' => true,
+            'synonyms' => [],
+        ];
+
+        $this->assertEquals(
+            [],
             ImmutableConfig::createFromArray($config)->toArray()
         );
     }
