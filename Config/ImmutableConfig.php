@@ -85,7 +85,7 @@ class ImmutableConfig implements HttpTransportable
      */
     public function addSynonym(Synonym $synonym)
     {
-        $this->synonyms = $synonym;
+        $this->synonyms[] = $synonym;
     }
 
     /**
