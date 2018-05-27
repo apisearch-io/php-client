@@ -68,8 +68,7 @@ class TestClient extends Client implements HttpClient
         array $body = [],
         array $server = []
     ): array {
-        $method = trim(str_ireplace('async', '', $method));
-        $method = strtolower($method);
+        $method = trim(strtolower($method));
         $requestParts = $this->buildRequestParts(
             $url,
             $method,
