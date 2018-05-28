@@ -106,6 +106,31 @@ class HttpRepository extends Repository
     }
 
     /**
+     * Update items.
+     *
+     * @param Query   $query
+     * @param Changes $changes
+     */
+    public function updateItems(
+        Query $query,
+        Changes $changes
+    ) {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/items',
+                'put',
+                Http::getQueryValues($this),
+                [
+                    Http::QUERY_FIELD => json_encode($query->toArray()),
+                    Http::CHANGES_FIELD => json_encode($changes->toArray()),
+                ]
+            );
+
+        $this->throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
      * Search across the index types.
      *
      * @param Query $query
@@ -130,31 +155,6 @@ class HttpRepository extends Repository
         $this->throwTransportableExceptionIfNeeded($response);
 
         return Result::createFromArray($response['body']);
-    }
-
-    /**
-     * Update items.
-     *
-     * @param Query   $query
-     * @param Changes $changes
-     */
-    public function updateItems(
-        Query $query,
-        Changes $changes
-    ) {
-        $response = $this
-            ->httpClient
-            ->get(
-                '/',
-                'put',
-                Http::getQueryValues($this),
-                [
-                    Http::QUERY_FIELD => json_encode($query->toArray()),
-                    Http::CHANGES_FIELD => json_encode($changes->toArray()),
-                ]
-            );
-
-        $this->throwTransportableExceptionIfNeeded($response);
     }
 
     /**
