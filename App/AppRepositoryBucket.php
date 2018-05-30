@@ -29,6 +29,23 @@ class AppRepositoryBucket
     private $repositories = [];
 
     /**
+     * @var array
+     *
+     * Repositories configuration
+     */
+    private $configuration;
+
+    /**
+     * AppRepositoryBucket constructor.
+     *
+     * @param array $configuration
+     */
+    public function __construct(array $configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
+    /**
      * Add repository.
      *
      * @param string        $appName
@@ -53,5 +70,15 @@ class AppRepositoryBucket
         return isset($this->repositories[$appName])
             ? $this->repositories[$appName]
             : null;
+    }
+
+    /**
+     * Get configuration
+     *
+     * @return array
+     */
+    public function getConfiguration() : array
+    {
+        return $this->configuration;
     }
 }
