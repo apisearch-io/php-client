@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
+use Apisearch\Exception\ConnectionException;
 use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Exception\InvalidTokenException;
 use Apisearch\Exception\ResourceExistsException;
@@ -44,6 +45,8 @@ trait HttpResponsesToException
                 throw new InvalidFormatException($response['body']['message']);
             case ResourceExistsException::getTransportableHTTPError():
                 throw new ResourceExistsException($response['body']['message']);
+            case ConnectionException::getTransportableHTTPError():
+                throw new ConnectionException('Apisearch returned an internal error code [500]');
         }
     }
 }
