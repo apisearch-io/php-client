@@ -40,8 +40,9 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 'post',
                 Http::getQueryValues($this),
                 [
-                    'token' => json_encode($token->toArray()),
-                ]);
+                    Http::TOKEN_FIELD => json_encode($token->toArray()),
+                ]
+            );
 
         $this->throwTransportableExceptionIfNeeded($response);
     }
@@ -60,9 +61,32 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 'delete',
                 Http::getQueryValues($this),
                 [
-                    'token' => json_encode($tokenUUID->toArray()),
-                ]);
+                    Http::TOKEN_FIELD => json_encode($tokenUUID->toArray()),
+                ]
+            );
 
         $this->throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
+     * Get tokens.
+     *
+     * @return Token[]
+     */
+    public function getTokens(): array
+    {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/token',
+                'get',
+                Http::getQueryValues($this)
+            );
+
+        $this->throwTransportableExceptionIfNeeded($response);
+
+        return array_map(function (array $token) {
+            return Token::createFromArray($token);
+        }, $response['body']);
     }
 }

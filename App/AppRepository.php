@@ -38,4 +38,11 @@ interface AppRepository extends WithRepositoryReference
      * @param TokenUUID $tokenUUID
      */
     public function deleteToken(TokenUUID $tokenUUID);
+
+    /**
+     * Get tokens.
+     *
+     * @return Token[]
+     */
+    public function getTokens(): array;
 }

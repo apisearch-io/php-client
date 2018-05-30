@@ -50,6 +50,12 @@ class Endpoints
                 'path' => '/v1/index/reset',
                 'verb' => 'post',
             ],
+            'v1-config' => [
+                'name' => 'Config',
+                'description' => 'Configure your index',
+                'path' => '/v1/index',
+                'verb' => 'PUT',
+            ],
 
             /*
              * Write endpoints
@@ -100,21 +106,27 @@ class Endpoints
                 'path' => '/v1/logs/stream',
                 'verb' => 'get',
             ],
-            'v1-config' => [
-                'name' => 'Config',
-                'description' => 'Configure your index',
-                'path' => '/v1/index',
-                'verb' => 'PUT',
+            'v1-tokens' => [
+                'name' => 'Get tokens',
+                'description' => 'Get app tokens',
+                'path' => '/v1/token',
+                'verb' => 'GET',
             ],
 
             /*
              * Interaction endpoints
              */
             'v1-interaction' => [
-                'name' => 'Interactions',
-                'description' => 'Push interactions',
+                'name' => 'Add interaction',
+                'description' => 'Push a new interaction',
                 'path' => '/v1/interaction',
                 'verb' => 'get',
+            ],
+            'v1-interactions-delete' => [
+                'name' => 'Delete Interactions',
+                'description' => 'Delete all stored interactions',
+                'path' => '/v1/interaction',
+                'verb' => 'delete',
             ],
         ];
     }
