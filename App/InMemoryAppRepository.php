@@ -42,7 +42,7 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
     {
         return $this
             ->getRepositoryReference()
-            ->compose();
+            ->getAppId();
     }
 
     /**
@@ -71,5 +71,31 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
         }
 
         unset($this->tokens[$this->getIndexKey()][$tokenUUID->composeUUID()]);
+    }
+
+    /**
+     * Get tokens.
+     *
+     * @return Token[]
+     */
+    public function getTokens(): array
+    {
+        if (!array_key_exists($this->getIndexKey(), $this->tokens)) {
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
+        }
+
+        return $this->tokens[$this->getIndexKey()];
+    }
+
+    /**
+     * Delete all tokens.
+     */
+    public function deleteTokens()
+    {
+        if (!array_key_exists($this->getIndexKey(), $this->tokens)) {
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
+        }
+
+        $this->tokens[$this->getIndexKey()] = [];
     }
 }

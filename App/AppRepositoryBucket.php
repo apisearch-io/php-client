@@ -73,11 +73,11 @@ class AppRepositoryBucket
     }
 
     /**
-     * Get configuration
+     * Get configuration.
      *
      * @return array
      */
-    public function getConfiguration() : array
+    public function getConfiguration(): array
     {
         return $this->configuration;
     }

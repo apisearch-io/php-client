@@ -45,4 +45,9 @@ interface AppRepository extends WithRepositoryReference
      * @return Token[]
      */
     public function getTokens(): array;
+
+    /**
+     * Purge tokens.
+     */
+    public function deleteTokens();
 }

@@ -78,7 +78,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/token',
+                '/tokens',
                 'get',
                 Http::getQueryValues($this)
             );
@@ -88,5 +88,21 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         return array_map(function (array $token) {
             return Token::createFromArray($token);
         }, $response['body']);
+    }
+
+    /**
+     * Delete all tokens.
+     */
+    public function deleteTokens()
+    {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/tokens',
+                'delete',
+                Http::getQueryValues($this)
+            );
+
+        $this->throwTransportableExceptionIfNeeded($response);
     }
 }
