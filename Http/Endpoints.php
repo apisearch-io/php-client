@@ -54,7 +54,7 @@ class Endpoints
                 'name' => 'Config',
                 'description' => 'Configure your index',
                 'path' => '/v1/index',
-                'verb' => 'PUT',
+                'verb' => 'put',
             ],
 
             /*
@@ -106,11 +106,33 @@ class Endpoints
                 'path' => '/v1/logs/stream',
                 'verb' => 'get',
             ],
-            'v1-tokens' => [
-                'name' => 'Get tokens',
-                'description' => 'Get app tokens',
+
+            /*
+             * Tokens
+             */
+            'v1-token-add' => [
+                'name' => 'Add token',
+                'description' => 'Add token',
                 'path' => '/v1/token',
-                'verb' => 'GET',
+                'verb' => 'post',
+            ],
+            'v1-token-delete' => [
+                'name' => 'Delete token',
+                'description' => 'Delete token',
+                'path' => '/v1/token',
+                'verb' => 'delete',
+            ],
+            'v1-tokens-get' => [
+                'name' => 'Get all tokens',
+                'description' => 'Get all tokens',
+                'path' => '/v1/tokens',
+                'verb' => 'get',
+            ],
+            'v1-tokens-delete-all' => [
+                'name' => 'Delete all tokens',
+                'description' => 'Delete all tokens',
+                'path' => '/v1/tokens',
+                'verb' => 'delete',
             ],
 
             /*
@@ -125,7 +147,7 @@ class Endpoints
             'v1-interactions-delete' => [
                 'name' => 'Delete Interactions',
                 'description' => 'Delete all stored interactions',
-                'path' => '/v1/interaction',
+                'path' => '/v1/interactions',
                 'verb' => 'delete',
             ],
         ];
@@ -190,6 +212,19 @@ class Endpoints
     }
 
     /**
+     * Read endpoints.
+     */
+    public static function tokensOnly(): array
+    {
+        return [
+            'v1-token-add',
+            'v1-token-delete',
+            'v1-tokens-get',
+            'v1-tokens-delete-all',
+        ];
+    }
+
+    /**
      * Interaction endpoints.
      */
     public static function interactionOnly(): array
@@ -210,10 +245,34 @@ class Endpoints
     {
         $all = self::all();
 
-        return array_map(function (string $endpoint) use ($all) {
+        return array_values(array_filter(array_map(function (string $endpoint) use ($all) {
             return isset($all[$endpoint])
-                ? $all[$endpoint]['verb'].'~~'.$all[$endpoint]['path']
+                ? strtolower($all[$endpoint]['verb'].'~~'.$all[$endpoint]['path'])
                 : '';
-        }, $endpoints);
+        }, $endpoints)));
+    }
+
+    /**
+     * From composed.
+     *
+     * @param string[] $endpoints
+     *
+     * @return string[]
+     */
+    public static function fromComposed(array $endpoints)
+    {
+        $all = self::all();
+        $allInversed = [];
+
+        array_walk($all, function (array $element, string $name) use (&$allInversed) {
+            $composed = strtolower($element['verb'].'~~'.$element['path']);
+            $allInversed[$composed] = $name;
+        });
+
+        return array_values(array_filter(array_map(function (string $endpoint) use ($allInversed) {
+            return isset($allInversed[$endpoint])
+                ? $allInversed[$endpoint]
+                : '';
+        }, $endpoints)));
     }
 }
