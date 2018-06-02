@@ -35,6 +35,13 @@ class Token implements HttpTransportable
     /**
      * @var int
      *
+     * No cache
+     */
+    const NO_CACHE = 0;
+
+    /**
+     * @var int
+     *
      * Infinite duration
      */
     const INFINITE_DURATION = 0;
