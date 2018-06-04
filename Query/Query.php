@@ -78,11 +78,11 @@ class Query implements HttpTransportable
     private $itemsPromoted = [];
 
     /**
-     * @var array
+     * @var SortBy
      *
-     * Sort
+     * Sort by
      */
-    private $sort;
+    private $sortBy;
 
     /**
      * @var Aggregation[]
@@ -168,7 +168,7 @@ class Query implements HttpTransportable
      */
     private function __construct(string $queryText)
     {
-        $this->sortBy(SortBy::SCORE);
+        $this->sortBy = SortBy::create();
         $this->filters['_query'] = Filter::create(
             '',
             [$queryText],
@@ -649,28 +649,21 @@ class Query implements HttpTransportable
     /**
      * Sort by.
      *
-     * @param array $sort
+     * @param SortBy $sortBy
      *
      * @return Query
      */
-    public function sortBy(array $sort): self
+    public function sortBy(SortBy $sortBy): self
     {
-        if (isset($sort['_geo_distance'])) {
+        if ($sortBy->isSortedByGeoDistance()) {
             if (!$this->coordinate instanceof Coordinate) {
                 throw new QueryBuildException('In order to be able to sort by coordinates, you need to create a Query by using Query::createLocated() instead of Query::create()');
             }
-            $sort['_geo_distance']['coordinate'] = $this
-                ->coordinate
-                ->toArray();
+
+            $sortBy->setCoordinate($this->coordinate);
         }
 
-        foreach ($sort as $field => $direction) {
-            if (!is_array($direction)) {
-                $sort[$field] = ['order' => $direction];
-            }
-        }
-
-        $this->sort = $sort;
+        $this->sortBy = $sortBy;
 
         return $this;
     }
@@ -885,11 +878,11 @@ class Query implements HttpTransportable
     /**
      * Get sort by.
      *
-     * @return array
+     * @return SortBy
      */
-    public function getSortBy(): array
+    public function getSortBy(): SortBy
     {
-        return $this->sort;
+        return $this->sortBy;
     }
 
     /**
@@ -1218,9 +1211,9 @@ class Query implements HttpTransportable
             'aggregations' => array_map(function (Aggregation $aggregation) {
                 return $aggregation->toArray();
             }, $this->aggregations),
-            'sort' => SortBy::SCORE === $this->sort
-                ? null
-                : $this->sort,
+            'sort' => $this->sortBy instanceof SortBy
+                ? $this->sortBy->toArray()
+                : null,
             'page' => self::DEFAULT_PAGE === $this->page
                 ? null
                 : $this->page,
@@ -1281,7 +1274,7 @@ class Query implements HttpTransportable
             return Aggregation::createFromArray($aggregation);
         }, $array['aggregations'] ?? []);
 
-        $query->sort = $array['sort'] ?? SortBy::SCORE;
+        $query->sortBy = SortBy::createFromArray($array['sort'] ?? []);
         $query->filters = array_merge(
             $query->filters,
             array_map(function (array $filter) {
