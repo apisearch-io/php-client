@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace Apisearch\Log;
 
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Query\Query;
 use Apisearch\Repository\WithRepositoryReference;
@@ -27,20 +26,6 @@ use Apisearch\Result\Logs;
  */
 interface LogRepository extends WithRepositoryReference
 {
-    /**
-     * Create index.
-     *
-     * @throws ResourceExistsException
-     */
-    public function createIndex();
-
-    /**
-     * Delete index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function deleteIndex();
-
     /**
      * Save log.
      *

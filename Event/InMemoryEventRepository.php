@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace Apisearch\Event;
 
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Query\Query;
 use Apisearch\Repository\RepositoryWithCredentials;
@@ -34,34 +33,6 @@ class InMemoryEventRepository extends RepositoryWithCredentials implements Event
      * Events
      */
     private $events = [];
-
-    /**
-     * Create index.
-     *
-     * @throws ResourceExistsException
-     */
-    public function createIndex()
-    {
-        if (array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceExistsException::eventsIndexExists();
-        }
-
-        $this->events[$this->getIndexKey()] = [];
-    }
-
-    /**
-     * Delete index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function deleteIndex()
-    {
-        if (!array_key_exists($this->getIndexKey(), $this->events)) {
-            throw ResourceNotAvailableException::eventsIndexNotAvailable('Index not found in InMemoryEventRepository');
-        }
-
-        unset($this->events[$this->getIndexKey()]);
-    }
 
     /**
      * Query over events.

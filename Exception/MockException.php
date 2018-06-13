@@ -30,6 +30,6 @@ class MockException extends Exception
      */
     public static function isAMock(): self
     {
-        return new self('You\'re using a mock');
+        return new self('You are using a mock');
     }
 }
