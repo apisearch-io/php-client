@@ -71,7 +71,6 @@ class TestClient extends Client implements HttpClient
         $method = trim(strtolower($method));
         $requestParts = $this->buildRequestParts(
             $url,
-            $method,
             $query,
             $body,
             $server
@@ -82,8 +81,12 @@ class TestClient extends Client implements HttpClient
             ->request(
                 $method,
                 '/'.$requestParts->getUrl(),
-                $requestParts->getParameters()['form_params'],
-                $server
+                [],
+                [],
+                $server + [
+                    'CONTENT_TYPE' => 'application/json',
+                ],
+                json_encode($requestParts->getParameters()['json'])
             )
         ;
 

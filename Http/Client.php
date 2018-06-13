@@ -53,7 +53,6 @@ abstract class Client
      * Get some parameters and build a RequestParts instance.
      *
      * @param string $url
-     * @param string $method
      * @param array  $query
      * @param array  $body
      * @param array  $server
@@ -62,33 +61,18 @@ abstract class Client
      */
     public function buildRequestParts(
         string $url,
-        string $method,
         array $query = [],
         array $body = [],
         array $server = []
     ): RequestParts {
         $url = trim($url, '/');
         $url = trim("{$this->version}/$url", '/');
-
-        /*
-         * If method is GET, then we merge both the query and the body
-         * parameters. Otherwise, the query params will be appended into the url
-         * and the body will be served as the body itself
-         */
-        if ('get' !== $method) {
-            $url = $this->buildUrlParams($url, $query);
-        } else {
-            $url = $this->buildUrlParams($url, array_merge(
-                $query,
-                $body
-            ));
-            $body = [];
-        }
+        $url = $this->buildUrlParams($url, $query);
 
         return new RequestParts(
             $url,
             [
-                'form_params' => $body,
+                'json' => $body,
                 'headers' => $server,
             ],
             [

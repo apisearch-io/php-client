@@ -38,7 +38,7 @@ class HttpUserRepository extends HttpRepositoryWithCredentials implements UserRe
                 'get',
                 Http::getQueryValues($this),
                 [
-                    'interaction' => json_encode($interaction->toArray()),
+                    'interaction' => $interaction->toArray(),
                 ]);
 
         $this->throwTransportableExceptionIfNeeded($response);

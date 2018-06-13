@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace Apisearch\Log;
 
 use Apisearch\Exception\MockException;
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\HttpRepositoryWithCredentials;
 use Apisearch\Query\Query;
@@ -28,26 +27,6 @@ use Apisearch\Result\Logs;
  */
 class MockLogRepository extends HttpRepositoryWithCredentials implements LogRepository
 {
-    /**
-     * Create index.
-     *
-     * @throws ResourceExistsException
-     */
-    public function createIndex()
-    {
-        $this->throwMockException();
-    }
-
-    /**
-     * Delete index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function deleteIndex()
-    {
-        $this->throwMockException();
-    }
-
     /**
      * Save log.
      *

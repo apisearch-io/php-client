@@ -75,6 +75,13 @@ class Http
     /**
      * @var string
      *
+     * Interaction param field
+     */
+    const INTERACTION_FIELD = 'interaction';
+
+    /**
+     * @var string
+     *
      * Language query param field
      */
     const LANGUAGE_FIELD = 'language';

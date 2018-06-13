@@ -40,7 +40,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 'post',
                 Http::getQueryValues($this),
                 [
-                    Http::TOKEN_FIELD => json_encode($token->toArray()),
+                    Http::TOKEN_FIELD => $token->toArray(),
                 ]
             );
 
@@ -61,7 +61,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 'delete',
                 Http::getQueryValues($this),
                 [
-                    Http::TOKEN_FIELD => json_encode($tokenUUID->toArray()),
+                    Http::TOKEN_FIELD => $tokenUUID->toArray(),
                 ]
             );
 

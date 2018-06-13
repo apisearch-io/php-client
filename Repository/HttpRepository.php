@@ -75,11 +75,9 @@ class HttpRepository extends Repository
                     'post',
                     Http::getQueryValues($this),
                     [
-                        'items' => json_encode(
-                            array_map(function (Item $item) {
-                                return $item->toArray();
-                            }, $itemsToUpdate)
-                        ),
+                        'items' => array_map(function (Item $item) {
+                            return $item->toArray();
+                        }, $itemsToUpdate),
                     ]);
         }
 
@@ -90,11 +88,9 @@ class HttpRepository extends Repository
                     'delete',
                     Http::getQueryValues($this),
                     [
-                        'items' => json_encode(
-                            array_map(function (ItemUUID $itemUUID) {
-                                return $itemUUID->toArray();
-                            }, $itemsToDelete)
-                        ),
+                        'items' => array_map(function (ItemUUID $itemUUID) {
+                            return $itemUUID->toArray();
+                        }, $itemsToDelete),
                     ]);
         }
 
@@ -122,8 +118,8 @@ class HttpRepository extends Repository
                 'put',
                 Http::getQueryValues($this),
                 [
-                    Http::QUERY_FIELD => json_encode($query->toArray()),
-                    Http::CHANGES_FIELD => json_encode($changes->toArray()),
+                    Http::QUERY_FIELD => $query->toArray(),
+                    Http::CHANGES_FIELD => $changes->toArray(),
                 ]
             );
 
@@ -148,7 +144,7 @@ class HttpRepository extends Repository
                 'get',
                 Http::getQueryValues($this),
                 [
-                    Http::QUERY_FIELD => json_encode($query->toArray()),
+                    Http::QUERY_FIELD => $query->toArray(),
                 ]
             );
 
@@ -173,7 +169,7 @@ class HttpRepository extends Repository
                 'post',
                 Http::getQueryValues($this),
                 [
-                    Http::CONFIG_FIELD => json_encode($config->toArray()),
+                    Http::CONFIG_FIELD => $config->toArray(),
                 ]
             );
 
@@ -255,7 +251,7 @@ class HttpRepository extends Repository
                 'post',
                 Http::getQueryValues($this),
                 [
-                    Http::CONFIG_FIELD => json_encode($config->toArray()),
+                    Http::CONFIG_FIELD => $config->toArray(),
                 ]
             );
 

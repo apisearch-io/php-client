@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace Apisearch\Log;
 
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Query\Query;
 use Apisearch\Repository\RepositoryWithCredentials;
@@ -34,34 +33,6 @@ class InMemoryLogRepository extends RepositoryWithCredentials implements LogRepo
      * Logs
      */
     private $logs = [];
-
-    /**
-     * Create index.
-     *
-     * @throws ResourceExistsException
-     */
-    public function createIndex()
-    {
-        if (array_key_exists($this->getIndexKey(), $this->logs)) {
-            throw ResourceExistsException::logsIndexExists();
-        }
-
-        $this->logs[$this->getIndexKey()] = [];
-    }
-
-    /**
-     * Delete index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function deleteIndex()
-    {
-        if (!array_key_exists($this->getIndexKey(), $this->logs)) {
-            throw ResourceNotAvailableException::logsIndexNotAvailable('Index not found in InMemoryLogRepository');
-        }
-
-        unset($this->logs[$this->getIndexKey()]);
-    }
 
     /**
      * Query over logs.

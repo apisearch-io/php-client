@@ -83,7 +83,6 @@ class GuzzleClient extends Client implements HttpClient
         $method = strtolower($method);
         $requestParts = $this->buildRequestParts(
             $url,
-            $method,
             $query,
             $body,
             $server
