@@ -31,7 +31,7 @@ class EndpointsTest extends PHPUnit_Framework_TestCase
         'v1-index-create',
         'v1-index-delete',
         'v1-index-reset',
-        'v1-config',
+        'v1-index-config',
 
         'v1-items-index',
         'v1-items-delete',
@@ -45,7 +45,7 @@ class EndpointsTest extends PHPUnit_Framework_TestCase
         'v1-token-add',
         'v1-token-delete',
         'v1-tokens-get',
-        'v1-tokens-delete-all',
+        'v1-tokens-delete',
 
         'v1-interaction',
         'v1-interactions-delete',

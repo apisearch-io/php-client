@@ -44,7 +44,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 ]
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -65,7 +65,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 ]
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -83,7 +83,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 Http::getQueryValues($this)
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
 
         return array_map(function (array $token) {
             return Token::createFromArray($token);
@@ -103,6 +103,6 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 Http::getQueryValues($this)
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 }

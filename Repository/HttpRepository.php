@@ -98,7 +98,7 @@ class HttpRepository extends Repository
             return;
         }
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -123,7 +123,7 @@ class HttpRepository extends Repository
                 ]
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -148,7 +148,7 @@ class HttpRepository extends Repository
                 ]
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
 
         return Result::createFromArray($response['body']);
     }
@@ -173,7 +173,7 @@ class HttpRepository extends Repository
                 ]
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -191,7 +191,7 @@ class HttpRepository extends Repository
                 Http::getQueryValues($this)
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -209,7 +209,7 @@ class HttpRepository extends Repository
                 Http::getQueryValues($this)
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -259,6 +259,6 @@ class HttpRepository extends Repository
             return;
         }
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 }

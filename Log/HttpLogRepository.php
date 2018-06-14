@@ -57,7 +57,7 @@ class HttpLogRepository extends HttpRepositoryWithCredentials implements LogRepo
                 ]
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
 
         return Logs::createFromArray($response['body']);
     }

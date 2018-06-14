@@ -34,8 +34,12 @@ trait HttpResponsesToException
      *
      * @throw TransportableException
      */
-    protected function throwTransportableExceptionIfNeeded(array $response)
+    protected static function throwTransportableExceptionIfNeeded(array $response)
     {
+        if (!isset($response['code'])) {
+            return;
+        }
+
         switch ($response['code']) {
             case ResourceNotAvailableException::getTransportableHTTPError():
                 throw new ResourceNotAvailableException($response['body']['message']);

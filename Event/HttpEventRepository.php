@@ -57,7 +57,7 @@ class HttpEventRepository extends HttpRepositoryWithCredentials implements Event
                 ]
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
 
         return Events::createFromArray($response['body']);
     }

@@ -41,7 +41,7 @@ class HttpUserRepository extends HttpRepositoryWithCredentials implements UserRe
                     'interaction' => $interaction->toArray(),
                 ]);
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -57,6 +57,6 @@ class HttpUserRepository extends HttpRepositoryWithCredentials implements UserRe
                 Http::getQueryValues($this)
             );
 
-        $this->throwTransportableExceptionIfNeeded($response);
+        self::throwTransportableExceptionIfNeeded($response);
     }
 }

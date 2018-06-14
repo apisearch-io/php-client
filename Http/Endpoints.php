@@ -30,7 +30,7 @@ class Endpoints
     {
         return [
             /*
-             * Admin endpoints
+             * Application endpoints
              */
             'v1-index-create' => [
                 'name' => 'Index create',
@@ -50,66 +50,18 @@ class Endpoints
                 'path' => '/v1/index/reset',
                 'verb' => 'post',
             ],
-            'v1-config' => [
-                'name' => 'Config',
+            'v1-index-check' => [
+                'name' => 'Index check',
+                'description' => 'Check your index',
+                'path' => '/v1/index',
+                'verb' => 'head',
+            ],
+            'v1-index-config' => [
+                'name' => 'Index Config',
                 'description' => 'Configure your index',
                 'path' => '/v1/index',
                 'verb' => 'put',
             ],
-
-            /*
-             * Write endpoints
-             */
-            'v1-items-index' => [
-                'name' => 'Items index',
-                'description' => 'Index your items',
-                'path' => '/v1/items',
-                'verb' => 'post',
-            ],
-            'v1-items-delete' => [
-                'name' => 'Items delete',
-                'description' => 'Delete your items',
-                'path' => '/v1/items',
-                'verb' => 'delete',
-            ],
-
-            /*
-             * Read endpoints
-             */
-            'v1-query' => [
-                'name' => 'Query',
-                'description' => 'Make queries',
-                'path' => '/v1',
-                'verb' => 'get',
-            ],
-            'v1-events' => [
-                'name' => 'Events',
-                'description' => 'Query your events',
-                'path' => '/v1/events',
-                'verb' => 'get',
-            ],
-            'v1-events-stream' => [
-                'name' => 'Events real-time',
-                'description' => 'Events stream',
-                'path' => '/v1/events/stream',
-                'verb' => 'get',
-            ],
-            'v1-logs' => [
-                'name' => 'Logs',
-                'description' => 'Query your logs',
-                'path' => '/v1/logs',
-                'verb' => 'get',
-            ],
-            'v1-logs-stream' => [
-                'name' => 'Logs real-time',
-                'description' => 'Logs stream',
-                'path' => '/v1/logs/stream',
-                'verb' => 'get',
-            ],
-
-            /*
-             * Tokens
-             */
             'v1-token-add' => [
                 'name' => 'Add token',
                 'description' => 'Add token',
@@ -128,7 +80,7 @@ class Endpoints
                 'path' => '/v1/tokens',
                 'verb' => 'get',
             ],
-            'v1-tokens-delete-all' => [
+            'v1-tokens-delete' => [
                 'name' => 'Delete all tokens',
                 'description' => 'Delete all tokens',
                 'path' => '/v1/tokens',
@@ -136,7 +88,67 @@ class Endpoints
             ],
 
             /*
-             * Interaction endpoints
+             * Query endpoints
+             */
+            'v1-query' => [
+                'name' => 'Query',
+                'description' => 'Make queries',
+                'path' => '/v1',
+                'verb' => 'get',
+            ],
+            'v1-items-index' => [
+                'name' => 'Items index',
+                'description' => 'Index your items',
+                'path' => '/v1/items',
+                'verb' => 'post',
+            ],
+            'v1-items-delete' => [
+                'name' => 'Items delete',
+                'description' => 'Delete your items',
+                'path' => '/v1/items',
+                'verb' => 'delete',
+            ],
+            'v1-items-update' => [
+                'name' => 'Items update',
+                'description' => 'Update your items',
+                'path' => '/v1/items',
+                'verb' => 'put',
+            ],
+
+            /*
+             * Events endpoints
+             */
+            'v1-events' => [
+                'name' => 'Events',
+                'description' => 'Query your events',
+                'path' => '/v1/events',
+                'verb' => 'get',
+            ],
+            'v1-events-stream' => [
+                'name' => 'Events real-time',
+                'description' => 'Events stream',
+                'path' => '/v1/events/stream',
+                'verb' => 'get',
+            ],
+
+            /*
+             * Logs endpoints
+             */
+            'v1-logs' => [
+                'name' => 'Logs',
+                'description' => 'Query your logs',
+                'path' => '/v1/logs',
+                'verb' => 'get',
+            ],
+            'v1-logs-stream' => [
+                'name' => 'Logs real-time',
+                'description' => 'Logs stream',
+                'path' => '/v1/logs/stream',
+                'verb' => 'get',
+            ],
+
+            /*
+             * User endpoints
              */
             'v1-interaction' => [
                 'name' => 'Add interaction',
