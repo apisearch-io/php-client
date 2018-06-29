@@ -9,14 +9,13 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
 
 namespace Apisearch\Model;
 
-use Apisearch\Exception\UUIDException;
+use Apisearch\Exception\InvalidFormatException;
 
 /**
  * Class ItemUUID.
@@ -58,13 +57,13 @@ class ItemUUID implements HttpTransportable, UUIDReference
      *
      * @return ItemUUID
      *
-     * @throws UUIDException
+     * @throws InvalidFormatException
      */
     public static function createByComposedUUID(string $composedUUID): self
     {
-        $parts = explode('~', $composedUUID, 2);
-        if (1 === count($parts)) {
-            throw UUIDException::createComposedUUIDBadFormatException($composedUUID);
+        $parts = explode('~', $composedUUID);
+        if (2 !== count($parts)) {
+            throw InvalidFormatException::composedItemUUIDNotValid($composedUUID);
         }
 
         return new self($parts[0], $parts[1]);
@@ -116,9 +115,7 @@ class ItemUUID implements HttpTransportable, UUIDReference
             !isset($array['id']) ||
             !isset($array['type'])
         ) {
-            if (!isset($array['uuid'])) {
-                throw UUIDException::createUUIDBadFormatException();
-            }
+            throw InvalidFormatException::composedItemUUIDNotValid([]);
         }
 
         return new static(

@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -58,6 +57,6 @@ class ForbiddenException extends TransportableException
      */
     public static function createTokenIsRequiredException(): self
     {
-        return new self('Index query parameter MUST be defined with a valid value');
+        return new self('Token query parameter MUST be defined with a valid value');
     }
 }

@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -48,6 +47,21 @@ class ChangesTest extends PHPUnit_Framework_TestCase
         $firstChange = reset($changesValues);
         $this->assertEquals('field1', $firstChange['field']);
         $this->assertEquals('value1', $firstChange['value']);
+        $this->assertEquals(Changes::TYPE_VALUE, $firstChange['type']);
+    }
+
+    /**
+     * Test add change.
+     */
+    public function testAddChangeDefaultType()
+    {
+        $changes = Changes::create();
+        $changes->addChange(
+            'field1',
+            'value1'
+        );
+        $changesValues = $changes->getChanges();
+        $firstChange = reset($changesValues);
         $this->assertEquals(Changes::TYPE_VALUE, $firstChange['type']);
     }
 

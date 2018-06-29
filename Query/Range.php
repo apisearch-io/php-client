@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -76,19 +75,14 @@ class Range
      */
     public static function arrayToString(array $values): string
     {
-        list($from, $to) = $values;
-        $string = '';
-        if ($from > self::ZERO) {
-            $string .= $from;
+        if (self::ZERO == $values[0]) {
+            $values[0] = '';
+        }
+        if (self::INFINITE == $values[1]) {
+            $values[1] = '';
         }
 
-        $string .= self::SEPARATOR;
-
-        if ($to >= self::ZERO) {
-            $string .= $to;
-        }
-
-        return $string;
+        return implode(self::SEPARATOR, $values);
     }
 
     /**
@@ -108,7 +102,7 @@ class Range
         $ranges = [];
         while ($from < $to) {
             $nextTo = $from + $incremental;
-            $ranges[] = "$from..$nextTo";
+            $ranges[] = $from.self::SEPARATOR.$nextTo;
             $from = $nextTo;
         }
 

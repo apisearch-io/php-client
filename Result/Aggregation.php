@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -106,13 +105,13 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             return;
         }
 
-        $counter = Counter::createByActiveElements(
+        $counterInstance = Counter::createByActiveElements(
             $name,
             $counter,
             $this->activeElements
         );
 
-        if (!$counter instanceof Counter) {
+        if (!$counterInstance instanceof Counter) {
             return;
         }
 
@@ -124,18 +123,18 @@ class Aggregation implements IteratorAggregate, HttpTransportable
         if (
             $this->applicationType & Filter::MUST_ALL_WITH_LEVELS &&
             $this->applicationType & ~Filter::MUST_ALL &&
-            $counter->isUsed()
+            $counterInstance->isUsed()
         ) {
-            $this->activeElements[$counter->getId()] = $counter;
+            $this->activeElements[$counterInstance->getId()] = $counterInstance;
             $this->highestActiveLevel = max(
-                $counter->getLevel(),
+                $counterInstance->getLevel(),
                 $this->highestActiveLevel
             );
 
             return;
         }
 
-        $this->counters[$counter->getId()] = $counter;
+        $this->counters[$counterInstance->getId()] = $counterInstance;
     }
 
     /**

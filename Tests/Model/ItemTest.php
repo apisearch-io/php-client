@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -84,10 +83,10 @@ class ItemTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test item creation with location from array without coordinate in the
+     * Test item creation from array without coordinate in the
      * array.
      */
-    public function testCreateLocatedFromArrayWithoutCoordinate()
+    public function testCreateFromArrayWithoutCoordinate()
     {
         $itemArray = [
             'uuid' => [
@@ -134,7 +133,7 @@ class ItemTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider dataItemBadFormattedUUID
      *
-     * @expectedException \Apisearch\Exception\UUIDException
+     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testItemBadFormattedUUID($data)
     {
@@ -165,7 +164,7 @@ class ItemTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider dataCoordinateBadFormattedUUID
      *
-     * @expectedException \Apisearch\Exception\CoordinateException
+     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCoordinateFormattedUUID($data)
     {
@@ -250,6 +249,7 @@ class ItemTest extends PHPUnit_Framework_TestCase
         $item->setMetadata(['c' => true, 'd' => ['e' => 'hola']]);
         $this->assertEquals('hola', $item->getMetadata()['d']['e']);
         $this->assertEquals('hola', $item->getAllMetadata()['d']['e']);
+        $this->assertEquals('hola', $item->get('d')['e']);
         $this->assertCount(2, $item->getAllMetadata());
 
         $item->addMetadata('z', 10);
@@ -290,9 +290,9 @@ class ItemTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test item to array.
+     * Test item to array with default values.
      */
-    public function testToArray()
+    public function testToArrayDefaultValues()
     {
         $item = Item::createFromArray([
             'uuid' => [
@@ -301,6 +301,7 @@ class ItemTest extends PHPUnit_Framework_TestCase
             ],
             'coordinate' => null,
             'distance' => null,
+            'is_promoted' => false,
             'metadata' => [],
             'indexed_metadata' => [],
             'searchable_metadata' => [],
@@ -319,6 +320,37 @@ class ItemTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(array_key_exists('searchable_metadata', $itemArray));
         $this->assertFalse(array_key_exists('exact_matching_metadata', $itemArray));
         $this->assertFalse(array_key_exists('suggest', $itemArray));
+        $this->assertFalse(array_key_exists('is_promoted', $itemArray));
+    }
+
+    /**
+     * Test item to array with all values.
+     */
+    public function testToArrayAllValues()
+    {
+        $itemAsArray = [
+            'uuid' => [
+                'id' => '1',
+                'type' => 'product',
+            ],
+            'coordinate' => [
+                'lat' => 0.0,
+                'lon' => 0.0,
+            ],
+            'distance' => 0.4,
+            'metadata' => ['a' => 1],
+            'indexed_metadata' => ['b' => 2],
+            'searchable_metadata' => ['c' => 3],
+            'exact_matching_metadata' => ['d'],
+            'suggest' => ['hola'],
+            'is_promoted' => true,
+            'highlights' => ['a' => '<strong>a</strong>'],
+        ];
+
+        $this->assertEquals(
+            $itemAsArray,
+            Item::createFromArray($itemAsArray)->toArray()
+        );
     }
 
     /**
@@ -348,5 +380,17 @@ class ItemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, $item->c);
         $this->assertEquals('z', $item->d['e']);
         $this->assertNull($item->nonexisting);
+    }
+
+    /**
+     * Test composed uuid.
+     */
+    public function testComposedUUID()
+    {
+        $composedId = '1~product';
+        $this->assertEquals(
+            $composedId,
+            Item::create(ItemUUID::createByComposedUUID($composedId))->composeUUID()
+        );
     }
 }

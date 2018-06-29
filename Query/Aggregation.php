@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -91,7 +90,7 @@ class Aggregation implements HttpTransportable
      *
      * Subgroup
      */
-    private $subgroup;
+    private $subgroup = [];
 
     /**
      * @var array
@@ -295,5 +294,3 @@ class Aggregation implements HttpTransportable
         );
     }
 }
-
-http://search.puntmig.net/?app_id=music&key=1cc7a3e0-bda5-11e7-abc4-cec278b6b50a&query=%7B%22q%22%3A%22%22%2C%22universe_filters%22%3A%5B%5D%2C%22filters%22%3A%5B%5D%2C%22items_promoted%22%3A%5B%5D%2C%22aggregations%22%3A%7B%22year%22%3A%7B%22name%22%3A%22year%22%2C%22field%22%3A%22indexed_metadata.year%22%2C%22applicationType%22%3A8%2C%22filterType%22%3A%22field%22%2C%22subgroup%22%3A%5B%5D%2C%22sort%22%3A%5B%22_term%22%2C%22desc%22%5D%2C%22limit%22%3A0%7D%2C%22genre%22%3A%7B%22name%22%3A%22genre%22%2C%22field%22%3A%22indexed_metadata.genre_data%22%2C%22applicationType%22%3A8%2C%22filterType%22%3A%22field%22%2C%22subgroup%22%3A%5B%5D%2C%22sort%22%3A%5B%22_term%22%2C%22desc%22%5D%2C%22limit%22%3A0%7D%2C%22rating%22%3A%7B%22name%22%3A%22rating%22%2C%22field%22%3A%22indexed_metadata.rating%22%2C%22applicationType%22%3A4%2C%22filterType%22%3A%22field%22%2C%22subgroup%22%3A%5B%5D%2C%22sort%22%3A%5B%22_term%22%2C%22desc%22%5D%2C%22limit%22%3A0%7D%7D%2C%22page%22%3A1%2C%22size%22%3A12%2C%22from%22%3A0%2C%22results_enabled%22%3Atrue%2C%22aggregations_enabled%22%3Atrue%2C%22suggestions_enabled%22%3Afalse%2C%22highlight_enabled%22%3Atrue%2C%22filter_fields%22%3A%5B%5D%2C%22user%22%3Anull%2C%22coordinate%22%3Anull%2C%22sort%22%3A%7B%22_score%22%3A%7B%22order%22%3A%22asc%22%7D%7D%7D

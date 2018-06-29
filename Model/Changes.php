@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -86,7 +85,7 @@ class Changes implements HttpTransportable
      * @param mixed  $value
      * @param int    $type
      *
-     * @return self
+     * @return Changes
      */
     public function addChange(
         string $field,
@@ -110,7 +109,7 @@ class Changes implements HttpTransportable
      * @param mixed  $value
      * @param int    $type
      *
-     * @return self
+     * @return Changes
      */
     public function updateElementFromList(
         string $field,
@@ -135,7 +134,7 @@ class Changes implements HttpTransportable
      * @param mixed  $value
      * @param int    $type
      *
-     * @return self
+     * @return Changes
      */
     public function addElementInList(
         string $field,
@@ -157,7 +156,7 @@ class Changes implements HttpTransportable
      * @param string $field
      * @param string $condition
      *
-     * @return self
+     * @return Changes
      */
     public function deleteElementFromList(
         string $field,
