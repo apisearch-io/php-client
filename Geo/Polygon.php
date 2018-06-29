@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Apisearch\Geo;
 
 use Apisearch\Model\Coordinate;
-use ReflectionClass;
 
 /**
  * Class Polygon.
@@ -35,7 +34,7 @@ class Polygon extends LocationRange
      *
      * @param Coordinate[] $coordinates
      */
-    public function __construct(Coordinate ...$coordinates)
+    public function __construct(array $coordinates)
     {
         $this->coordinates = $coordinates;
     }
@@ -47,9 +46,9 @@ class Polygon extends LocationRange
      */
     public function toFilterArray(): array
     {
-        return array_map(function (Coordinate $coordinate) {
+        return ['coordinates' => array_map(function (Coordinate $coordinate) {
             return $coordinate->toArray();
-        }, $this->coordinates);
+        }, $this->coordinates)];
     }
 
     /**
@@ -63,10 +62,8 @@ class Polygon extends LocationRange
     {
         $coordinates = array_map(function (array $coordinate) {
             return Coordinate::createFromArray($coordinate);
-        }, $array);
+        }, $array['coordinates']);
 
-        $class = new ReflectionClass(static::class);
-
-        return $class->newInstanceArgs($coordinates);
+        return new Polygon($coordinates);
     }
 }
