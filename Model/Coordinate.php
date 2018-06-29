@@ -9,14 +9,13 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
 
 namespace Apisearch\Model;
 
-use Apisearch\Exception\CoordinateException;
+use Apisearch\Exception\InvalidFormatException;
 
 /**
  * Class Coordinate.
@@ -97,7 +96,7 @@ class Coordinate implements HttpTransportable
             !isset($array['lat']) ||
             !isset($array['lon'])
         ) {
-            throw CoordinateException::createCoordinateBadFormatException();
+            throw InvalidFormatException::coordinateFormatNotValid();
         }
 
         return new self(

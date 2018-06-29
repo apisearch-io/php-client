@@ -9,15 +9,13 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
 
 namespace Apisearch\Model;
 
-use Apisearch\Exception\CoordinateException;
-use Apisearch\Exception\UUIDException;
+use Apisearch\Exception\InvalidFormatException;
 
 /**
  * Class Item.
@@ -479,7 +477,7 @@ class Item implements HttpTransportable, UUIDReference
             'exact_matching_metadata' => $this->exactMatchingMetadata,
             'suggest' => $this->suggest,
             'highlights' => $this->highlights,
-            'is_promoted' => $this->promoted,
+            'is_promoted' => !$this->promoted ? null : true,
         ], function ($element) {
             return
             !(
@@ -502,14 +500,14 @@ class Item implements HttpTransportable, UUIDReference
             !isset($array['uuid']) ||
             !is_array($array['uuid'])
         ) {
-            throw UUIDException::createUUIDBadFormatException();
+            throw InvalidFormatException::itemUUIDRepresentationNotValid($array['uuid'] ?? []);
         }
 
         if (
             isset($array['coordinate']) &&
             !is_array($array['coordinate'])
         ) {
-            throw CoordinateException::createCoordinateBadFormatException();
+            throw InvalidFormatException::coordinateFormatNotValid();
         }
 
         $item = isset($array['coordinate'])

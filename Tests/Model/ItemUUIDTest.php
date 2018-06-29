@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -24,21 +23,6 @@ use PHPUnit_Framework_TestCase;
  */
 class ItemUUIDTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * Test create from array.
-     */
-    public function testCreateFromArray()
-    {
-        $uuidArray = [
-            'id' => '1',
-            'type' => 'product',
-        ];
-
-        $uuid = ItemUUID::createFromArray($uuidArray);
-        $this->assertSame('1', $uuid->getId());
-        $this->assertSame('product', $uuid->getType());
-    }
-
     /**
      * Test create.
      */
@@ -73,7 +57,7 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider dataCreateByComposedUUIDException
      *
-     * @expectedException \Apisearch\Exception\UUIDException
+     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCreateByComposedUUIDException(string $composedUUID)
     {
@@ -89,6 +73,62 @@ class ItemUUIDTest extends PHPUnit_Framework_TestCase
             ['item'],
             [''],
             ['1'],
+            ['1~item~xxx'],
         ];
+    }
+
+    /**
+     * Test create from array.
+     */
+    public function testCreateFromArray()
+    {
+        $uuidArray = [
+            'id' => '1',
+            'type' => 'product',
+        ];
+
+        $uuid = ItemUUID::createFromArray($uuidArray);
+        $this->assertSame('1', $uuid->getId());
+        $this->assertSame('product', $uuid->getType());
+    }
+
+    /**
+     * Test create from array with exception.
+     *
+     * @dataProvider dataCreateFromArrayException
+     *
+     * @expectedException \Apisearch\Exception\InvalidFormatException
+     */
+    public function testCreateFromArrayException(array $composedUUID)
+    {
+        ItemUUID::createFromArray($composedUUID);
+    }
+
+    /**
+     * Data for testCreateByComposedUUIDException.
+     */
+    public function dataCreateFromArrayException()
+    {
+        return [
+            [['type' => 'item']],
+            [[]],
+            [['id' => '1']],
+        ];
+    }
+
+    /**
+     * Test to array.
+     */
+    public function testToArray()
+    {
+        $uuidArray = [
+            'id' => '1',
+            'type' => 'product',
+        ];
+
+        $this->assertEquals(
+            $uuidArray,
+            ItemUUID::createFromArray($uuidArray)->toArray()
+        );
     }
 }

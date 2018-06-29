@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -28,54 +27,54 @@ class ResourceNotAvailableException extends TransportableException
      */
     public static function getTransportableHTTPError(): int
     {
-        return 409;
+        return 404;
     }
 
     /**
      * Index is not available.
      *
-     * @param string $message
+     * @param string $resourceId
      *
      * @return ResourceNotAvailableException
      */
-    public static function indexNotAvailable(string $message): self
+    public static function indexNotAvailable(string $resourceId): self
     {
-        return new self(sprintf('Index not available - %s', $message));
+        return new self(sprintf('Index not available - %s', $resourceId));
     }
 
     /**
      * Events index is not available.
      *
-     * @param string $message
+     * @param string $resourceId
      *
      * @return ResourceNotAvailableException
      */
-    public static function eventsIndexNotAvailable(string $message): self
+    public static function eventsIndexNotAvailable(string $resourceId): self
     {
-        return new self(sprintf('Events index not available - %s', $message));
+        return new self(sprintf('Events index not available - %s', $resourceId));
     }
 
     /**
      * Logs index is not available.
      *
-     * @param string $message
+     * @param string $resourceId
      *
      * @return ResourceNotAvailableException
      */
-    public static function logsIndexNotAvailable(string $message): self
+    public static function logsIndexNotAvailable(string $resourceId): self
     {
-        return new self(sprintf('Logs index not available - %s', $message));
+        return new self(sprintf('Logs index not available - %s', $resourceId));
     }
 
     /**
      * Engine is not available.
      *
-     * @param string $engineName
+     * @param string $resourceId
      *
      * @return ResourceNotAvailableException
      */
-    public static function engineNotAvailable(string $engineName): self
+    public static function engineNotAvailable(string $resourceId): self
     {
-        return new self(sprintf('Engine %s not available', $engineName));
+        return new self(sprintf('Engine not available - %s', $resourceId));
     }
 }

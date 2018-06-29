@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -166,13 +165,11 @@ class Counter implements HttpTransportable
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'values' => $this->values,
-            'used' => false === $this->used
-                ? null
-                : true,
+            'used' => $this->used,
             'n' => $this->n,
-        ];
+        ]);
     }
 
     /**

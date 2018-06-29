@@ -9,14 +9,13 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
 
 namespace Apisearch\Query;
 
-use Apisearch\Exception\QueryBuildException;
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Geo\LocationRange;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\HttpTransportable;
@@ -657,7 +656,7 @@ class Query implements HttpTransportable
     {
         if ($sortBy->isSortedByGeoDistance()) {
             if (!$this->coordinate instanceof Coordinate) {
-                throw new QueryBuildException('In order to be able to sort by coordinates, you need to create a Query by using Query::createLocated() instead of Query::create()');
+                throw InvalidFormatException::querySortedByDistanceWithoutCoordinate();
             }
 
             $sortBy->setCoordinate($this->coordinate);

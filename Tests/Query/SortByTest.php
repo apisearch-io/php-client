@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -98,9 +97,9 @@ class SortByTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test empty sort by.
+     * Test sort by field value.
      */
-    public function testSortByField()
+    public function testSortByFieldValue()
     {
         $sortBy = SortBy::create();
         $sortBy->byFieldValue('category', SortBy::ASC);
@@ -224,6 +223,7 @@ class SortByTest extends PHPUnit_Framework_TestCase
         $coordinate = new Coordinate(10.0, 20.0);
         $sortBy = SortBy::create()
             ->byValue(SortBy::LOCATION_KM_ASC)
+            ->byValue(SortBy::AL_TUN_TUN)
             ->setCoordinate($coordinate);
 
         $this->assertEquals(
@@ -236,6 +236,7 @@ class SortByTest extends PHPUnit_Framework_TestCase
                         'unit' => 'km',
                     ],
                 ],
+                SortBy::AL_TUN_TUN,
             ],
             $sortBy->all()
         );
@@ -249,6 +250,7 @@ class SortByTest extends PHPUnit_Framework_TestCase
                         'unit' => 'km',
                     ],
                 ],
+                SortBy::AL_TUN_TUN,
             ],
             $sortBy->toArray()
         );
@@ -263,6 +265,7 @@ class SortByTest extends PHPUnit_Framework_TestCase
                         'unit' => 'km',
                     ],
                 ],
+                SortBy::AL_TUN_TUN,
             ])
         );
     }

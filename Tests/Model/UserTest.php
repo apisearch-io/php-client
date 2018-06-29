@@ -9,7 +9,6 @@
  * Feel free to edit as you please, and have fun.
  *
  * @author Marc Morera <yuhu@mmoreram.com>
- * @author PuntMig Technologies
  */
 
 declare(strict_types=1);
@@ -49,5 +48,28 @@ class UserTest extends PHPUnit_Framework_TestCase
             $user,
             User::createFromArray($user)->toArray()
         );
+    }
+
+    /**
+     * Test create from array with exception.
+     *
+     * @dataProvider dataCreateFromArrayException
+     *
+     * @expectedException \Apisearch\Exception\InvalidFormatException
+     */
+    public function testCreateFromArrayException(array $user)
+    {
+        User::createFromArray($user);
+    }
+
+    /**
+     * Data for testCreateByComposedUUIDException.
+     */
+    public function dataCreateFromArrayException()
+    {
+        return [
+            [[]],
+            [['attributes' => []]],
+        ];
     }
 }
