@@ -164,7 +164,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      */
     public function isFilter(): bool
     {
-        return (bool) (true === ($this->applicationType & Filter::MUST_ALL));
+        return ($this->applicationType & Filter::MUST_ALL) > 0;
     }
 
     /**
@@ -174,7 +174,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      */
     public function hasLevels(): bool
     {
-        return (bool) ($this->applicationType & Filter::MUST_ALL_WITH_LEVELS);
+        return ($this->applicationType & Filter::MUST_ALL_WITH_LEVELS) > 0;
     }
 
     /**
@@ -220,7 +220,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             return [];
         }
 
-        if ($this->applicationType & Filter::MUST_ALL_WITH_LEVELS) {
+        if (Filter::MUST_ALL_WITH_LEVELS === $this->applicationType) {
             $value = [array_reduce(
                 $this->activeElements,
                 function ($carry, $counter) {

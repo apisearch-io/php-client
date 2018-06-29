@@ -265,7 +265,6 @@ class Query implements HttpTransportable
             return $uuid->composeUUID();
         }, $uuids);
 
-        $ids = array_unique($ids);
         $query = self::create('', self::DEFAULT_PAGE, count($uuids))
             ->disableAggregations()
             ->disableSuggestions();
@@ -803,9 +802,9 @@ class Query implements HttpTransportable
      */
     public function getQueryText(): string
     {
-        return $query = (
-                isset($this->filters['_query']) &&
-                $this->filters['_query'] instanceof Filter
+        return (
+            isset($this->filters['_query']) &&
+            $this->filters['_query'] instanceof Filter
         )
             ? $this->filters['_query']->getValues()[0]
             : '';
@@ -1290,9 +1289,9 @@ class Query implements HttpTransportable
         $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
         $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
         $query->highlightEnabled = $array['highlight_enabled'] ?? false;
-        $query->itemsPromoted = array_map(function (array $itemUUID) {
+        $query->itemsPromoted = array_values(array_map(function (array $itemUUID) {
             return ItemUUID::createFromArray($itemUUID);
-        }, $array['items_promoted'] ?? []);
+        }, $array['items_promoted'] ?? []));
         $query->filterFields = $array['filter_fields'] ?? [];
         $query->scoreStrategy = isset($array['score_strategy'])
             ? ScoreStrategy::createFromArray($array['score_strategy'])
