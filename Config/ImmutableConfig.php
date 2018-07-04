@@ -34,7 +34,7 @@ class ImmutableConfig implements HttpTransportable
      *
      * Store searchable metadata
      */
-    private $storeSearchableMetadata = true;
+    private $storeSearchableMetadata;
 
     /**
      * @var Synonym[]
@@ -51,7 +51,7 @@ class ImmutableConfig implements HttpTransportable
      */
     public function __construct(
         ?string $language = null,
-        bool $storeSearchableMetadata
+        bool $storeSearchableMetadata = true
     ) {
         $this->language = $language;
         $this->storeSearchableMetadata = $storeSearchableMetadata;

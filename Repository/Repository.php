@@ -69,9 +69,7 @@ abstract class Repository extends RepositoryWithCredentials
      */
     public function addItem(Item $item)
     {
-        $itemUUID = $item
-            ->getUUID()
-            ->composeUUID();
+        $itemUUID = $item->composeUUID();
 
         $this->elementsToUpdate[$itemUUID] = $item;
         unset($this->elementsToDelete[$itemUUID]);

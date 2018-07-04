@@ -62,4 +62,16 @@ class SynonymTest extends PHPUnit_Framework_TestCase
             $synonym->toArray()
         );
     }
+
+    /**
+     * Test to array empty.
+     */
+    public function testCreateFromEmptyArray()
+    {
+        $synonym = Synonym::createFromArray([]);
+        $this->assertEquals(
+            [],
+            $synonym->getWords()
+        );
+    }
 }

@@ -64,8 +64,6 @@ class HttpRepository extends Repository
         array $itemsToUpdate,
         array $itemsToDelete
     ) {
-        $response = null;
-
         if (!empty($itemsToUpdate)) {
             $response = $this
                 ->httpClient
@@ -78,6 +76,8 @@ class HttpRepository extends Repository
                             return $item->toArray();
                         }, $itemsToUpdate),
                     ]);
+
+            self::throwTransportableExceptionIfNeeded($response);
         }
 
         if (!empty($itemsToDelete)) {
@@ -91,13 +91,9 @@ class HttpRepository extends Repository
                             return $itemUUID->toArray();
                         }, $itemsToDelete),
                     ]);
-        }
 
-        if (is_null($response)) {
-            return;
+            self::throwTransportableExceptionIfNeeded($response);
         }
-
-        self::throwTransportableExceptionIfNeeded($response);
     }
 
     /**
@@ -223,8 +219,7 @@ class HttpRepository extends Repository
             ->get(
                 '/index',
                 'head',
-                Http::getQueryValues($this),
-                []
+                Http::getQueryValues($this)
             );
 
         if (is_null($response)) {
