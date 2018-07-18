@@ -56,6 +56,14 @@ class MockAppRepository extends HttpRepositoryWithCredentials implements AppRepo
     }
 
     /**
+     * Purge tokens.
+     */
+    public function deleteTokens()
+    {
+        $this->throwMockException();
+    }
+
+    /**
      * Throw exception.
      *
      * @throws MockException

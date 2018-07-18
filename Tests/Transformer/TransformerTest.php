@@ -35,6 +35,9 @@ class TransformerTest extends PHPUnit_Framework_TestCase
         $transformer->addWriteTransformer(new ProductWriteTransformer());
         $product = new Product('34672864', 'zapatilla', new DateTime());
         $item = $transformer->toItem($product);
+        $this->assertEquals('34672864', $item->getId());
+        $this->assertEquals('product', $item->getType());
+        $this->assertEquals('zapatilla', $item->get('name'));
         $this->assertEquals(
             $item,
             $transformer->toItems([$product])[0]
