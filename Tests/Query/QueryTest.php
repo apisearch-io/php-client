@@ -103,4 +103,22 @@ class QueryTest extends PHPUnit_Framework_TestCase
             $scoreStrategy->getFunction()
         );
     }
+
+    /**
+     * Test fuzziness.
+     */
+    public function testFuzziness()
+    {
+        $query = Query::createMatchAll();
+        $this->assertNull($query->getFuzziness());
+        $this->assertFalse(array_key_exists('fuzziness', $query->toArray()));
+        $query->setFuzziness(1.0);
+        $this->assertEquals(1.0, $query->getFuzziness());
+        $this->assertEquals(1.0, $query->toArray()['fuzziness']);
+        $this->assertEquals(1.0, Query::createFromArray(['fuzziness' => 1.0])->getFuzziness());
+        $this->assertEquals(null, Query::createFromArray([])->getFuzziness());
+        $this->assertInstanceOf(Query::class, $query->setFuzziness('1..3'));
+        $this->assertEquals('AUTO', Query::createMatchAll()->setAutoFuzziness()->getFuzziness());
+        $this->assertInstanceOf(Query::class, $query->setAutoFuzziness());
+    }
 }

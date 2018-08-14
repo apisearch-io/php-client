@@ -154,6 +154,13 @@ class Query implements HttpTransportable
     private $scoreStrategy;
 
     /**
+     * @var float|string|array
+     *
+     * Fuzziness
+     */
+    private $fuzziness;
+
+    /**
      * @var User
      *
      * User associated to query
@@ -1147,6 +1154,42 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Get Fuzziness.
+     *
+     * @return null|float|string|array
+     */
+    public function getFuzziness()
+    {
+        return $this->fuzziness;
+    }
+
+    /**
+     * Set Fuzziness.
+     *
+     * @param float|string|array $fuzziness
+     *
+     * @return Query
+     */
+    public function setFuzziness($fuzziness)
+    {
+        $this->fuzziness = $fuzziness;
+
+        return $this;
+    }
+
+    /**
+     * Set auto Fuzziness.
+     *
+     * @return Query
+     */
+    public function setAutoFuzziness()
+    {
+        $this->fuzziness = 'AUTO';
+
+        return $this;
+    }
+
+    /**
      * Query by user.
      *
      * @param User $user
@@ -1230,6 +1273,7 @@ class Query implements HttpTransportable
             'score_strategy' => $this->scoreStrategy instanceof ScoreStrategy
                 ? $this->scoreStrategy->toArray()
                 : null,
+            'fuzziness' => $this->fuzziness,
             'user' => ($this->user instanceof User)
                 ? $this->user->toArray()
                 : null,
@@ -1292,6 +1336,7 @@ class Query implements HttpTransportable
         $query->itemsPromoted = array_values(array_map(function (array $itemUUID) {
             return ItemUUID::createFromArray($itemUUID);
         }, $array['items_promoted'] ?? []));
+        $query->fuzziness = $array['fuzziness'] ?? null;
         $query->filterFields = $array['filter_fields'] ?? [];
         $query->scoreStrategy = isset($array['score_strategy'])
             ? ScoreStrategy::createFromArray($array['score_strategy'])
