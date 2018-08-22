@@ -31,6 +31,12 @@ class Endpoints
             /*
              * Application endpoints
              */
+            'v1-indices-get' => [
+                'name' => 'Get all indices',
+                'description' => 'Get all indices',
+                'path' => '/v1/indices',
+                'verb' => 'get',
+            ],
             'v1-index-create' => [
                 'name' => 'Index create',
                 'description' => 'Reset your App index',

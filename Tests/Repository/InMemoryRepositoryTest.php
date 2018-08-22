@@ -91,6 +91,11 @@ class InMemoryRepositoryTest extends PHPUnit_Framework_TestCase
                 ->query(Query::createByUUID(ItemUUID::createByComposedUUID('1~product')))
                 ->getItems()
         );
+
+        $indices = $repository->getIndices();
+        $this->assertCount(2, $indices);
+        $indicesFiltered = $repository->getIndices('xxx');
+        $this->assertCount(1, $indicesFiltered);
     }
 
     /**

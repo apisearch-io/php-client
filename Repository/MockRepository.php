@@ -21,6 +21,7 @@ use Apisearch\Exception\MockException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Changes;
+use Apisearch\Model\Index;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -68,6 +69,18 @@ class MockRepository extends Repository
         Query $query,
         Changes $changes
     ) {
+        $this->throwMockException();
+    }
+
+    /**
+     * @param string|null $appId
+     *
+     * @return array|Index[]
+     *
+     * @throws MockException
+     */
+    public function getIndices(string $appId = null): array
+    {
         $this->throwMockException();
     }
 

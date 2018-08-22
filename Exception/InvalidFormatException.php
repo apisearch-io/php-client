@@ -123,6 +123,16 @@ class InvalidFormatException extends TransportableException
     }
 
     /**
+     * Index format not valid.
+     *
+     * @return InvalidFormatException
+     */
+    public static function indexFormatNotValid(): self
+    {
+        return new static('Index Format not valid. Expecting an Index serialized but found malformed data');
+    }
+
+    /**
      * Campaign format not valid.
      *
      * @param mixed $campaignBeforeHydration

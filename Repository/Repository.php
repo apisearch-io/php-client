@@ -200,6 +200,15 @@ abstract class Repository extends RepositoryWithCredentials
     );
 
     /**
+     * Get indices.
+     *
+     * @param string|null $appId
+     *
+     * @return array|Index[]
+     */
+    abstract public function getIndices(string $appId = null): array;
+
+    /**
      * Create an index.
      *
      * @param ImmutableConfig $config

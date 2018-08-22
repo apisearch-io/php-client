@@ -20,6 +20,7 @@ use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Changes;
+use Apisearch\Model\Index;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -163,6 +164,18 @@ class TransformableRepository extends Repository
                 $query,
                 $changes
             );
+    }
+
+    /**
+     * @param string|null $appId
+     *
+     * @return array|Index[]
+     */
+    public function getIndices(string $appId = null): array
+    {
+        $this
+            ->repository
+            ->getIndices($appId);
     }
 
     /**
