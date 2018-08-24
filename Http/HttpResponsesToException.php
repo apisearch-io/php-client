@@ -39,11 +39,10 @@ trait HttpResponsesToException
         array $response,
         string $url = ''
     ) {
-        if (!isset($response['code'])) {
-            return;
-        }
-
-        if (is_null($response['body'])) {
+        if (
+            !isset($response['code']) ||
+            0 === $response['code']
+        ) {
             throw ConnectionException::buildConnectExceptionByUrl($url);
         }
 
