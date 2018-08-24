@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Apisearch\Http;
 
 use Apisearch\Exception\ConnectionException;
+use Apisearch\Exception\ForbiddenException;
 use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Exception\InvalidTokenException;
 use Apisearch\Exception\ResourceExistsException;
@@ -29,18 +30,20 @@ trait HttpResponsesToException
     /**
      * Transform transportable http errors to exceptions.
      *
-     * @param array $response
+     * @param array  $response
+     * @param string $url
      *
      * @throw TransportableException
      */
-    protected static function throwTransportableExceptionIfNeeded(array $response)
-    {
-        if (!isset($response['code'])) {
-            return;
-        }
-
-        if (is_null($response['body'])) {
-            throw new ConnectionException();
+    protected static function throwTransportableExceptionIfNeeded(
+        array $response,
+        string $url = ''
+    ) {
+        if (
+            !isset($response['code']) ||
+            0 === $response['code']
+        ) {
+            throw ConnectionException::buildConnectExceptionByUrl($url);
         }
 
         switch ($response['code']) {
@@ -52,6 +55,8 @@ trait HttpResponsesToException
                 throw new InvalidFormatException($response['body']['message']);
             case ResourceExistsException::getTransportableHTTPError():
                 throw new ResourceExistsException($response['body']['message']);
+            case ForbiddenException::getTransportableHTTPError():
+                throw new ForbiddenException($response['body']['message']);
             case ConnectionException::getTransportableHTTPError():
                 throw new ConnectionException('Apisearch returned an internal error code [500]');
         }

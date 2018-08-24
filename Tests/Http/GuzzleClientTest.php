@@ -15,10 +15,10 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Http;
 
+use Apisearch\Exception\ConnectionException;
 use Apisearch\Http\GuzzleClient;
 use Apisearch\Http\RetryMap;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ConnectException;
 use PHPUnit_Framework_TestCase;
 use Prophecy\Argument;
 
@@ -126,7 +126,7 @@ class GuzzleClientTest extends PHPUnit_Framework_TestCase
         $guzzleClient
             ->get(Argument::cetera())
             ->shouldBeCalledTimes($triesExpected)
-            ->willThrow(ConnectException::class);
+            ->willThrow(ConnectionException::class);
 
         $apisearchClient = new GuzzleClient(
             $guzzleClient->reveal(),
@@ -137,8 +137,8 @@ class GuzzleClientTest extends PHPUnit_Framework_TestCase
 
         try {
             $apisearchClient->get($url, $method);
-            $this->fail('Client should throw an exception of type '.ConnectException::class);
-        } catch (ConnectException $e) {
+            $this->fail('Client should throw an exception of type '.ConnectionException::class);
+        } catch (ConnectionException $e) {
             $after = microtime(true) * 1000000;
             $diff = $after - $before;
             if (!is_null($microsecondsMinimumExpected)) {

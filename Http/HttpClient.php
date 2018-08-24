@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
+use Apisearch\Exception\ConnectionException;
+
 /**
  * Class HttpClient.
  */
@@ -31,6 +33,8 @@ interface HttpClient
      * @param array  $server
      *
      * @return array
+     *
+     * @throws ConnectionException
      */
     public function get(
         string $url,

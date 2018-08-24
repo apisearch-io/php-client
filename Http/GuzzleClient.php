@@ -15,7 +15,9 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
+use Apisearch\Exception\ConnectionException;
 use GuzzleHttp\Client as GuzzleHttpClient;
+use GuzzleHttp\Exception\ConnectException as GuzzleConnectException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -71,6 +73,8 @@ class GuzzleClient extends Client implements HttpClient
      * @param array  $server
      *
      * @return array
+     *
+     * @throws ConnectionException
      */
     public function get(
         string $url,
@@ -90,7 +94,7 @@ class GuzzleClient extends Client implements HttpClient
         /**
          * @var ResponseInterface
          */
-        $response = $this->tryRequest(function () use ($method, $requestParts) {
+        $response = $this->tryRequest($url, function () use ($method, $requestParts) {
             return $this
                 ->client
                 ->$method(
@@ -117,6 +121,7 @@ class GuzzleClient extends Client implements HttpClient
      *
      * Retry n times this connection before returning response.
      *
+     * @param string     $url
      * @param callable   $callable
      * @param null|Retry $retry
      *
@@ -125,6 +130,7 @@ class GuzzleClient extends Client implements HttpClient
      * @throws \Exception
      */
     private function tryRequest(
+        string $url,
         callable $callable,
         ?Retry $retry
     ): ResponseInterface {
@@ -137,6 +143,10 @@ class GuzzleClient extends Client implements HttpClient
                 return $callable();
             } catch (\Exception $e) {
                 if ($tries-- <= 0) {
+                    if ($e instanceof GuzzleConnectException) {
+                        throw ConnectionException::buildConnectExceptionByUrl($url);
+                    }
+
                     throw $e;
                 }
 

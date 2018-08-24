@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Repository;
 
+use Apisearch\Exception\ConnectionException;
 use Apisearch\Http\HttpClient;
 use Apisearch\Query\Query;
 use Apisearch\Repository\HttpRepository;
@@ -36,6 +37,20 @@ class HttpRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $client = $this->prophesize(HttpClient::class);
         $client->get(Argument::cetera())->willReturn(['code' => 0, 'body' => null]);
+        $repository = new HttpRepository($client->reveal());
+        $repository->setCredentials(RepositoryReference::create('123', '456'), '000');
+        $repository->query(Query::createMatchAll());
+    }
+
+    /**
+     * Test add, delete and query items by UUID.
+     *
+     * @expectedException \Apisearch\Exception\ConnectionException
+     */
+    public function testConnectionExceptionResponse()
+    {
+        $client = $this->prophesize(HttpClient::class);
+        $client->get(Argument::cetera())->willThrow(ConnectionException::buildConnectExceptionByUrl('http://xxx.xx'));
         $repository = new HttpRepository($client->reveal());
         $repository->setCredentials(RepositoryReference::create('123', '456'), '000');
         $repository->query(Query::createMatchAll());
