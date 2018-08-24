@@ -173,7 +173,7 @@ class TransformableRepository extends Repository
      */
     public function getIndices(string $appId = null): array
     {
-        $this
+        return $this
             ->repository
             ->getIndices($appId);
     }
