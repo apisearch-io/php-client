@@ -20,6 +20,7 @@ use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Changes;
+use Apisearch\Model\Index;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Filter;
@@ -111,6 +112,31 @@ class InMemoryRepository extends Repository
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @param string|null $appId
+     *
+     * @return array|Index[]
+     */
+    public function getIndices(string $appId = null): array
+    {
+        $result = [];
+        foreach ($this->getItems() as $index => $data) {
+            if (false !== preg_match("/(?P<app_id>[^_]+)\_(?P<name>[\S]+)/", $index, $matches)) {
+                if (!empty($appId) && $matches['app_id'] !== $appId) {
+                    continue;
+                }
+                $indexMeta = [
+                    'app_id' => $matches['app_id'],
+                    'name' => $matches['name'],
+                    'doc_count' => \count($data),
+                ];
+                $result[] = Index::createFromArray($indexMeta);
+            }
+        }
+
+        return $result;
     }
 
     /**
