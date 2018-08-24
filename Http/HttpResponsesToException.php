@@ -39,6 +39,10 @@ trait HttpResponsesToException
             return;
         }
 
+        if (is_null($response['body'])) {
+            throw new ConnectionException();
+        }
+
         switch ($response['code']) {
             case ResourceNotAvailableException::getTransportableHTTPError():
                 throw new ResourceNotAvailableException($response['body']['message']);
