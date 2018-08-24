@@ -29,4 +29,16 @@ class ConnectionException extends TransportableException
     {
         return 500;
     }
+
+    /**
+     * Build new connect exception.
+     *
+     * @param string $url
+     *
+     * @return ConnectionException
+     */
+    public static function buildConnectExceptionByUrl(string $url)
+    {
+        return new ConnectionException(sprintf('Unable to connect to Apisearch server in %s', $url));
+    }
 }

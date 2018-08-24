@@ -29,18 +29,21 @@ trait HttpResponsesToException
     /**
      * Transform transportable http errors to exceptions.
      *
-     * @param array $response
+     * @param array  $response
+     * @param string $url
      *
      * @throw TransportableException
      */
-    protected static function throwTransportableExceptionIfNeeded(array $response)
-    {
+    protected static function throwTransportableExceptionIfNeeded(
+        array $response,
+        string $url = ''
+    ) {
         if (!isset($response['code'])) {
             return;
         }
 
         if (is_null($response['body'])) {
-            throw new ConnectionException();
+            throw ConnectionException::buildConnectExceptionByUrl($url);
         }
 
         switch ($response['code']) {
