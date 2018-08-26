@@ -67,6 +67,18 @@ class ResourceNotAvailableException extends TransportableException
     }
 
     /**
+     * Route not available.
+     *
+     * @param string $resourceId
+     *
+     * @return ResourceNotAvailableException
+     */
+    public static function routeNotAvailable(string $resourceId): self
+    {
+        return new self(sprintf('Route not available - %s', $resourceId));
+    }
+
+    /**
      * Engine is not available.
      *
      * @param string $resourceId
