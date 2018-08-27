@@ -49,6 +49,28 @@ class AggregationTest extends TestCase
     }
 
     /**
+     * Test creation with bad name.
+     *
+     * @expectedException \Apisearch\Exception\InvalidFormatException
+     */
+    public function testCreateBadName()
+    {
+        Aggregation::createFromArray([]);
+    }
+
+    /**
+     * Test creation with empty name.
+     *
+     * @expectedException \Apisearch\Exception\InvalidFormatException
+     */
+    public function testCreateEmptyName()
+    {
+        Aggregation::createFromArray([
+            'name' => '',
+        ]);
+    }
+
+    /**
      * Test creation with default values.
      */
     public function testCreateDefaultValues()
