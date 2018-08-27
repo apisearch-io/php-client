@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Query;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\HttpTransportable;
 
 /**
@@ -283,6 +284,10 @@ class Aggregation implements HttpTransportable
      */
     public static function createFromArray(array $array): self
     {
+        if (empty($array['name'])) {
+            throw InvalidFormatException::queryFormatNotValid($array);
+        }
+
         return self::create(
             $array['name'],
             $array['field'] ?? 'uuid.type',
