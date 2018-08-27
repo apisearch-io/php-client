@@ -117,6 +117,33 @@ class SortByTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test sort by field value.
+     */
+    public function testSortByFieldValueBasicFields()
+    {
+        $sortBy = SortBy::create();
+        $sortBy->byFieldValue('id', SortBy::ASC);
+        $sortBy->byFieldValue('type', SortBy::ASC);
+        $this->assertEquals(
+            [
+                [
+                    'type' => SortBy::TYPE_FIELD,
+                    'uuid.id' => [
+                        'order' => SortBy::ASC,
+                    ],
+                ],
+                [
+                    'type' => SortBy::TYPE_FIELD,
+                    'uuid.type' => [
+                        'order' => SortBy::ASC,
+                    ],
+                ],
+            ],
+            $sortBy->all()
+        );
+    }
+
+    /**
      * Test sortby nested field and filter.
      */
     public function testNestedFieldAndFilter()

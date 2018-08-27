@@ -251,7 +251,7 @@ class SortBy implements HttpTransportable
     ): SortBy {
         $this->sortsBy[] = [
             'type' => self::TYPE_FIELD,
-            "indexed_metadata.$field" => [
+            Filter::getFilterPathByField($field) => [
                 'order' => $order,
             ],
         ];
