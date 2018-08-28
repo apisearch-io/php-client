@@ -16,12 +16,12 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Model;
 
 use Apisearch\Model\User;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class UserTest.
  */
-class UserTest extends PHPUnit_Framework_TestCase
+class UserTest extends TestCase
 {
     /**
      * Test user creation.

@@ -15,42 +15,43 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Model\TokenUUID;
+
 /**
  * Class RepositoryWithCredentials.
  */
 abstract class RepositoryWithCredentials implements WithRepositoryReference
 {
+    use WithRepositoryReferenceTrait;
 
-use WithRepositoryReferenceTrait;
-
-/**
-     * @var string
+    /**
+     * @var TokenUUID
      *
-     * Api Token
+     * Token UUID
      */
-    private $token;
+    private $tokenUUID;
 
     /**
      * Set credentials.
      *
      * @param RepositoryReference $repositoryReference
-     * @param string              $token
+     * @param TokenUUID           $tokenUUID
      */
     public function setCredentials(
         RepositoryReference $repositoryReference,
-        string $token
+        TokenUUID $tokenUUID
     ) {
-        $this->token = $token;
+        $this->tokenUUID = $tokenUUID;
         $this->setRepositoryReference($repositoryReference);
     }
 
     /**
-     * Get token.
+     * Get tokenUUID.
      *
-     * @return string|null
+     * @return TokenUUID|null
      */
-    public function getToken(): ? string
+    public function getTokenUUID(): ? TokenUUID
     {
-        return $this->token;
+        return $this->tokenUUID;
     }
 }

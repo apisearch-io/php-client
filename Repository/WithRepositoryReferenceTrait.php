@@ -15,6 +15,9 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Model\AppUUID;
+use Apisearch\Model\IndexUUID;
+
 /**
  * Class WithRepositoryReferenceTrait.
  */
@@ -48,26 +51,26 @@ trait WithRepositoryReferenceTrait
     }
 
     /**
-     * Get AppId.
+     * Get AppUUID.
      *
-     * @return string
+     * @return AppUUID|null
      */
-    public function getAppId(): string
+    public function getAppUUID():? AppUUID
     {
         return $this
             ->repositoryReference
-            ->getAppId();
+            ->getAppUUID();
     }
 
     /**
-     * Get Index.
+     * Get IndexUUID.
      *
-     * @return string
+     * @return IndexUUID|null
      */
-    public function getIndex(): string
+    public function getIndexUUID():? IndexUUID
     {
         return $this
             ->repositoryReference
-            ->getIndex();
+            ->getIndexUUID();
     }
 }

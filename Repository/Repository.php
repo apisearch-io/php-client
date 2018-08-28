@@ -15,9 +15,6 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
-use Apisearch\Config\Config;
-use Apisearch\Config\ImmutableConfig;
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Changes;
 use Apisearch\Model\Item;
@@ -198,52 +195,4 @@ abstract class Repository extends RepositoryWithCredentials
         Query $query,
         Changes $changes
     );
-
-    /**
-     * Get indices.
-     *
-     * @param string|null $appId
-     *
-     * @return array|Index[]
-     */
-    abstract public function getIndices(string $appId = null): array;
-
-    /**
-     * Create an index.
-     *
-     * @param ImmutableConfig $config
-     *
-     * @throws ResourceExistsException
-     */
-    abstract public function createIndex(ImmutableConfig $config);
-
-    /**
-     * Delete an index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    abstract public function deleteIndex();
-
-    /**
-     * Reset the index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    abstract public function resetIndex();
-
-    /**
-     * Checks the index.
-     *
-     * @return bool
-     */
-    abstract public function checkIndex(): bool;
-
-    /**
-     * Config the index.
-     *
-     * @param Config $config
-     *
-     * @throws ResourceNotAvailableException
-     */
-    abstract public function configureIndex(Config $config);
 }

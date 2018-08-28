@@ -18,12 +18,12 @@ namespace Apisearch\Tests\Model;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * File header placeholder.
  */
-class ItemTest extends PHPUnit_Framework_TestCase
+class ItemTest extends TestCase
 {
     /**
      * Test item creation with location.

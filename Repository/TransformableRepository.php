@@ -15,14 +15,11 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
-use Apisearch\Config\Config;
-use Apisearch\Config\ImmutableConfig;
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Changes;
-use Apisearch\Model\Index;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
+use Apisearch\Model\TokenUUID;
 use Apisearch\Query\Query;
 use Apisearch\Result\Result;
 use Apisearch\Transformer\Transformer;
@@ -76,19 +73,19 @@ class TransformableRepository extends Repository
     }
 
     /**
-     * Set repository credentials.
+     * Set credentials.
      *
      * @param RepositoryReference $repositoryReference
-     * @param string              $token
+     * @param TokenUUID           $tokenUUID
      */
     public function setCredentials(
         RepositoryReference $repositoryReference,
-        string $token
+        TokenUUID $tokenUUID
     ) {
-        parent::setCredentials($repositoryReference, $token);
+        parent::setCredentials($repositoryReference, $tokenUUID);
         $this
             ->repository
-            ->setCredentials($repositoryReference, $token);
+            ->setCredentials($repositoryReference, $tokenUUID);
     }
 
     /**
@@ -164,82 +161,6 @@ class TransformableRepository extends Repository
                 $query,
                 $changes
             );
-    }
-
-    /**
-     * @param string|null $appId
-     *
-     * @return array|Index[]
-     */
-    public function getIndices(string $appId = null): array
-    {
-        return $this
-            ->repository
-            ->getIndices($appId);
-    }
-
-    /**
-     * Create an index.
-     *
-     * @param ImmutableConfig $config
-     *
-     * @throws ResourceExistsException
-     */
-    public function createIndex(ImmutableConfig $config)
-    {
-        $this
-            ->repository
-            ->createIndex($config);
-    }
-
-    /**
-     * Delete an index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function deleteIndex()
-    {
-        $this
-            ->repository
-            ->deleteIndex();
-    }
-
-    /**
-     * Reset the index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function resetIndex()
-    {
-        $this
-            ->repository
-            ->resetIndex();
-    }
-
-    /**
-     * Checks the index.
-     *
-     * @return bool
-     */
-    public function checkIndex(): bool
-    {
-        return $this
-            ->repository
-            ->checkIndex();
-    }
-
-    /**
-     * Config the index.
-     *
-     * @param Config $config
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function configureIndex(Config $config)
-    {
-        $this
-            ->repository
-            ->configureIndex($config);
     }
 
     /**

@@ -15,15 +15,11 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
-use Apisearch\Config\Config;
-use Apisearch\Config\ImmutableConfig;
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\Http;
 use Apisearch\Http\HttpClient;
 use Apisearch\Http\HttpResponsesToException;
 use Apisearch\Model\Changes;
-use Apisearch\Model\Index;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -147,143 +143,5 @@ class HttpRepository extends Repository
         self::throwTransportableExceptionIfNeeded($response);
 
         return Result::createFromArray($response['body']);
-    }
-
-    /**
-     * @param string|null $appId
-     *
-     * @return array|Index[]
-     */
-    public function getIndices(string $appId = null): array
-    {
-        $queryParams = Http::getQueryValues($this);
-        if (!empty($appId)) {
-            $queryParams['app-id'] = $appId;
-        }
-
-        $response = $this
-            ->httpClient
-            ->get(
-                '/indices',
-                'get',
-                $queryParams
-            );
-
-        self::throwTransportableExceptionIfNeeded($response);
-
-        $result = [];
-        foreach ($response['body'] as $index) {
-            $result[] = Index::createFromArray($index);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Create an index.
-     *
-     * @param ImmutableConfig $config
-     *
-     * @throws ResourceExistsException
-     */
-    public function createIndex(ImmutableConfig $config)
-    {
-        $response = $this
-            ->httpClient
-            ->get(
-                '/index',
-                'post',
-                Http::getQueryValues($this),
-                [
-                    Http::CONFIG_FIELD => $config->toArray(),
-                ]
-            );
-
-        self::throwTransportableExceptionIfNeeded($response);
-    }
-
-    /**
-     * Delete an index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function deleteIndex()
-    {
-        $response = $this
-            ->httpClient
-            ->get(
-                '/index',
-                'delete',
-                Http::getQueryValues($this)
-            );
-
-        self::throwTransportableExceptionIfNeeded($response);
-    }
-
-    /**
-     * Reset the index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function resetIndex()
-    {
-        $response = $this
-            ->httpClient
-            ->get(
-                '/index/reset',
-                'post',
-                Http::getQueryValues($this)
-            );
-
-        self::throwTransportableExceptionIfNeeded($response);
-    }
-
-    /**
-     * Checks the index.
-     *
-     * @return bool
-     */
-    public function checkIndex(): bool
-    {
-        $response = $this
-            ->httpClient
-            ->get(
-                '/index',
-                'head',
-                Http::getQueryValues($this)
-            );
-
-        if (is_null($response)) {
-            return false;
-        }
-
-        return 200 === $response['code'];
-    }
-
-    /**
-     * Config the index.
-     *
-     * @param Config $config
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function configureIndex(Config $config)
-    {
-        $response = $this
-            ->httpClient
-            ->get(
-                '/index/config',
-                'post',
-                Http::getQueryValues($this),
-                [
-                    Http::CONFIG_FIELD => $config->toArray(),
-                ]
-            );
-
-        if (is_null($response)) {
-            return;
-        }
-
-        self::throwTransportableExceptionIfNeeded($response);
     }
 }

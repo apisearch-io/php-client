@@ -13,16 +13,14 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\Token;
+namespace Apisearch\Model;
 
 use Apisearch\Exception\InvalidFormatException;
-use Apisearch\Model\HttpTransportable;
-use Apisearch\Model\UUIDReference;
 
 /**
- * File header placeholder.
+ * Class AppUUID.
  */
-class TokenUUID implements HttpTransportable, UUIDReference
+class AppUUID implements HttpTransportable, UUIDReference
 {
     /**
      * @var string
@@ -32,17 +30,21 @@ class TokenUUID implements HttpTransportable, UUIDReference
     private $id;
 
     /**
-     * TokenUUID constructor.
+     * IndexUUID constructor.
      *
      * @param string $id
      */
     private function __construct(string $id)
     {
+        if (strpos($id, '_') > 0) {
+            throw InvalidFormatException::appUUIDFormatNotValid();
+        }
+
         $this->id = $id;
     }
 
     /**
-     * Get Id.
+     * Get id.
      *
      * @return string
      */
@@ -56,7 +58,7 @@ class TokenUUID implements HttpTransportable, UUIDReference
      *
      * @param string $id
      *
-     * @return TokenUUID
+     * @return AppUUID
      */
     public static function createById(string $id)
     {
@@ -80,17 +82,17 @@ class TokenUUID implements HttpTransportable, UUIDReference
      *
      * @param array $array
      *
-     * @return self
+     * @return AppUUID
      *
      * @throws InvalidFormatException
      */
-    public static function createFromArray(array $array)
+    public static function createFromArray(array $array): self
     {
         if (!isset($array['id'])) {
-            throw InvalidFormatException::tokenUUIDFormatNotValid(json_encode($array));
+            throw InvalidFormatException::appUUIDFormatNotValid();
         }
 
-        return self::createById($array['id']);
+        return new self($array['id']);
     }
 
     /**
@@ -100,6 +102,6 @@ class TokenUUID implements HttpTransportable, UUIDReference
      */
     public function composeUUID(): string
     {
-        return $this->getId();
+        return $this->id;
     }
 }

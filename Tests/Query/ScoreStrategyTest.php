@@ -16,12 +16,12 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Query;
 
 use Apisearch\Query\ScoreStrategy;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ScoreStrategyTest.
  */
-class ScoreStrategyTest extends PHPUnit_Framework_TestCase
+class ScoreStrategyTest extends TestCase
 {
     /**
      * Test create default.

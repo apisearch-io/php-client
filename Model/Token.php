@@ -13,10 +13,9 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\Token;
+namespace Apisearch\Model;
 
 use Apisearch\Exception\InvalidFormatException;
-use Apisearch\Model\HttpTransportable;
 use Carbon\Carbon;
 
 /**
@@ -48,7 +47,7 @@ class Token implements HttpTransportable
     /**
      * @var int
      *
-     * INfinite hits per query
+     * Infinite hits per query
      */
     const INFINITE_HITS_PER_QUERY = 0;
 
@@ -60,11 +59,11 @@ class Token implements HttpTransportable
     private $tokenUUID;
 
     /**
-     * @var string
+     * @var AppUUID
      *
-     * App id
+     * App uuid
      */
-    private $appId;
+    private $appUUID;
 
     /**
      * @var int
@@ -81,7 +80,7 @@ class Token implements HttpTransportable
     private $updatedAt;
 
     /**
-     * @var string[]
+     * @var IndexUUID[]
      *
      * Indices
      */
@@ -132,19 +131,19 @@ class Token implements HttpTransportable
     /**
      * PushToken constructor.
      *
-     * @param TokenUUID $tokenUUID
-     * @param string    $appId
-     * @param string[]  $indices
-     * @param string[]  $httpReferrers
-     * @param string[]  $endpoints
-     * @param string[]  $plugins
-     * @param int       $secondsValid
-     * @param int       $maxHitsPerQuery
-     * @param int       $ttl
+     * @param TokenUUID   $tokenUUID
+     * @param AppUUID     $appUUID
+     * @param IndexUUID[] $indices
+     * @param string[]    $httpReferrers
+     * @param string[]    $endpoints
+     * @param string[]    $plugins
+     * @param int         $secondsValid
+     * @param int         $maxHitsPerQuery
+     * @param int         $ttl
      */
     public function __construct(
         TokenUUID $tokenUUID,
-        string $appId,
+        AppUUID $appUUID,
         array $indices = [],
         array $httpReferrers = [],
         array $endpoints = [],
@@ -154,7 +153,7 @@ class Token implements HttpTransportable
         int $ttl = self::DEFAULT_TTL
     ) {
         $this->tokenUUID = $tokenUUID;
-        $this->appId = $appId;
+        $this->appUUID = $appUUID;
         $this->createdAt = Carbon::now('UTC')->timestamp;
         $this->updatedAt = $this->createdAt;
         $this->setIndices($indices);
@@ -177,13 +176,13 @@ class Token implements HttpTransportable
     }
 
     /**
-     * Get AppId.
+     * Get AppUUID.
      *
-     * @return string
+     * @return AppUUID
      */
-    public function getAppId(): string
+    public function getAppUUID(): AppUUID
     {
-        return $this->appId;
+        return $this->appUUID;
     }
 
     /**
@@ -219,17 +218,11 @@ class Token implements HttpTransportable
     /**
      * Set indices.
      *
-     * @param string[] $indices
+     * @param IndexUUID[] $indices
      */
     public function setIndices(array $indices)
     {
-        $this->indices = array_values(
-            array_unique(
-                array_filter(
-                    $indices
-                )
-            )
-        );
+        $this->indices = $indices;
     }
 
     /**
@@ -396,10 +389,12 @@ class Token implements HttpTransportable
     {
         return [
             'uuid' => $this->tokenUUID->toArray(),
-            'app_id' => $this->appId,
+            'app_uuid' => $this->appUUID->toArray(),
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
-            'indices' => $this->indices,
+            'indices' => array_map(function (IndexUUID $indexUUID) {
+                return $indexUUID->toArray();
+            }, $this->indices),
             'seconds_valid' => $this->secondsValid,
             'max_hits_per_query' => $this->maxHitsPerQuery,
             'http_referrers' => $this->httpReferrers,
@@ -422,15 +417,17 @@ class Token implements HttpTransportable
     {
         if (
             !isset($array['uuid']) ||
-            !isset($array['app_id'])
+            !isset($array['app_uuid'])
         ) {
             throw InvalidFormatException::tokenFormatNotValid(json_encode($array));
         }
 
         $token = new self(
             TokenUUID::createFromArray($array['uuid']),
-            $array['app_id'],
-            $array['indices'] ?? [],
+            AppUUID::createFromArray($array['app_uuid']),
+            array_map(function (array $indexUUIDAsArray) {
+                return IndexUUID::createFromArray($indexUUIDAsArray);
+            }, ($array['indices'] ?? [])),
             $array['http_referrers'] ?? [],
             $array['endpoints'] ?? [],
             $array['plugins'] ?? [],

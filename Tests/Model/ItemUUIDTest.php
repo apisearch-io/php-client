@@ -16,12 +16,12 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Model;
 
 use Apisearch\Model\ItemUUID;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ItemUUIDTest.
  */
-class ItemUUIDTest extends PHPUnit_Framework_TestCase
+class ItemUUIDTest extends TestCase
 {
     /**
      * Test create.

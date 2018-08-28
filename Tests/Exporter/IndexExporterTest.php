@@ -15,20 +15,22 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Exporter;
 
-use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exporter\ExporterCollection;
 use Apisearch\Exporter\IndexExporter;
 use Apisearch\Exporter\JSONExporter;
+use Apisearch\Model\AppUUID;
+use Apisearch\Model\IndexUUID;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
 use Apisearch\Repository\InMemoryRepository;
 use Apisearch\Repository\RepositoryReference;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class IndexExporterTest.
  */
-class IndexExporterTest extends \PHPUnit_Framework_TestCase
+class IndexExporterTest extends TestCase
 {
     /**
      * Test import and export.
@@ -36,8 +38,7 @@ class IndexExporterTest extends \PHPUnit_Framework_TestCase
     public function testImportAndExport()
     {
         $repository = new InMemoryRepository();
-        $repository->setRepositoryReference(RepositoryReference::create('xxx', 'xxx'));
-        $repository->createIndex(ImmutableConfig::createEmpty());
+        $repository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx'), IndexUUID::createById('xxx')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~1')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~2')));
         $repository->addItem(Item::create(ItemUUID::createByComposedUUID('product~3')));
@@ -52,12 +53,14 @@ class IndexExporterTest extends \PHPUnit_Framework_TestCase
         $exporterCollection->addExporter(new JSONExporter());
         $indexExporter = new IndexExporter($exporterCollection);
         $data = $indexExporter->exportIndex($repository, 'json');
-        $repository->resetIndex();
-        $this->assertCount(0,
+        $this->assertCount(3,
             $repository
                 ->query(Query::createMatchAll())
                 ->getItems()
         );
+
+        $repository = new InMemoryRepository();
+        $repository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx'), IndexUUID::createById('xxx')));
         $indexExporter->importIndex($repository, $data, 'json');
         $this->assertCount(3,
             $repository

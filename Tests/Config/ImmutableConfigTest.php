@@ -17,12 +17,12 @@ namespace Apisearch\Tests\Config;
 
 use Apisearch\Config\ImmutableConfig;
 use Apisearch\Config\Synonym;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * File header placeholde.
  */
-class ImmutableConfigTest extends PHPUnit_Framework_TestCase
+class ImmutableConfigTest extends TestCase
 {
     /**
      * Test object construction.

@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
-use Apisearch\Token\Token;
+use Apisearch\Model\Token;
 
 /**
  * Class WithTokenTrait.
