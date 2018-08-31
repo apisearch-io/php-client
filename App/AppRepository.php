@@ -15,9 +15,15 @@ declare(strict_types=1);
 
 namespace Apisearch\App;
 
+use Apisearch\Config\Config;
+use Apisearch\Config\ImmutableConfig;
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Model\Index;
+use Apisearch\Model\IndexUUID;
+use Apisearch\Model\Token;
+use Apisearch\Model\TokenUUID;
 use Apisearch\Repository\WithRepositoryReference;
-use Apisearch\Token\Token;
-use Apisearch\Token\TokenUUID;
 
 /**
  * Class AppRepository.
@@ -49,4 +55,64 @@ interface AppRepository extends WithRepositoryReference
      * Purge tokens.
      */
     public function deleteTokens();
+
+    /**
+     * Get indices.
+     *
+     * @return Index[]
+     */
+    public function getIndices(): array;
+
+    /**
+     * Create an index.
+     *
+     * @param IndexUUID       $indexUUID
+     * @param ImmutableConfig $config
+     *
+     * @throws ResourceExistsException
+     */
+    public function createIndex(
+        IndexUUID $indexUUID,
+        ImmutableConfig $config
+    );
+
+    /**
+     * Delete an index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function deleteIndex(IndexUUID $indexUUID);
+
+    /**
+     * Reset the index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function resetIndex(IndexUUID $indexUUID);
+
+    /**
+     * Checks the index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @return bool
+     */
+    public function checkIndex(IndexUUID $indexUUID): bool;
+
+    /**
+     * Config the index.
+     *
+     * @param IndexUUID $indexUUID
+     * @param Config    $config
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function configureIndex(
+        IndexUUID $indexUUID,
+        Config $config
+    );
 }

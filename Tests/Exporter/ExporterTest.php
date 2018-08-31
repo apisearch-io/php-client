@@ -19,11 +19,12 @@ use Apisearch\Exporter\Exporter;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ExporterTest.
  */
-abstract class ExporterTest extends \PHPUnit_Framework_TestCase
+abstract class ExporterTest extends TestCase
 {
     /**
      * Get exporter instance.

@@ -16,12 +16,12 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Model;
 
 use Apisearch\Model\Changes;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ChangesTest.
  */
-class ChangesTest extends PHPUnit_Framework_TestCase
+class ChangesTest extends TestCase
 {
     /**
      * test empty creation.

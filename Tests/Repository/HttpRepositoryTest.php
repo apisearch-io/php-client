@@ -17,16 +17,19 @@ namespace Apisearch\Tests\Repository;
 
 use Apisearch\Exception\ConnectionException;
 use Apisearch\Http\HttpClient;
+use Apisearch\Model\AppUUID;
+use Apisearch\Model\IndexUUID;
+use Apisearch\Model\TokenUUID;
 use Apisearch\Query\Query;
 use Apisearch\Repository\HttpRepository;
 use Apisearch\Repository\RepositoryReference;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * Class HttpRepositoryTest.
  */
-class HttpRepositoryTest extends PHPUnit_Framework_TestCase
+class HttpRepositoryTest extends TestCase
 {
     /**
      * Test add, delete and query items by UUID.
@@ -38,7 +41,7 @@ class HttpRepositoryTest extends PHPUnit_Framework_TestCase
         $client = $this->prophesize(HttpClient::class);
         $client->get(Argument::cetera())->willReturn(['code' => 0, 'body' => null]);
         $repository = new HttpRepository($client->reveal());
-        $repository->setCredentials(RepositoryReference::create('123', '456'), '000');
+        $repository->setCredentials(RepositoryReference::create(AppUUID::createById('123'), IndexUUID::createById('456')), TokenUUID::createById('000'));
         $repository->query(Query::createMatchAll());
     }
 
@@ -52,7 +55,7 @@ class HttpRepositoryTest extends PHPUnit_Framework_TestCase
         $client = $this->prophesize(HttpClient::class);
         $client->get(Argument::cetera())->willThrow(ConnectionException::buildConnectExceptionByUrl('http://xxx.xx'));
         $repository = new HttpRepository($client->reveal());
-        $repository->setCredentials(RepositoryReference::create('123', '456'), '000');
+        $repository->setCredentials(RepositoryReference::create(AppUUID::createById('123'), IndexUUID::createById('456')), TokenUUID::createById('000'));
         $repository->query(Query::createMatchAll());
     }
 }

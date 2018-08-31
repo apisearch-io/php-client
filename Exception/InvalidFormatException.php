@@ -133,6 +133,26 @@ class InvalidFormatException extends TransportableException
     }
 
     /**
+     * IndexUUI format not valid.
+     *
+     * @return InvalidFormatException
+     */
+    public static function indexUUIDFormatNotValid(): self
+    {
+        return new static('IndexUUID Format not valid. Expecting an IndexUUID serialized but found malformed data');
+    }
+
+    /**
+     * App format not valid.
+     *
+     * @return InvalidFormatException
+     */
+    public static function appUUIDFormatNotValid(): self
+    {
+        return new static('AppUUID Format not valid. Expecting an AppUUID serialized but found malformed data');
+    }
+
+    /**
      * Campaign format not valid.
      *
      * @param mixed $campaignBeforeHydration

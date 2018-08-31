@@ -15,13 +15,9 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
-use Apisearch\Config\Config;
-use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\MockException;
-use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Changes;
-use Apisearch\Model\Index;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Query\Query;
@@ -69,72 +65,6 @@ class MockRepository extends Repository
         Query $query,
         Changes $changes
     ) {
-        $this->throwMockException();
-    }
-
-    /**
-     * @param string|null $appId
-     *
-     * @return array|Index[]
-     *
-     * @throws MockException
-     */
-    public function getIndices(string $appId = null): array
-    {
-        $this->throwMockException();
-    }
-
-    /**
-     * Create an index.
-     *
-     * @param ImmutableConfig $config
-     *
-     * @throws ResourceExistsException
-     */
-    public function createIndex(ImmutableConfig $config)
-    {
-        $this->throwMockException();
-    }
-
-    /**
-     * Delete an index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function deleteIndex()
-    {
-        $this->throwMockException();
-    }
-
-    /**
-     * Reset the index.
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function resetIndex()
-    {
-        $this->throwMockException();
-    }
-
-    /**
-     * Checks the index.
-     *
-     * @return bool
-     */
-    public function checkIndex(): bool
-    {
-        $this->throwMockException();
-    }
-
-    /**
-     * Config the index.
-     *
-     * @param Config $config
-     *
-     * @throws ResourceNotAvailableException
-     */
-    public function configureIndex(Config $config)
-    {
         $this->throwMockException();
     }
 

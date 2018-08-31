@@ -16,12 +16,12 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Http;
 
 use Apisearch\Http\Endpoints;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class EndpointsTest.
  */
-class EndpointsTest extends PHPUnit_Framework_TestCase
+class EndpointsTest extends TestCase
 {
     /**
      * All endoints.

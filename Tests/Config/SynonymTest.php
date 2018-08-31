@@ -16,9 +16,9 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Config;
 
 use Apisearch\Config\Synonym;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class SynonymTest extends PHPUnit_Framework_TestCase
+class SynonymTest extends TestCase
 {
     /**
      * @var string[]

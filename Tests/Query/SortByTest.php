@@ -18,12 +18,12 @@ namespace Apisearch\Tests\Query;
 use Apisearch\Model\Coordinate;
 use Apisearch\Query\Filter;
 use Apisearch\Query\SortBy;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class SortByTest.
  */
-class SortByTest extends PHPUnit_Framework_TestCase
+class SortByTest extends TestCase
 {
     /**
      * Test empty object.

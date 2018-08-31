@@ -13,16 +13,18 @@
 
 declare(strict_types=1);
 
-namespace Apisearch\Tests\Token;
+namespace Apisearch\Tests\Model;
 
-use Apisearch\Token\Token;
-use Apisearch\Token\TokenUUID;
-use PHPUnit_Framework_TestCase;
+use Apisearch\Model\AppUUID;
+use Apisearch\Model\IndexUUID;
+use Apisearch\Model\Token;
+use Apisearch\Model\TokenUUID;
+use PHPUnit\Framework\TestCase;
 
 /**
  * File header placeholder.
  */
-class TokenTest extends PHPUnit_Framework_TestCase
+class TokenTest extends TestCase
 {
     /**
      * Test token to and from array.
@@ -31,8 +33,8 @@ class TokenTest extends PHPUnit_Framework_TestCase
     {
         $token = new Token(
             TokenUUID::createById('1234'),
-            '987',
-            ['index1', 'index2'],
+            AppUUID::createById('987'),
+            [IndexUUID::createById('index1'), IndexUUID::createById('index2')],
             ['referrer1', 'referrer2'],
             ['get~~endpoint1', 'post~~endpoint2'],
             ['plugin1', 'plugin2'],

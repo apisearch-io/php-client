@@ -15,72 +15,90 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
+use Apisearch\Model\AppUUID;
+use Apisearch\Model\IndexUUID;
+
 /**
  * Class RepositoryReference.
  */
 class RepositoryReference
 {
     /**
-     * @var string
+     * @var AppUUID|null
      *
-     * App id
+     * App uuid
      */
-    protected $appId;
+    protected $appUUID;
 
     /**
-     * @var string
+     * @var IndexUUID|null
      *
-     * Index
+     * Index uuid
      */
-    protected $index;
+    protected $indexUUID;
 
     /**
      * RepositoryReference constructor.
      *
-     * @param string $appId
-     * @param string $index
+     * @param AppUUID   $appUUID
+     * @param IndexUUID $indexUUID
      */
     private function __construct(
-        string $appId,
-        string $index
+        AppUUID $appUUID = null,
+        IndexUUID $indexUUID = null
     ) {
-        $this->appId = $appId;
-        $this->index = $index;
+        $this->appUUID = $appUUID;
+        $this->indexUUID = $indexUUID;
     }
 
     /**
-     * Get AppId.
+     * Get AppUUID.
      *
-     * @return string
+     * @return AppUUID|null
      */
-    public function getAppId(): string
+    public function getAppUUID(): ? AppUUID
     {
-        return $this->appId;
+        return $this->appUUID;
     }
 
     /**
-     * Get Index.
+     * Get IndexUUID.
      *
-     * @return string
+     * @return IndexUUID|null
      */
-    public function getIndex(): string
+    public function getIndexUUID(): ? IndexUUID
     {
-        return $this->index;
+        return $this->indexUUID;
     }
 
     /**
-     * Create by app id and token.
+     * Create by appUUID and indexUUID.
      *
-     * @param string $appId
-     * @param string $index
+     * @param AppUUID   $appUUID
+     * @param IndexUUID $indexUUID
      *
      * @return RepositoryReference
      */
     public static function create(
-        string $appId,
-        string $index
-    ) {
-        return new self($appId, $index);
+        AppUUID $appUUID = null,
+        IndexUUID $indexUUID = null
+    ): RepositoryReference {
+        return new self($appUUID, $indexUUID);
+    }
+
+    /**
+     * Change the index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @return RepositoryReference
+     */
+    public function changeIndex(IndexUUID $indexUUID): RepositoryReference
+    {
+        return self::create(
+            $this->appUUID,
+            $indexUUID
+        );
     }
 
     /**
@@ -90,6 +108,30 @@ class RepositoryReference
      */
     public function compose(): string
     {
-        return "{$this->appId}_{$this->index}";
+        return sprintf('%s_%s',
+            $this->appUUID instanceof AppUUID
+                ? str_replace('_', '-', $this->appUUID->composeUUID())
+                : '',
+            $this->indexUUID instanceof IndexUUID
+                ? str_replace('_', '-', $this->indexUUID->composeUUID())
+                : ''
+        );
+    }
+
+    /**
+     * Create from composed.
+     *
+     * @param string $composed
+     *
+     * @return RepositoryReference
+     */
+    public static function createFromComposed(string $composed): RepositoryReference
+    {
+        list($appUUIDComposed, $indexUUIDComposed) = explode('_', $composed, 2);
+
+        return RepositoryReference::create(
+            AppUUID::createById($appUUIDComposed),
+            IndexUUID::createById($indexUUIDComposed)
+        );
     }
 }

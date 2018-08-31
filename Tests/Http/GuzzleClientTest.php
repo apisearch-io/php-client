@@ -19,13 +19,13 @@ use Apisearch\Exception\ConnectionException;
 use Apisearch\Http\GuzzleClient;
 use Apisearch\Http\RetryMap;
 use GuzzleHttp\Client;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * Class GuzzleClientTest.
  */
-class GuzzleClientTest extends PHPUnit_Framework_TestCase
+class GuzzleClientTest extends TestCase
 {
     /**
      * Test n query retries.

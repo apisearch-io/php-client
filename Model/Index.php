@@ -18,64 +18,112 @@ namespace Apisearch\Model;
 use Apisearch\Exception\InvalidFormatException;
 
 /**
- * Class Coordinate.
+ * Class Index.
  */
 class Index implements HttpTransportable
 {
     /**
-     * @var string
+     * @var IndexUUID
+     *
+     * Index UUID
      */
-    private $appId;
+    private $uuid;
 
     /**
-     * @var string
+     * App id.
+     *
+     * @var AppUUID
      */
-    private $name;
+    private $appUUID;
 
     /**
+     * Is OK
+     *
+     * @var boolean
+     */
+    private $isOK;
+
+    /**
+     * Doc count.
+     *
      * @var int
      */
     private $docCount;
 
     /**
-     * GeoPoint constructor.
+     * Size
      *
-     * @param string $appId
-     * @param string $name
-     * @param int    $docCount
+     * @var string
+     */
+    private $size;
+
+    /**
+     * Index constructor.
+     *
+     * @param IndexUUID $uuid
+     * @param AppUUID    $appUUID
+     * @param bool $isOK
+     * @param int       $docCount
+     * @param string $size
      */
     public function __construct(
-        string $appId,
-        string $name,
-        int $docCount = 0
+        IndexUUID $uuid,
+        AppUUID $appUUID,
+        bool $isOK,
+        int $docCount = 0,
+        string $size
     ) {
-        $this->appId = $appId;
-        $this->name = $name;
+        $this->uuid = $uuid;
+        $this->appUUID = $appUUID;
+        $this->isOK = $isOK;
         $this->docCount = $docCount;
+        $this->size = $size;
     }
 
     /**
-     * @return string
+     * Get IndexUUID.
+     *
+     * @return IndexUUID
      */
-    public function getAppId(): string
+    public function getUUID(): IndexUUID
     {
-        return $this->appId;
+        return $this->uuid;
     }
 
     /**
-     * @return string
+     * Get app id.
+     *
+     * @return AppUUID
      */
-    public function getName(): string
+    public function getAppUUID(): AppUUID
     {
-        return $this->name;
+        return $this->appUUID;
     }
 
     /**
+     * @return bool
+     */
+    public function isOK(): bool
+    {
+        return $this->isOK;
+    }
+
+    /**
+     * Get doc count.
+     *
      * @return int
      */
     public function getDocCount(): int
     {
         return $this->docCount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSize(): string
+    {
+        return $this->size;
     }
 
     /**
@@ -86,9 +134,11 @@ class Index implements HttpTransportable
     public function toArray(): array
     {
         return [
-            'app_id' => $this->appId,
-            'name' => $this->name,
+            'uuid' => $this->uuid->toArray(),
+            'app_id' => $this->appUUID->toArray(),
+            'is_ok' => $this->isOK,
             'doc_count' => $this->docCount,
+            'size' => $this->size
         ];
     }
 
@@ -98,17 +148,21 @@ class Index implements HttpTransportable
      * @param array $array
      *
      * @return Index
+     *
+     * @throws InvalidFormatException
      */
     public static function createFromArray(array $array): self
     {
-        if (!isset($array['app_id'], $array['name'])) {
+        if (!isset($array['uuid'], $array['app_id'])) {
             throw InvalidFormatException::indexFormatNotValid();
         }
 
         return new self(
-            $array['app_id'],
-            $array['name'],
-            isset($array['doc_count']) ? (int) $array['doc_count'] : 0
+            IndexUUID::createFromArray($array['uuid']),
+            AppUUID::createFromArray($array['app_id']),
+            $array['is_ok'] ?? false,
+            $array['doc_count'] ?? 0,
+            $array['size'] ?? '0kb'
         );
     }
 }

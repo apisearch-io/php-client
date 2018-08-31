@@ -15,10 +15,16 @@ declare(strict_types=1);
 
 namespace Apisearch\App;
 
+use Apisearch\Config\Config;
+use Apisearch\Config\ImmutableConfig;
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\Http;
 use Apisearch\Http\HttpRepositoryWithCredentials;
-use Apisearch\Token\Token;
-use Apisearch\Token\TokenUUID;
+use Apisearch\Model\Index;
+use Apisearch\Model\IndexUUID;
+use Apisearch\Model\Token;
+use Apisearch\Model\TokenUUID;
 
 /**
  * Class HttpAppRepository.
@@ -37,7 +43,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
             ->get(
                 '/token',
                 'post',
-                Http::getQueryValues($this),
+                Http::getAppQueryValues($this),
                 [
                     Http::TOKEN_FIELD => $token->toArray(),
                 ]
@@ -58,7 +64,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
             ->get(
                 '/token',
                 'delete',
-                Http::getQueryValues($this),
+                Http::getAppQueryValues($this),
                 [
                     Http::TOKEN_FIELD => $tokenUUID->toArray(),
                 ]
@@ -79,7 +85,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
             ->get(
                 '/tokens',
                 'get',
-                Http::getQueryValues($this)
+                Http::getAppQueryValues($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -99,8 +105,158 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
             ->get(
                 '/tokens',
                 'delete',
-                Http::getQueryValues($this)
+                Http::getAppQueryValues($this)
             );
+
+        self::throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
+     * Get indices.
+     *
+     * @return Index[]
+     */
+    public function getIndices(): array
+    {
+        if (!empty($appId)) {
+            $queryParams['app-id'] = $appId;
+        }
+
+        $response = $this
+            ->httpClient
+            ->get(
+                '/indices',
+                'get',
+                Http::getAppQueryValues($this)
+            );
+
+        self::throwTransportableExceptionIfNeeded($response);
+
+        $result = [];
+        foreach ($response['body'] as $index) {
+            $result[] = Index::createFromArray($index);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Create an index.
+     *
+     * @param IndexUUID       $indexUUID
+     * @param ImmutableConfig $config
+     *
+     * @throws ResourceExistsException
+     */
+    public function createIndex(
+        IndexUUID $indexUUID,
+        ImmutableConfig $config
+    ) {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index',
+                'post',
+                Http::getAppQueryValues($this),
+                [
+                    Http::INDEX_FIELD => $indexUUID->toArray(),
+                    Http::CONFIG_FIELD => $config->toArray(),
+                ]
+            );
+
+        self::throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
+     * Delete an index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function deleteIndex(IndexUUID $indexUUID)
+    {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index',
+                'delete',
+                Http::getAppQueryValues($this, $indexUUID)
+            );
+
+        self::throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
+     * Reset the index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function resetIndex(IndexUUID $indexUUID)
+    {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index/reset',
+                'post',
+                Http::getAppQueryValues($this, $indexUUID)
+            );
+
+        self::throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
+     * Checks the index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @return bool
+     */
+    public function checkIndex(IndexUUID $indexUUID): bool
+    {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index',
+                'head',
+                Http::getAppQueryValues($this, $indexUUID)
+            );
+
+        if (is_null($response)) {
+            return false;
+        }
+
+        return 200 === $response['code'];
+    }
+
+    /**
+     * Config the index.
+     *
+     * @param IndexUUID $indexUUID
+     * @param Config    $config
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function configureIndex(
+        IndexUUID $indexUUID,
+        Config $config
+    ) {
+        $response = $this
+            ->httpClient
+            ->get(
+                '/index/config',
+                'post',
+                Http::getAppQueryValues($this, $indexUUID),
+                [
+                    Http::CONFIG_FIELD => $config->toArray(),
+                ]
+            );
+
+        if (is_null($response)) {
+            return;
+        }
 
         self::throwTransportableExceptionIfNeeded($response);
     }

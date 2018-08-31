@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
+use Apisearch\Model\IndexUUID;
 use Apisearch\Repository\RepositoryWithCredentials;
 
 /**
@@ -109,14 +110,37 @@ class Http
     /**
      * Get common query values.
      *
+     * @param RepositoryWithCredentials $repository
+     *
      * @return string[]
      */
     public static function getQueryValues(RepositoryWithCredentials $repository): array
     {
         return [
-            self::APP_ID_FIELD => $repository->getAppId(),
-            self::INDEX_FIELD => $repository->getIndex(),
-            self::TOKEN_FIELD => $repository->getToken(),
+            self::APP_ID_FIELD => $repository->getAppUUID()->composeUUID(),
+            self::INDEX_FIELD => $repository->getIndexUUID()->composeUUID(),
+            self::TOKEN_FIELD => $repository->getTokenUUID()->composeUUID(),
         ];
+    }
+
+    /**
+     * Get common query values.
+     *
+     * @param RepositoryWithCredentials $repository
+     * @param IndexUUID                 $indexUUID
+     *
+     * @return string[]
+     */
+    public static function getAppQueryValues(
+        RepositoryWithCredentials $repository,
+        IndexUUID $indexUUID = null
+    ): array {
+        return array_filter([
+            self::APP_ID_FIELD => $repository->getAppUUID()->composeUUID(),
+            self::INDEX_FIELD => $indexUUID instanceof IndexUUID
+                ? $indexUUID->composeUUID()
+                : false,
+            self::TOKEN_FIELD => $repository->getTokenUUID()->composeUUID(),
+        ]);
     }
 }

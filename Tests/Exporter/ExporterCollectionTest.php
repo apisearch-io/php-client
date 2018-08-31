@@ -18,11 +18,12 @@ namespace Apisearch\Tests\Exporter;
 use Apisearch\Exporter\CSVExporter;
 use Apisearch\Exporter\ExporterCollection;
 use Apisearch\Exporter\JSONExporter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ExporterCollectionTest.
  */
-class ExporterCollectionTest extends \PHPUnit_Framework_TestCase
+class ExporterCollectionTest extends TestCase
 {
     /**
      * Test collection.

@@ -17,13 +17,13 @@ namespace Apisearch\Tests\Transformer;
 
 use Apisearch\Transformer\Transformer;
 use DateTime;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class TransformerTest.
  */
-class TransformerTest extends PHPUnit_Framework_TestCase
+class TransformerTest extends TestCase
 {
     /**
      * Test basic transformer.

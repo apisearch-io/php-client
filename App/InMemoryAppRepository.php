@@ -15,10 +15,16 @@ declare(strict_types=1);
 
 namespace Apisearch\App;
 
+use Apisearch\Config\Config;
+use Apisearch\Config\ImmutableConfig;
+use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Model\AppUUID;
+use Apisearch\Model\Index;
+use Apisearch\Model\IndexUUID;
+use Apisearch\Model\Token;
+use Apisearch\Model\TokenUUID;
 use Apisearch\Repository\RepositoryWithCredentials;
-use Apisearch\Token\Token;
-use Apisearch\Token\TokenUUID;
 
 /**
  * Class InMemoryAppRepository.
@@ -30,18 +36,124 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
      *
      * Items
      */
-    private $tokens = [];
+    public $indices = [];
 
     /**
-     * Get index position by credentials.
+     * @var Token[]
      *
-     * @return string
+     * Tokens
      */
-    private function getIndexKey(): string
+    public $tokens = [];
+
+    /**
+     * Get indices.
+     *
+     * @return Index[]
+     */
+    public function getIndices(): array
     {
-        return $this
-            ->getRepositoryReference()
-            ->getAppId();
+        $appId = $this->getAppKey();
+
+        $result = [];
+        foreach ($this->indices as $index => $_) {
+            if (false !== preg_match("/(?P<app_id>[^_]+)\_(?P<id>[\S]+)/", $index, $matches)) {
+                if (!empty($appId) && $matches['app_id'] !== $appId) {
+                    continue;
+                }
+
+                $indexMeta = [
+                    'uuid' => ['id' => $matches['id']],
+                    'app_id' => ['id' => $matches['app_id']],
+                    'doc_count' => 0,
+                ];
+
+                $result[] = Index::createFromArray($indexMeta);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Create an index.
+     *
+     * @param IndexUUID       $indexUUID
+     * @param ImmutableConfig $config
+     *
+     * @throws ResourceExistsException
+     */
+    public function createIndex(
+        IndexUUID $indexUUID,
+        ImmutableConfig $config
+    ) {
+        if (array_key_exists($this->getIndexKey($indexUUID), $this->indices)) {
+            throw ResourceExistsException::indexExists();
+        }
+
+        $this->indices[$this->getIndexKey($indexUUID)] = [
+            'config' => $config,
+            'was_reset' => false,
+            'was_reconfigured' => false,
+        ];
+    }
+
+    /**
+     * Delete an index.
+     *
+     * @param IndexUUID $indexUUID
+     */
+    public function deleteIndex(IndexUUID $indexUUID)
+    {
+        if (!array_key_exists($this->getIndexKey($indexUUID), $this->indices)) {
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
+        }
+
+        unset($this->indices[$this->getIndexKey($indexUUID)]);
+    }
+
+    /**
+     * Reset the index.
+     *
+     * @param IndexUUID $indexUUID
+     */
+    public function resetIndex(IndexUUID $indexUUID)
+    {
+        if (!array_key_exists($this->getIndexKey($indexUUID), $this->indices)) {
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
+        }
+
+        $this->indices[$this->getIndexKey($indexUUID)]['was_reset'] = true;
+    }
+
+    /**
+     * Checks the index.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @return bool
+     */
+    public function checkIndex(IndexUUID $indexUUID): bool
+    {
+        return array_key_exists($this->getIndexKey($indexUUID), $this->indices);
+    }
+
+    /**
+     * Config the index.
+     *
+     * @param IndexUUID $indexUUID
+     * @param Config    $config
+     *
+     * @throws ResourceNotAvailableException
+     */
+    public function configureIndex(
+        IndexUUID $indexUUID,
+        Config $config
+    ) {
+        if (!array_key_exists($this->getIndexKey($indexUUID), $this->indices)) {
+            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
+        }
+
+        $this->indices[$this->getIndexKey($indexUUID)]['was_reconfigured'] = true;
     }
 
     /**
@@ -51,11 +163,7 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
      */
     public function addToken(Token $token)
     {
-        if (!array_key_exists($this->getIndexKey(), $this->tokens)) {
-            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
-        }
-
-        $this->tokens[$this->getIndexKey()][$token->getTokenUUID()->composeUUID()] = $token;
+        $this->tokens[$this->getAppKey()][$token->getTokenUUID()->composeUUID()] = $token;
     }
 
     /**
@@ -65,11 +173,7 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
      */
     public function deleteToken(TokenUUID $tokenUUID)
     {
-        if (!array_key_exists($this->getIndexKey(), $this->tokens)) {
-            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
-        }
-
-        unset($this->tokens[$this->getIndexKey()][$tokenUUID->composeUUID()]);
+        unset($this->tokens[$this->getAppKey()][$tokenUUID->composeUUID()]);
     }
 
     /**
@@ -79,11 +183,7 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
      */
     public function getTokens(): array
     {
-        if (!array_key_exists($this->getIndexKey(), $this->tokens)) {
-            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
-        }
-
-        return $this->tokens[$this->getIndexKey()];
+        return $this->tokens[$this->getAppKey()] ?? [];
     }
 
     /**
@@ -91,10 +191,34 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
      */
     public function deleteTokens()
     {
-        if (!array_key_exists($this->getIndexKey(), $this->tokens)) {
-            throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
-        }
+        $this->tokens[$this->getAppKey()] = [];
+    }
 
-        $this->tokens[$this->getIndexKey()] = [];
+    /**
+     * Get index position by credentials.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @return string
+     */
+    private function getIndexKey(IndexUUID $indexUUID): string
+    {
+        return $this->getAppKey().'_'.$indexUUID->getId();
+    }
+
+    /**
+     * Get app position by credentials.
+     *
+     * @return string
+     */
+    private function getAppKey(): string
+    {
+        $appUUID = $this
+            ->getRepositoryReference()
+            ->getAppUUID();
+
+        return $appUUID instanceof AppUUID
+            ? $appUUID->getId()
+            : '';
     }
 }

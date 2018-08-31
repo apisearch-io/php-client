@@ -37,7 +37,7 @@ class ForbiddenException extends TransportableException
      */
     public static function createAppIdIsRequiredException(): self
     {
-        return new self('AppId query parameter MUST be defined with a valid value');
+        return new self('app_id query parameter MUST be defined with a valid value');
     }
 
     /**
@@ -47,7 +47,7 @@ class ForbiddenException extends TransportableException
      */
     public static function createIndexIsRequiredException(): self
     {
-        return new self('Index query parameter MUST be defined with a valid value');
+        return new self('index query parameter MUST be defined with a valid value');
     }
 
     /**
@@ -57,6 +57,6 @@ class ForbiddenException extends TransportableException
      */
     public static function createTokenIsRequiredException(): self
     {
-        return new self('Token query parameter MUST be defined with a valid value');
+        return new self('token query parameter MUST be defined with a valid value');
     }
 }

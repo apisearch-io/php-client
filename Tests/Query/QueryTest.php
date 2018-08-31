@@ -18,12 +18,12 @@ namespace Apisearch\Tests\Query;
 use Apisearch\Query\Query;
 use Apisearch\Query\ScoreStrategy;
 use Apisearch\Query\SortBy;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class QueryTest.
  */
-class QueryTest extends PHPUnit_Framework_TestCase
+class QueryTest extends TestCase
 {
     /**
      * Test to array.
