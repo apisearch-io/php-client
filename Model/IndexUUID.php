@@ -37,7 +37,6 @@ class IndexUUID implements HttpTransportable, UUIDReference
     private function __construct(string $id)
     {
         if (strpos($id, '_') > 0) {
-            var_dump($id);
             throw InvalidFormatException::indexUUIDFormatNotValid();
         }
 
