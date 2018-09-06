@@ -55,7 +55,7 @@ trait WithRepositoryReferenceTrait
      *
      * @return AppUUID|null
      */
-    public function getAppUUID():? AppUUID
+    public function getAppUUID(): ? AppUUID
     {
         return $this
             ->repositoryReference
@@ -67,7 +67,7 @@ trait WithRepositoryReferenceTrait
      *
      * @return IndexUUID|null
      */
-    public function getIndexUUID():? IndexUUID
+    public function getIndexUUID(): ? IndexUUID
     {
         return $this
             ->repositoryReference

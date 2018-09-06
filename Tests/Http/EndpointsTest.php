@@ -54,10 +54,10 @@ class EndpointsTest extends TestCase
      * All composed endpoints.
      */
     private $allComposedEndpoints = [
-        'post~~/v1/index',
+        'put~~/v1/index',
         'delete~~/v1/index',
         'post~~/v1/index/reset',
-        'put~~/v1/index',
+        'post~~/v1/index',
 
         'post~~/v1/items',
         'delete~~/v1/items',

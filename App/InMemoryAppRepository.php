@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Apisearch\App;
 
 use Apisearch\Config\Config;
-use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\AppUUID;
@@ -77,14 +76,14 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
     /**
      * Create an index.
      *
-     * @param IndexUUID       $indexUUID
-     * @param ImmutableConfig $config
+     * @param IndexUUID $indexUUID
+     * @param Config    $config
      *
      * @throws ResourceExistsException
      */
     public function createIndex(
         IndexUUID $indexUUID,
-        ImmutableConfig $config
+        Config $config
     ) {
         if (array_key_exists($this->getIndexKey($indexUUID), $this->indices)) {
             throw ResourceExistsException::indexExists();
