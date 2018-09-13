@@ -28,11 +28,30 @@ class SynonymTest extends TestCase
     private $words = ['a', 'b', 'c'];
 
     /**
+     * @var string[]
+     *
+     * Words with spaces
+     */
+    private $wordsWithSpaces = ['  a', 'b  ', '  c  '];
+
+    /**
      * Test creation by array.
      */
     public function testCreate()
     {
         $synonym = Synonym::createByWords($this->words);
+        $this->assertEquals(
+            $this->words,
+            $synonym->getWords()
+        );
+    }
+
+    /**
+     * Test creation by array with spaces.
+     */
+    public function testSpacesInWords()
+    {
+        $synonym = Synonym::createByWords($this->wordsWithSpaces);
         $this->assertEquals(
             $this->words,
             $synonym->getWords()

@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Apisearch\App;
 
 use Apisearch\Config\Config;
-use Apisearch\Config\ImmutableConfig;
 use Apisearch\Exception\MockException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
@@ -82,14 +81,14 @@ class MockAppRepository extends HttpRepositoryWithCredentials implements AppRepo
     /**
      * Create an index.
      *
-     * @param IndexUUID       $indexUUID
-     * @param ImmutableConfig $config
+     * @param IndexUUID $indexUUID
+     * @param Config    $config
      *
      * @throws ResourceExistsException
      */
     public function createIndex(
         IndexUUID $indexUUID,
-        ImmutableConfig $config
+        Config $config
     ) {
         $this->throwMockException();
     }

@@ -57,7 +57,7 @@ class Synonym implements HttpTransportable
      */
     public static function createByWords(array $words)
     {
-        return new self($words);
+        return new self(array_map('trim', $words));
     }
 
     /**

@@ -37,9 +37,9 @@ class Index implements HttpTransportable
     private $appUUID;
 
     /**
-     * Is OK
+     * Is OK.
      *
-     * @var boolean
+     * @var bool
      */
     private $isOK;
 
@@ -51,7 +51,7 @@ class Index implements HttpTransportable
     private $docCount;
 
     /**
-     * Size
+     * Size.
      *
      * @var string
      */
@@ -61,10 +61,10 @@ class Index implements HttpTransportable
      * Index constructor.
      *
      * @param IndexUUID $uuid
-     * @param AppUUID    $appUUID
-     * @param bool $isOK
+     * @param AppUUID   $appUUID
+     * @param bool      $isOK
      * @param int       $docCount
-     * @param string $size
+     * @param string    $size
      */
     public function __construct(
         IndexUUID $uuid,
@@ -138,7 +138,7 @@ class Index implements HttpTransportable
             'app_id' => $this->appUUID->toArray(),
             'is_ok' => $this->isOK,
             'doc_count' => $this->docCount,
-            'size' => $this->size
+            'size' => $this->size,
         ];
     }
 

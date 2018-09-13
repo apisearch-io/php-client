@@ -41,7 +41,7 @@ class Endpoints
                 'name' => 'Index create',
                 'description' => 'Reset your App index',
                 'path' => '/v1/index',
-                'verb' => 'post',
+                'verb' => 'put',
             ],
             'v1-index-delete' => [
                 'name' => 'Index delete',
@@ -65,7 +65,7 @@ class Endpoints
                 'name' => 'Index Config',
                 'description' => 'Configure your index',
                 'path' => '/v1/index',
-                'verb' => 'put',
+                'verb' => 'post',
             ],
             'v1-token-add' => [
                 'name' => 'Add token',

@@ -42,6 +42,7 @@ class TestClient extends Client implements HttpClient
         RetryMap $retryMap
     ) {
         $this->client = $client;
+
         parent::__construct(
             $version,
             $retryMap
@@ -86,8 +87,7 @@ class TestClient extends Client implements HttpClient
                     'CONTENT_TYPE' => 'application/json',
                 ],
                 json_encode($requestParts->getParameters()['json'])
-            )
-        ;
+            );
 
         $response = $this
             ->client

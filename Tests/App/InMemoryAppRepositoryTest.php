@@ -17,7 +17,6 @@ namespace Apisearch\Tests\App;
 
 use Apisearch\App\InMemoryAppRepository;
 use Apisearch\Config\Config;
-use Apisearch\Config\ImmutableConfig;
 use Apisearch\Model\AppUUID;
 use Apisearch\Model\IndexUUID;
 use Apisearch\Model\Token;
@@ -37,7 +36,7 @@ class InMemoryAppRepositoryTest extends TestCase
     {
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $this->assertCount(1, $inMemoryAppRepository->getIndices());
     }
 
@@ -50,8 +49,8 @@ class InMemoryAppRepositoryTest extends TestCase
     {
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
     }
 
     /**
@@ -61,7 +60,7 @@ class InMemoryAppRepositoryTest extends TestCase
     {
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $this->assertCount(1, $inMemoryAppRepository->getIndices());
         $inMemoryAppRepository->deleteIndex(IndexUUID::createById('yyy'));
         $this->assertCount(0, $inMemoryAppRepository->getIndices());
@@ -76,7 +75,7 @@ class InMemoryAppRepositoryTest extends TestCase
     {
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $inMemoryAppRepository->deleteIndex(IndexUUID::createById('yyy'));
         $inMemoryAppRepository->deleteIndex(IndexUUID::createById('yyy'));
     }
@@ -113,7 +112,7 @@ class InMemoryAppRepositoryTest extends TestCase
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
         $this->assertFalse($inMemoryAppRepository->checkIndex(IndexUUID::createById('yyy')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $this->assertTrue($inMemoryAppRepository->checkIndex(IndexUUID::createById('yyy')));
         $inMemoryAppRepository->deleteIndex(IndexUUID::createById('yyy'));
         $this->assertFalse($inMemoryAppRepository->checkIndex(IndexUUID::createById('yyy')));
@@ -126,15 +125,15 @@ class InMemoryAppRepositoryTest extends TestCase
     {
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $this->assertCount(1, $inMemoryAppRepository->getIndices());
         $this->assertEquals('yyy', $inMemoryAppRepository->getIndices()[0]->getUUID()->getId());
         $this->assertEquals('xxx', $inMemoryAppRepository->getIndices()[0]->getAppUUID()->composeUUID());
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('zzz'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('zzz'), new Config());
         $this->assertCount(2, $inMemoryAppRepository->getIndices());
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('ooo')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('aaa'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('aaa'), new Config());
         $this->assertCount(1, $inMemoryAppRepository->getIndices());
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create());
         $this->assertCount(3, $inMemoryAppRepository->getIndices());
@@ -163,7 +162,7 @@ class InMemoryAppRepositoryTest extends TestCase
     {
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $token = new Token(TokenUUID::createById('lll'), AppUUID::createById('xxx'));
         $inMemoryAppRepository->addToken($token);
         $this->assertCount(1, $inMemoryAppRepository->getTokens());
@@ -180,7 +179,7 @@ class InMemoryAppRepositoryTest extends TestCase
     {
         $inMemoryAppRepository = new InMemoryAppRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
-        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new ImmutableConfig());
+        $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $token = new Token(TokenUUID::createById('lll'), AppUUID::createById('xxx'));
         $inMemoryAppRepository->addToken($token);
         $token2 = new Token(TokenUUID::createById('uuu'), AppUUID::createById('xxx'));

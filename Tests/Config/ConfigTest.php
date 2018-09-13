@@ -15,21 +15,21 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Config;
 
-use Apisearch\Config\ImmutableConfig;
+use Apisearch\Config\Config;
 use Apisearch\Config\Synonym;
 use PHPUnit\Framework\TestCase;
 
 /**
- * File header placeholde.
+ * Class ConfigTest.
  */
-class ImmutableConfigTest extends TestCase
+class ConfigTest extends TestCase
 {
     /**
      * Test object construction.
      */
     public function testCreate()
     {
-        $config = new ImmutableConfig('es', true);
+        $config = new Config('es', true);
         $this->assertEquals('es', $config->getLanguage());
         $this->assertTrue($config->shouldSearchableMetadataBeStored());
     }
@@ -39,7 +39,7 @@ class ImmutableConfigTest extends TestCase
      */
     public function testCreateNullLanguage()
     {
-        $config = new ImmutableConfig(null, true);
+        $config = new Config(null, true);
         $this->assertNull($config->getLanguage());
     }
 
@@ -48,10 +48,10 @@ class ImmutableConfigTest extends TestCase
      */
     public function testCreateSearchableMetadataStoreDisabled()
     {
-        $config = new ImmutableConfig(null, false);
+        $config = new Config(null, false);
         $this->assertFalse($config->shouldSearchableMetadataBeStored());
 
-        $config = ImmutableConfig::createFromArray([
+        $config = Config::createFromArray([
             'store_searchable_metadata' => false,
         ]);
         $this->assertFalse($config->shouldSearchableMetadataBeStored());
@@ -62,7 +62,7 @@ class ImmutableConfigTest extends TestCase
      */
     public function testSynonyms()
     {
-        $config = new ImmutableConfig(null, true);
+        $config = new Config(null, true);
         $config->addSynonym(Synonym::createByWords(['a', 'b']));
         $config->addSynonym(Synonym::createByWords(['c', 'd']));
         $this->assertEquals(
@@ -79,7 +79,7 @@ class ImmutableConfigTest extends TestCase
      */
     public function testDefaultValues()
     {
-        $config = ImmutableConfig::createFromArray([]);
+        $config = Config::createFromArray([]);
         $this->assertNull($config->getLanguage());
         $this->assertTrue($config->shouldSearchableMetadataBeStored());
         $this->assertEmpty($config->getSynonyms());
@@ -101,7 +101,7 @@ class ImmutableConfigTest extends TestCase
 
         $this->assertEquals(
             $config,
-            ImmutableConfig::createFromArray($config)->toArray()
+            Config::createFromArray($config)->toArray()
         );
     }
 
@@ -118,7 +118,7 @@ class ImmutableConfigTest extends TestCase
 
         $this->assertEquals(
             [],
-            ImmutableConfig::createFromArray($config)->toArray()
+            Config::createFromArray($config)->toArray()
         );
     }
 }

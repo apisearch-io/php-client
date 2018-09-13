@@ -75,7 +75,7 @@ class IndexTest extends TestCase
 
         $index2 = new Index(IndexUUID::createById('testId'), AppUUID::createById('testAppId'), true, 20, '2kb');
         $this->assertEquals('testId', $index2->getUUID()->getId());
-        $this->assertEquals('testAppId', $index2->getAppUUID()->composeUUID());;
+        $this->assertEquals('testAppId', $index2->getAppUUID()->composeUUID());
         $this->assertTrue($index2->isOK());
         $this->assertEquals(20, $index2->getDocCount());
         $this->assertEquals('2kb', $index2->getSize());
