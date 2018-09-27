@@ -37,6 +37,7 @@ class QueryTest extends TestCase
         $this->assertFalse(array_key_exists('filter_fields', $queryArray));
         $this->assertFalse(array_key_exists('user', $queryArray));
         $this->assertFalse(array_key_exists('score_strategy', $queryArray));
+        $this->assertEquals(Query::NO_MIN_SCORE, $queryArray['min_score']);
     }
 
     /**
@@ -70,6 +71,7 @@ class QueryTest extends TestCase
         $this->assertEquals(SortBy::create(), $query->getSortBy());
         $this->assertNull($query->getUser());
         $this->assertNull($query->getScoreStrategy());
+        $this->assertEquals(Query::NO_MIN_SCORE, $query->getMinScore());
     }
 
     /**
@@ -120,5 +122,16 @@ class QueryTest extends TestCase
         $this->assertInstanceOf(Query::class, $query->setFuzziness('1..3'));
         $this->assertEquals('AUTO', Query::createMatchAll()->setAutoFuzziness()->getFuzziness());
         $this->assertInstanceOf(Query::class, $query->setAutoFuzziness());
+    }
+
+    /**
+     * Test min score.
+     */
+    public function testMinScore()
+    {
+        $query = Query::createMatchAll()->setMinScore(10.0);
+        $this->assertEquals(10.0, $query->getMinScore());
+        $this->assertEquals(10.0, $query->toArray()['min_score']);
+        $this->assertEquals(10.0, Query::createFromArray(['min_score' => 10.0])->toArray()['min_score']);
     }
 }
