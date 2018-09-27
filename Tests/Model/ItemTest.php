@@ -126,6 +126,7 @@ class ItemTest extends TestCase
         $this->assertSame([], $item->getAllMetadata());
         $this->assertNull($item->getCoordinate());
         $this->assertNull($item->getDistance());
+        $this->assertNull($item->getScore());
     }
 
     /**
@@ -392,5 +393,21 @@ class ItemTest extends TestCase
             $composedId,
             Item::create(ItemUUID::createByComposedUUID($composedId))->composeUUID()
         );
+    }
+
+    /**
+     * Test score.
+     */
+    public function testScore()
+    {
+        $item = Item::create(ItemUUID::createByComposedUUID('1~item'));
+        $this->assertNull($item->getScore());
+        $this->assertFalse(array_key_exists('score', $item->toArray()));
+        $this->assertNull(Item::createFromArray($item->toArray())->getScore());
+
+        $item = Item::create(ItemUUID::createByComposedUUID('1~item'))->setScore(5.5);
+        $this->assertEquals(5.5, $item->getScore());
+        $this->assertEquals(5.5, $item->toArray()['score']);
+        $this->assertEquals(5.5, Item::createFromArray($item->toArray())->getScore());
     }
 }
