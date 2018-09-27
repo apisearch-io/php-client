@@ -93,6 +93,13 @@ class Item implements HttpTransportable, UUIDReference
     private $promoted = false;
 
     /**
+     * @var float
+     *
+     * Score
+     */
+    private $score;
+
+    /**
      * Item constructor.
      *
      * @param ItemUUID   $uuid
@@ -459,6 +466,30 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
+     * Get Score.
+     *
+     * @return float|null
+     */
+    public function getScore(): ? float
+    {
+        return $this->score;
+    }
+
+    /**
+     * Set Score.
+     *
+     * @param float $score
+     *
+     * @return Item
+     */
+    public function setScore(float $score)
+    {
+        $this->score = $score;
+
+        return $this;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -478,6 +509,7 @@ class Item implements HttpTransportable, UUIDReference
             'suggest' => $this->suggest,
             'highlights' => $this->highlights,
             'is_promoted' => !$this->promoted ? null : true,
+            'score' => $this->score,
         ], function ($element) {
             return
             !(
@@ -539,6 +571,10 @@ class Item implements HttpTransportable, UUIDReference
 
         if (isset($array['is_promoted']) && true === $array['is_promoted']) {
             $item->setPromoted();
+        }
+
+        if (isset($array['score']) && !is_null($array['score'])) {
+            $item->setScore((float) $array['score']);
         }
 
         return $item;
