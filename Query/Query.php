@@ -49,6 +49,13 @@ class Query implements HttpTransportable
     const INFINITE_SIZE = 1000;
 
     /**
+     * @var float
+     *
+     * No min score
+     */
+    const NO_MIN_SCORE = 0.0;
+
+    /**
      * @var Coordinate
      *
      * Coordinate
@@ -159,6 +166,13 @@ class Query implements HttpTransportable
      * Fuzziness
      */
     private $fuzziness;
+
+    /**
+     * @var float
+     *
+     * Min score
+     */
+    private $minScore = self::NO_MIN_SCORE;
 
     /**
      * @var User
@@ -1190,6 +1204,30 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Get MinScore.
+     *
+     * @return float
+     */
+    public function getMinScore(): float
+    {
+        return $this->minScore;
+    }
+
+    /**
+     * Set MinScore.
+     *
+     * @param float $minScore
+     *
+     * @return Query
+     */
+    public function setMinScore(float $minScore)
+    {
+        $this->minScore = $minScore;
+
+        return $this;
+    }
+
+    /**
      * Query by user.
      *
      * @param User $user
@@ -1274,6 +1312,7 @@ class Query implements HttpTransportable
                 ? $this->scoreStrategy->toArray()
                 : null,
             'fuzziness' => $this->fuzziness,
+            'min_score' => $this->minScore,
             'user' => ($this->user instanceof User)
                 ? $this->user->toArray()
                 : null,
@@ -1341,6 +1380,7 @@ class Query implements HttpTransportable
         $query->scoreStrategy = isset($array['score_strategy'])
             ? ScoreStrategy::createFromArray($array['score_strategy'])
             : null;
+        $query->minScore = $array['min_score'] ?? self::NO_MIN_SCORE;
 
         if (isset($array['user'])) {
             $query->user = User::createFromArray($array['user']);
