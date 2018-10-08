@@ -234,8 +234,8 @@ class Config implements HttpTransportable
         $config->synonyms = array_map(function (array $synonym) {
             return Synonym::createFromArray($synonym);
         }, $array['synonyms'] ?? []);
-        $config->shards = $array['shards'] ?? self::DEFAULT_SHARDS;
-        $config->replicas = $array['replicas'] ?? self::DEFAULT_REPLICAS;
+        $config->shards = (int) ($array['shards'] ?? self::DEFAULT_SHARDS);
+        $config->replicas = (int) ($array['replicas'] ?? self::DEFAULT_REPLICAS);
 
         return $config;
     }

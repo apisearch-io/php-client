@@ -148,5 +148,12 @@ class ConfigTest extends TestCase
         ]);
         $this->assertEquals(5, $config->getShards());
         $this->assertEquals(10, $config->getReplicas());
+
+        $config = Config::createFromArray([
+            'shards' => '5',
+            'replicas' => '10',
+        ]);
+        $this->assertEquals(5, $config->getShards());
+        $this->assertEquals(10, $config->getReplicas());
     }
 }
