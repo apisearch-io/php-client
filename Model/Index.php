@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Model;
 
+use Apisearch\Config\Config;
 use Apisearch\Exception\InvalidFormatException;
 
 /**
@@ -58,6 +59,27 @@ class Index implements HttpTransportable
     private $size;
 
     /**
+     * Shards.
+     *
+     * @var int
+     */
+    private $shards;
+
+    /**
+     * Replicas.
+     *
+     * @var int
+     */
+    private $replicas;
+
+    /**
+     * Miscellanea.
+     *
+     * @var array
+     */
+    private $miscellanea;
+
+    /**
      * Index constructor.
      *
      * @param IndexUUID $uuid
@@ -65,19 +87,28 @@ class Index implements HttpTransportable
      * @param bool      $isOK
      * @param int       $docCount
      * @param string    $size
+     * @param int       $shards
+     * @param int       $replicas
+     * @param array     $miscellanea
      */
     public function __construct(
         IndexUUID $uuid,
         AppUUID $appUUID,
         bool $isOK,
         int $docCount = 0,
-        string $size
+        string $size,
+        int $shards,
+        int $replicas,
+        array $miscellanea = []
     ) {
         $this->uuid = $uuid;
         $this->appUUID = $appUUID;
         $this->isOK = $isOK;
         $this->docCount = $docCount;
         $this->size = $size;
+        $this->shards = $shards;
+        $this->replicas = $replicas;
+        $this->miscellanea = $miscellanea;
     }
 
     /**
@@ -119,11 +150,43 @@ class Index implements HttpTransportable
     }
 
     /**
+     * Get size.
+     *
      * @return string
      */
     public function getSize(): string
     {
         return $this->size;
+    }
+
+    /**
+     * Get Shards.
+     *
+     * @return int
+     */
+    public function getShards(): int
+    {
+        return $this->shards;
+    }
+
+    /**
+     * Get Replicas.
+     *
+     * @return int
+     */
+    public function getReplicas(): int
+    {
+        return $this->replicas;
+    }
+
+    /**
+     * Get Miscellanea.
+     *
+     * @return array
+     */
+    public function getMiscellanea(): array
+    {
+        return $this->miscellanea;
     }
 
     /**
@@ -139,6 +202,9 @@ class Index implements HttpTransportable
             'is_ok' => $this->isOK,
             'doc_count' => $this->docCount,
             'size' => $this->size,
+            'shards' => $this->shards,
+            'replicas' => $this->replicas,
+            'miscellanea' => $this->miscellanea,
         ];
     }
 
@@ -162,7 +228,10 @@ class Index implements HttpTransportable
             AppUUID::createFromArray($array['app_id']),
             $array['is_ok'] ?? false,
             $array['doc_count'] ?? 0,
-            $array['size'] ?? '0kb'
+            $array['size'] ?? '0kb',
+            $array['shards'] ?? Config::DEFAULT_SHARDS,
+            $array['replicas'] ?? Config::DEFAULT_REPLICAS,
+            $array['miscellanea'] ?? []
         );
     }
 }
