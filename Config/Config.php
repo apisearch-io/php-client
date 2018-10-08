@@ -23,6 +23,20 @@ use Apisearch\Model\HttpTransportable;
 class Config implements HttpTransportable
 {
     /**
+     * @var int
+     *
+     * Default shards
+     */
+    const DEFAULT_SHARDS = 1;
+
+    /**
+     * @var int
+     *
+     * Default replicas
+     */
+    const DEFAULT_REPLICAS = 0;
+
+    /**
      * @var string|null
      *
      * Language
@@ -51,17 +65,37 @@ class Config implements HttpTransportable
     private $campaigns = [];
 
     /**
+     * @var int
+     *
+     * Shards
+     */
+    private $shards;
+
+    /**
+     * @var int
+     *
+     * Replicas
+     */
+    private $replicas;
+
+    /**
      * Config constructor.
      *
      * @param null|string $language
      * @param bool        $storeSearchableMetadata
+     * @param int         $shards
+     * @param int         $replicas
      */
     public function __construct(
         ?string $language = null,
-        bool $storeSearchableMetadata = true
+        bool $storeSearchableMetadata = true,
+        int $shards = self::DEFAULT_SHARDS,
+        int $replicas = self::DEFAULT_REPLICAS
     ) {
         $this->language = $language;
         $this->storeSearchableMetadata = $storeSearchableMetadata;
+        $this->shards = $shards;
+        $this->replicas = $replicas;
         $this->campaigns = new Campaigns();
     }
 
@@ -136,6 +170,26 @@ class Config implements HttpTransportable
     }
 
     /**
+     * Get Shards.
+     *
+     * @return int
+     */
+    public function getShards(): int
+    {
+        return $this->shards;
+    }
+
+    /**
+     * Get Replicas.
+     *
+     * @return int
+     */
+    public function getReplicas(): int
+    {
+        return $this->replicas;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -151,6 +205,8 @@ class Config implements HttpTransportable
             'campaigns' => $this
                 ->campaigns
                 ->toArray(),
+            'shards' => $this->shards,
+            'replicas' => $this->replicas,
         ], function ($element) {
             return
             !(
@@ -178,6 +234,8 @@ class Config implements HttpTransportable
         $config->synonyms = array_map(function (array $synonym) {
             return Synonym::createFromArray($synonym);
         }, $array['synonyms'] ?? []);
+        $config->shards = $array['shards'] ?? self::DEFAULT_SHARDS;
+        $config->replicas = $array['replicas'] ?? self::DEFAULT_REPLICAS;
 
         return $config;
     }

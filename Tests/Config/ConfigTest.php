@@ -32,6 +32,8 @@ class ConfigTest extends TestCase
         $config = new Config('es', true);
         $this->assertEquals('es', $config->getLanguage());
         $this->assertTrue($config->shouldSearchableMetadataBeStored());
+        $this->assertEquals(Config::DEFAULT_SHARDS, $config->getShards());
+        $this->assertEquals(Config::DEFAULT_REPLICAS, $config->getReplicas());
     }
 
     /**
@@ -97,6 +99,8 @@ class ConfigTest extends TestCase
                 ['words' => ['a', 'b']],
                 ['words' => ['c', 'd']],
             ],
+            'shards' => Config::DEFAULT_SHARDS,
+            'replicas' => Config::DEFAULT_REPLICAS,
         ];
 
         $this->assertEquals(
@@ -114,11 +118,35 @@ class ConfigTest extends TestCase
             'language' => null,
             'store_searchable_metadata' => true,
             'synonyms' => [],
+            'shards' => Config::DEFAULT_SHARDS,
+            'replicas' => Config::DEFAULT_REPLICAS,
         ];
 
         $this->assertEquals(
-            [],
+            [
+                'shards' => Config::DEFAULT_SHARDS,
+                'replicas' => Config::DEFAULT_REPLICAS,
+            ],
             Config::createFromArray($config)->toArray()
         );
+    }
+
+    /**
+     * Test shards and replicas.
+     */
+    public function testShardsAndReplicas()
+    {
+        $config = new Config('es', true, 6, 3);
+        $this->assertEquals(6, $config->getShards());
+        $this->assertEquals(3, $config->getReplicas());
+        $this->assertEquals(6, $config->toArray()['shards']);
+        $this->assertEquals(3, $config->toArray()['replicas']);
+
+        $config = Config::createFromArray([
+            'shards' => 5,
+            'replicas' => 10,
+        ]);
+        $this->assertEquals(5, $config->getShards());
+        $this->assertEquals(10, $config->getReplicas());
     }
 }
