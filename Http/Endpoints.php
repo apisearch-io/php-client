@@ -121,38 +121,6 @@ class Endpoints
             ],
 
             /*
-             * Events endpoints
-             */
-            'v1-events' => [
-                'name' => 'Events',
-                'description' => 'Query your events',
-                'path' => '/v1/events',
-                'verb' => 'get',
-            ],
-            'v1-events-stream' => [
-                'name' => 'Events real-time',
-                'description' => 'Events stream',
-                'path' => '/v1/events/stream',
-                'verb' => 'get',
-            ],
-
-            /*
-             * Logs endpoints
-             */
-            'v1-logs' => [
-                'name' => 'Logs',
-                'description' => 'Query your logs',
-                'path' => '/v1/logs',
-                'verb' => 'get',
-            ],
-            'v1-logs-stream' => [
-                'name' => 'Logs real-time',
-                'description' => 'Logs stream',
-                'path' => '/v1/logs/stream',
-                'verb' => 'get',
-            ],
-
-            /*
              * User endpoints
              */
             'v1-interaction' => [
