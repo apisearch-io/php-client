@@ -307,4 +307,25 @@ class SortByTest extends TestCase
         $this->assertTrue(SortBy::create()->byValue(SortBy::RANDOM)->hasRandomSort());
         $this->assertTrue(SortBy::create()->byValue(SortBy::AL_TUN_TUN)->hasRandomSort());
     }
+
+    /**
+     * Test multiples sorts.
+     */
+    public function testMultiplesSorts()
+    {
+        $sortBy = SortBy::create()
+            ->byValue(SortBy::SCORE)
+            ->byValue(SortBy::LOCATION_KM_ASC)
+            ->byValue(SortBy::AL_TUN_TUN)
+            ->byNestedFieldAndFilter(
+                'category',
+                SortBy::ASC,
+                Filter::create('id', [1, 2], Filter::AT_LEAST_ONE, Filter::TYPE_FIELD)
+            );
+
+        $this->assertCount(
+            4,
+            $sortBy->all()
+        );
+    }
 }
