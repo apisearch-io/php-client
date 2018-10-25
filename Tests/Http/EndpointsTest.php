@@ -36,10 +36,6 @@ class EndpointsTest extends TestCase
         'v1-items-delete',
 
         'v1-query',
-        'v1-events',
-        'v1-events-stream',
-        'v1-logs',
-        'v1-logs-stream',
 
         'v1-token-add',
         'v1-token-delete',
@@ -63,10 +59,6 @@ class EndpointsTest extends TestCase
         'delete~~/v1/items',
 
         'get~~/v1',
-        'get~~/v1/events',
-        'get~~/v1/events/stream',
-        'get~~/v1/logs',
-        'get~~/v1/logs/stream',
 
         'post~~/v1/token',
         'delete~~/v1/token',
