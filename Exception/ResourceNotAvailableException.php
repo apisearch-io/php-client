@@ -43,30 +43,6 @@ class ResourceNotAvailableException extends TransportableException
     }
 
     /**
-     * Events index is not available.
-     *
-     * @param string $resourceId
-     *
-     * @return ResourceNotAvailableException
-     */
-    public static function eventsIndexNotAvailable(string $resourceId): self
-    {
-        return new self(sprintf('Events index not available - %s', $resourceId));
-    }
-
-    /**
-     * Logs index is not available.
-     *
-     * @param string $resourceId
-     *
-     * @return ResourceNotAvailableException
-     */
-    public static function logsIndexNotAvailable(string $resourceId): self
-    {
-        return new self(sprintf('Logs index not available - %s', $resourceId));
-    }
-
-    /**
      * Route not available.
      *
      * @param string $resourceId

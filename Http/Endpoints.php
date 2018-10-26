@@ -188,17 +188,6 @@ class Endpoints
     /**
      * Read endpoints.
      */
-    public static function eventsOnly(): array
-    {
-        return [
-            'v1-events',
-            'v1-events-stream',
-        ];
-    }
-
-    /**
-     * Read endpoints.
-     */
     public static function tokensOnly(): array
     {
         return [
