@@ -29,7 +29,7 @@ class SortBy implements HttpTransportable
      *
      * Sort by score
      */
-    const SCORE = ['_score' => ['order' => self::ASC]];
+    const SCORE = ['_score' => ['order' => self::DESC]];
 
     /**
      * @var array
@@ -230,9 +230,7 @@ class SortBy implements HttpTransportable
             $value['type'] = $value['type'] ?? self::TYPE_FIELD;
         }
 
-        if (self::SCORE !== $value) {
-            $this->sortsBy[] = $value;
-        }
+        $this->sortsBy[] = $value;
 
         return $this;
     }
