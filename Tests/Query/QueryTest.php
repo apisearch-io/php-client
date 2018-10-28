@@ -31,6 +31,7 @@ class QueryTest extends TestCase
     public function testToArray()
     {
         $queryArray = Query::createMatchAll()->toArray();
+        $this->assertFalse(array_key_exists('fields', $queryArray));
         $this->assertFalse(array_key_exists('coordinate', $queryArray));
         $this->assertFalse(array_key_exists('filters', $queryArray));
         $this->assertFalse(array_key_exists('aggregations', $queryArray));
@@ -63,6 +64,7 @@ class QueryTest extends TestCase
         $queryArray = Query::create('')->toArray();
         $query = Query::createFromArray($queryArray);
 
+        $this->assertEquals([], $query->getFields());
         $this->assertFalse($query->areSuggestionsEnabled());
         $this->assertTrue($query->areAggregationsEnabled());
         $this->assertEquals('', $query->getQueryText());
@@ -133,5 +135,32 @@ class QueryTest extends TestCase
         $this->assertEquals(10.0, $query->getMinScore());
         $this->assertEquals(10.0, $query->toArray()['min_score']);
         $this->assertEquals(10.0, Query::createFromArray(['min_score' => 10.0])->toArray()['min_score']);
+    }
+
+    /**
+     * Test values.
+     */
+    public function testValues()
+    {
+        $query = Query::create('hola', 2, 3)
+            ->setFields([
+                'a',
+                'b',
+            ]);
+
+        $this->assertEquals('hola', $query->getQueryText());
+        $this->assertEquals(2, $query->getPage());
+        $this->assertEquals(3, $query->getSize());
+        $this->assertEquals(['a', 'b'], $query->getFields());
+
+        /**
+         * To array transformation.
+         */
+        $query = Query::createFromArray($query->toArray());
+
+        $this->assertEquals('hola', $query->getQueryText());
+        $this->assertEquals(2, $query->getPage());
+        $this->assertEquals(3, $query->getSize());
+        $this->assertEquals(['a', 'b'], $query->getFields());
     }
 }
