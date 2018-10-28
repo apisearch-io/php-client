@@ -63,6 +63,13 @@ class Query implements HttpTransportable
     private $coordinate;
 
     /**
+     * @var string
+     *
+     * Fields
+     */
+    private $fields = [];
+
+    /**
      * @var Filter[]
      *
      * Universe Filters
@@ -298,6 +305,30 @@ class Query implements HttpTransportable
         );
 
         return $query;
+    }
+
+    /**
+     * Select fields.
+     *
+     * @param string[] $fields
+     *
+     * @return Query
+     */
+    public function setFields(array $fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * Get fields.
+     *
+     * @return string[]
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
     }
 
     /**
@@ -1272,6 +1303,7 @@ class Query implements HttpTransportable
     {
         return array_filter([
             'q' => $this->getQueryText(),
+            'fields' => $this->getFields(),
             'coordinate' => $this->coordinate instanceof HttpTransportable
                 ? $this->coordinate->toArray()
                 : null,
@@ -1351,6 +1383,7 @@ class Query implements HttpTransportable
                 (int) ($array['page'] ?? self::DEFAULT_PAGE),
                 (int) ($array['size'] ?? self::DEFAULT_SIZE)
             );
+        $query->fields = $array['fields'] ?? [];
         $query->aggregations = array_map(function (array $aggregation) {
             return Aggregation::createFromArray($aggregation);
         }, $array['aggregations'] ?? []);
