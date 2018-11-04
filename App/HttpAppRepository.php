@@ -117,10 +117,6 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
      */
     public function getIndices(): array
     {
-        if (!empty($appId)) {
-            $queryParams['app-id'] = $appId;
-        }
-
         $response = $this
             ->httpClient
             ->get(
@@ -223,7 +219,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 Http::getAppQueryValues($this, $indexUUID)
             );
 
-        if (is_null($response)) {
+        if ($response === null) {
             return false;
         }
 
@@ -253,7 +249,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 ]
             );
 
-        if (is_null($response)) {
+        if ($response === null) {
             return;
         }
 
