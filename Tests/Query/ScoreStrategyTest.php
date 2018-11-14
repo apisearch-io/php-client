@@ -17,6 +17,7 @@ namespace Apisearch\Tests\Query;
 
 use Apisearch\Query\Filter;
 use Apisearch\Query\ScoreStrategy;
+use Apisearch\Tests\HttpHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -35,7 +36,7 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getType()
         );
         $this->assertNull($scoreStrategy->getFilter());
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::DEFAULT_TYPE,
             $scoreStrategy->getType()
@@ -74,7 +75,7 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getWeight()
         );
         $this->assertNull($scoreStrategy->getFilter());
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::BOOSTING_FIELD_VALUE,
             $scoreStrategy->getType()
@@ -107,7 +108,7 @@ class ScoreStrategyTest extends TestCase
             2.0,
             ScoreStrategy::MODIFIER_LN,
             4.00,
-            $this->prophesize(Filter::class)->reveal()
+            Filter::create('x', [], 0, '')
         );
         $this->assertEquals(
             1.0,
@@ -129,7 +130,7 @@ class ScoreStrategyTest extends TestCase
             Filter::class,
             $scoreStrategy->getFilter()
         );
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             1.0,
             $scoreStrategy->getConfigurationValue('factor')
@@ -173,7 +174,7 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getConfigurationValue('function')
         );
         $this->assertNull($scoreStrategy->getFilter());
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::CUSTOM_FUNCTION,
             $scoreStrategy->getType()
@@ -194,7 +195,7 @@ class ScoreStrategyTest extends TestCase
         $scoreStrategy = ScoreStrategy::createCustomFunction(
             'xxx',
             2.34,
-            $this->prophesize(Filter::class)->reveal()
+            Filter::create('x', [], 0, '')
         );
         $this->assertEquals(
             2.34,
@@ -204,12 +205,12 @@ class ScoreStrategyTest extends TestCase
             Filter::class,
             $scoreStrategy->getFilter()
         );
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
         );
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             2.34,
             $scoreStrategy->getWeight()
@@ -218,7 +219,7 @@ class ScoreStrategyTest extends TestCase
             Filter::class,
             $scoreStrategy->getFilter()
         );
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
@@ -271,7 +272,7 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getConfigurationValue('decay')
         );
         $this->assertNull($scoreStrategy->getFilter());
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::DECAY,
             $scoreStrategy->getType()
@@ -317,7 +318,7 @@ class ScoreStrategyTest extends TestCase
             '10',
             1.0,
             5.50,
-            $this->prophesize(Filter::class)->reveal()
+            Filter::create('x', [], 0, '')
         );
         $this->assertEquals(
             5.50,
@@ -327,12 +328,12 @@ class ScoreStrategyTest extends TestCase
             Filter::class,
             $scoreStrategy->getFilter()
         );
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
         );
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             5.50,
             $scoreStrategy->getWeight()
@@ -341,7 +342,7 @@ class ScoreStrategyTest extends TestCase
             Filter::class,
             $scoreStrategy->getFilter()
         );
-        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
