@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Apisearch\Query;
 
 use Apisearch\Model\HttpTransportable;
+use Apisearch\Model\Item;
 
 /**
  * Class ScoreStrategy.
@@ -234,7 +235,7 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->configuration['missing'] = $missing;
         $scoreStrategy->configuration['modifier'] = $modifier;
         $scoreStrategy->weight = $weight;
-        $scoreStrategy->filter = $filter;
+        $scoreStrategy->filter = self::fixFilterFieldPath($filter);
 
         return $scoreStrategy;
     }
@@ -257,7 +258,7 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->type = self::CUSTOM_FUNCTION;
         $scoreStrategy->configuration['function'] = $function;
         $scoreStrategy->weight = $weight;
-        $scoreStrategy->filter = $filter;
+        $scoreStrategy->filter = self::fixFilterFieldPath($filter);
 
         return $scoreStrategy;
     }
@@ -295,9 +296,28 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->configuration['offset'] = $offset;
         $scoreStrategy->configuration['decay'] = $decay;
         $scoreStrategy->weight = $weight;
-        $scoreStrategy->filter = $filter;
+        $scoreStrategy->filter = self::fixFilterFieldPath($filter);
 
         return $scoreStrategy;
+    }
+
+    /**
+     * Fix filter path.
+     *
+     * @param Filter|null $filter
+     *
+     * @return Filter
+     */
+    private static function fixFilterFieldPath(?Filter $filter): ? Filter
+    {
+        if (is_null($filter)) {
+            return $filter;
+        }
+
+        $filterAsArray = $filter->toArray();
+        $filterAsArray['field'] = Item::getPathByField($filterAsArray['field']);
+
+        return Filter::createFromArray($filterAsArray);
     }
 
     /**
@@ -311,7 +331,11 @@ class ScoreStrategy implements HttpTransportable
             'type' => $this->type,
             'configuration' => $this->configuration,
             'weight' => $this->weight,
-            'filter' => $this->filter,
+            'filter' => ($this->filter instanceof Filter
+                ? $this
+                    ->filter
+                    ->toArray()
+                : null),
         ];
     }
 
@@ -328,7 +352,9 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->type = $array['type'] ?: self::DEFAULT_TYPE;
         $scoreStrategy->configuration = $array['configuration'] ?? [];
         $scoreStrategy->weight = $array['weight'] ?? self::DEFAULT_WEIGHT;
-        $scoreStrategy->filter = $array['filter'] ?? null;
+        $scoreStrategy->filter = is_array($array['filter'])
+            ? Filter::createFromArray($array['filter'])
+            : null;
 
         return $scoreStrategy;
     }
