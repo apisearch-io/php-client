@@ -19,6 +19,7 @@ use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Geo\LocationRange;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\HttpTransportable;
+use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Model\User;
 
@@ -161,11 +162,11 @@ class Query implements HttpTransportable
     private $filterFields = [];
 
     /**
-     * @var ScoreStrategy
+     * @var ScoreStrategies
      *
-     * Score strategy
+     * Score strategies
      */
-    private $scoreStrategy;
+    private $scoreStrategies;
 
     /**
      * @var float|string|array
@@ -340,7 +341,7 @@ class Query implements HttpTransportable
      */
     public function filterUniverseByTypes(array $values): self
     {
-        $fieldPath = Filter::getFilterPathByField('type');
+        $fieldPath = Item::getPathByField('type');
         if (!empty($values)) {
             $this->universeFilters['type'] = Filter::create(
                 $fieldPath,
@@ -369,7 +370,7 @@ class Query implements HttpTransportable
         bool $aggregate = true,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ): self {
-        $fieldPath = Filter::getFilterPathByField('type');
+        $fieldPath = Item::getPathByField('type');
         if (!empty($values)) {
             $this->filters['type'] = Filter::create(
                 $fieldPath,
@@ -404,7 +405,7 @@ class Query implements HttpTransportable
      */
     public function filterUniverseByIds(array $values): self
     {
-        $fieldPath = Filter::getFilterPathByField('id');
+        $fieldPath = Item::getPathByField('id');
         if (!empty($values)) {
             $this->universeFilters['id'] = Filter::create(
                 $fieldPath,
@@ -428,7 +429,7 @@ class Query implements HttpTransportable
      */
     public function filterByIds(array $values): self
     {
-        $fieldPath = Filter::getFilterPathByField('id');
+        $fieldPath = Item::getPathByField('id');
         if (!empty($values)) {
             $this->filters['id'] = Filter::create(
                 $fieldPath,
@@ -457,7 +458,7 @@ class Query implements HttpTransportable
         array $values,
         int $applicationType = Filter::AT_LEAST_ONE
     ): self {
-        $fieldPath = Filter::getFilterPathByField($field);
+        $fieldPath = Item::getPathByField($field);
         if (!empty($values)) {
             $this->universeFilters[$field] = Filter::create(
                 $fieldPath,
@@ -492,7 +493,7 @@ class Query implements HttpTransportable
         bool $aggregate = true,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ): self {
-        $fieldPath = Filter::getFilterPathByField($field);
+        $fieldPath = Item::getPathByField($field);
         if (!empty($values)) {
             $this->filters[$filterName] = Filter::create(
                 $fieldPath,
@@ -532,7 +533,7 @@ class Query implements HttpTransportable
         int $applicationType = Filter::AT_LEAST_ONE,
         string $rangeType = Filter::TYPE_RANGE
     ): self {
-        $fieldPath = Filter::getFilterPathByField($field);
+        $fieldPath = Item::getPathByField($field);
         if (!empty($values)) {
             $this->universeFilters[$field] = Filter::create(
                 $fieldPath,
@@ -593,7 +594,7 @@ class Query implements HttpTransportable
         bool $aggregate = true,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC
     ): self {
-        $fieldPath = Filter::getFilterPathByField($field);
+        $fieldPath = Item::getPathByField($field);
         if (!empty($values)) {
             $this->filters[$filterName] = Filter::create(
                 $fieldPath,
@@ -738,7 +739,7 @@ class Query implements HttpTransportable
     ): self {
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
-            Filter::getFilterPathByField($field),
+            Item::getPathByField($field),
             $applicationType,
             Filter::TYPE_FIELD,
             [],
@@ -777,7 +778,7 @@ class Query implements HttpTransportable
 
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
-            Filter::getFilterPathByField($field),
+            Item::getPathByField($field),
             $applicationType,
             $rangeType,
             $options,
@@ -814,7 +815,7 @@ class Query implements HttpTransportable
 
         $this->aggregations[$filterName] = Aggregation::create(
             $filterName,
-            Filter::getFilterPathByField($field),
+            Item::getPathByField($field),
             $applicationType,
             Filter::TYPE_DATE_RANGE,
             $options,
@@ -915,7 +916,7 @@ class Query implements HttpTransportable
      */
     public function getFilterByField(string $fieldName): ? Filter
     {
-        $fieldPath = Filter::getFilterPathByField($fieldName);
+        $fieldPath = Item::getPathByField($fieldName);
         foreach ($this->getFilters() as $filter) {
             if ($fieldPath === $filter->getField()) {
                 return $filter;
@@ -1175,25 +1176,25 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Get score strategy.
+     * Get score strategies.
      *
-     * @return ScoreStrategy|null
+     * @return ScoreStrategies|null
      */
-    public function getScoreStrategy(): ? ScoreStrategy
+    public function getScoreStrategies(): ? ScoreStrategies
     {
-        return $this->scoreStrategy;
+        return $this->scoreStrategies;
     }
 
     /**
-     * Set score strategy.
+     * Set score strategies.
      *
-     * @param ScoreStrategy $scoreStrategy
+     * @param ScoreStrategies $scoreStrategies
      *
      * @return Query
      */
-    public function setScoreStrategy(ScoreStrategy $scoreStrategy)
+    public function setScoreStrategies(ScoreStrategies $scoreStrategies)
     {
-        $this->scoreStrategy = $scoreStrategy;
+        $this->scoreStrategies = $scoreStrategies;
 
         return $this;
     }
@@ -1340,8 +1341,8 @@ class Query implements HttpTransportable
                 ? null
                 : false,
             'filter_fields' => $this->filterFields,
-            'score_strategy' => $this->scoreStrategy instanceof ScoreStrategy
-                ? $this->scoreStrategy->toArray()
+            'score_strategies' => $this->scoreStrategies instanceof ScoreStrategies
+                ? $this->scoreStrategies->toArray()
                 : null,
             'fuzziness' => $this->fuzziness,
             'min_score' => $this->minScore,
@@ -1410,8 +1411,8 @@ class Query implements HttpTransportable
         }, $array['items_promoted'] ?? []));
         $query->fuzziness = $array['fuzziness'] ?? null;
         $query->filterFields = $array['filter_fields'] ?? [];
-        $query->scoreStrategy = isset($array['score_strategy'])
-            ? ScoreStrategy::createFromArray($array['score_strategy'])
+        $query->scoreStrategies = isset($array['score_strategies'])
+            ? ScoreStrategies::createFromArray($array['score_strategies'])
             : null;
         $query->minScore = $array['min_score'] ?? self::NO_MIN_SCORE;
 

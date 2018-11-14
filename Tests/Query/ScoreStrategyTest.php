@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Query;
 
+use Apisearch\Query\Filter;
 use Apisearch\Query\ScoreStrategy;
 use PHPUnit\Framework\TestCase;
 
@@ -30,64 +31,320 @@ class ScoreStrategyTest extends TestCase
     {
         $scoreStrategy = ScoreStrategy::createDefault();
         $this->assertEquals(
-            ScoreStrategy::DEFAULT,
+            ScoreStrategy::DEFAULT_TYPE,
             $scoreStrategy->getType()
         );
-        $this->assertNull($scoreStrategy->getFunction());
-    }
-
-    /**
-     * Test create relevance boosting.
-     */
-    public function testCreateRelevanceBoosting()
-    {
-        $scoreStrategy = ScoreStrategy::createRelevanceBoosting();
+        $this->assertNull($scoreStrategy->getFilter());
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
         $this->assertEquals(
-            ScoreStrategy::BOOSTING_RELEVANCE_FIELD,
+            ScoreStrategy::DEFAULT_TYPE,
             $scoreStrategy->getType()
         );
-        $this->assertNull($scoreStrategy->getFunction());
+        $this->assertNull($scoreStrategy->getFilter());
     }
 
     /**
-     * Test create default.
+     * Test create field boosting.
      */
-    public function testCreateCustomFunction()
+    public function testFieldRelevanceBoosting()
     {
-        $function = 'xxx';
-        $scoreStrategy = ScoreStrategy::createCustomFunction($function);
+        $scoreStrategy = ScoreStrategy::createFieldBoosting('relevance');
+        $this->assertEquals(
+            ScoreStrategy::BOOSTING_FIELD_VALUE,
+            $scoreStrategy->getType()
+        );
+        $this->assertEquals(
+            'relevance',
+            $scoreStrategy->getConfigurationValue('field')
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_FACTOR,
+            $scoreStrategy->getConfigurationValue('factor')
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_MISSING,
+            $scoreStrategy->getConfigurationValue('missing')
+        );
+        $this->assertEquals(
+            ScoreStrategy::MODIFIER_NONE,
+            $scoreStrategy->getConfigurationValue('modifier')
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_WEIGHT,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertNull($scoreStrategy->getFilter());
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertEquals(
+            ScoreStrategy::BOOSTING_FIELD_VALUE,
+            $scoreStrategy->getType()
+        );
+        $this->assertEquals(
+            'relevance',
+            $scoreStrategy->getConfigurationValue('field')
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_FACTOR,
+            $scoreStrategy->getConfigurationValue('factor')
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_MISSING,
+            $scoreStrategy->getConfigurationValue('missing')
+        );
+        $this->assertEquals(
+            ScoreStrategy::MODIFIER_NONE,
+            $scoreStrategy->getConfigurationValue('modifier')
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_WEIGHT,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertNull($scoreStrategy->getFilter());
+
+        $scoreStrategy = ScoreStrategy::createFieldBoosting(
+            'relevance',
+            1.0,
+            2.0,
+            ScoreStrategy::MODIFIER_LN,
+            4.00,
+            $this->prophesize(Filter::class)->reveal()
+        );
+        $this->assertEquals(
+            1.0,
+            $scoreStrategy->getConfigurationValue('factor')
+        );
+        $this->assertEquals(
+            2.0,
+            $scoreStrategy->getConfigurationValue('missing')
+        );
+        $this->assertEquals(
+            ScoreStrategy::MODIFIER_LN,
+            $scoreStrategy->getConfigurationValue('modifier')
+        );
+        $this->assertEquals(
+            4.0,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertEquals(
+            1.0,
+            $scoreStrategy->getConfigurationValue('factor')
+        );
+        $this->assertEquals(
+            2.0,
+            $scoreStrategy->getConfigurationValue('missing')
+        );
+        $this->assertEquals(
+            ScoreStrategy::MODIFIER_LN,
+            $scoreStrategy->getConfigurationValue('modifier')
+        );
+        $this->assertEquals(
+            4.0,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+    }
+
+    /**
+     * Test custom function.
+     */
+    public function testCustomFunction()
+    {
+        $scoreStrategy = ScoreStrategy::createCustomFunction(
+            'xxx'
+        );
         $this->assertEquals(
             ScoreStrategy::CUSTOM_FUNCTION,
             $scoreStrategy->getType()
         );
         $this->assertEquals(
-            $function,
-            $scoreStrategy->getFunction()
+            ScoreStrategy::DEFAULT_WEIGHT,
+            $scoreStrategy->getWeight()
         );
-    }
-
-    /**
-     * Test http transportable methods.
-     */
-    public function testHttpTransportableMethods()
-    {
-        $function = 'xxx';
-        $array = [
-            'type' => ScoreStrategy::CUSTOM_FUNCTION,
-            'function' => $function,
-        ];
-        $scoreStrategy = ScoreStrategy::createFromArray($array);
+        $this->assertEquals(
+            'xxx',
+            $scoreStrategy->getConfigurationValue('function')
+        );
+        $this->assertNull($scoreStrategy->getFilter());
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
         $this->assertEquals(
             ScoreStrategy::CUSTOM_FUNCTION,
             $scoreStrategy->getType()
         );
         $this->assertEquals(
-            $function,
-            $scoreStrategy->getFunction()
+            ScoreStrategy::DEFAULT_WEIGHT,
+            $scoreStrategy->getWeight()
         );
         $this->assertEquals(
-            $array,
-            $scoreStrategy->toArray()
+            'xxx',
+            $scoreStrategy->getConfigurationValue('function')
+        );
+        $this->assertNull($scoreStrategy->getFilter());
+
+        /**
+         * Test with filter.
+         */
+        $scoreStrategy = ScoreStrategy::createCustomFunction(
+            'xxx',
+            2.34,
+            $this->prophesize(Filter::class)->reveal()
+        );
+        $this->assertEquals(
+            2.34,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertEquals(
+            2.34,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+    }
+
+    /**
+     * Test decay.
+     */
+    public function testDecay()
+    {
+        $scoreStrategy = ScoreStrategy::createDecayFunction(
+            ScoreStrategy::DECAY_GAUSS,
+            'field',
+            '1m',
+            'scale',
+            '10',
+            1.0
+        );
+        $this->assertEquals(
+            ScoreStrategy::DECAY,
+            $scoreStrategy->getType()
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_WEIGHT,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertEquals(
+            ScoreStrategy::DECAY_GAUSS,
+            $scoreStrategy->getConfigurationValue('type')
+        );
+        $this->assertEquals(
+            'field',
+            $scoreStrategy->getConfigurationValue('field')
+        );
+        $this->assertEquals(
+            '1m',
+            $scoreStrategy->getConfigurationValue('origin')
+        );
+        $this->assertEquals(
+            'scale',
+            $scoreStrategy->getConfigurationValue('scale')
+        );
+        $this->assertEquals(
+            '10',
+            $scoreStrategy->getConfigurationValue('offset')
+        );
+        $this->assertEquals(
+            1.0,
+            $scoreStrategy->getConfigurationValue('decay')
+        );
+        $this->assertNull($scoreStrategy->getFilter());
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertEquals(
+            ScoreStrategy::DECAY,
+            $scoreStrategy->getType()
+        );
+        $this->assertEquals(
+            ScoreStrategy::DEFAULT_WEIGHT,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertEquals(
+            ScoreStrategy::DECAY_GAUSS,
+            $scoreStrategy->getConfigurationValue('type')
+        );
+        $this->assertEquals(
+            'field',
+            $scoreStrategy->getConfigurationValue('field')
+        );
+        $this->assertEquals(
+            '1m',
+            $scoreStrategy->getConfigurationValue('origin')
+        );
+        $this->assertEquals(
+            'scale',
+            $scoreStrategy->getConfigurationValue('scale')
+        );
+        $this->assertEquals(
+            '10',
+            $scoreStrategy->getConfigurationValue('offset')
+        );
+        $this->assertEquals(
+            1.0,
+            $scoreStrategy->getConfigurationValue('decay')
+        );
+        $this->assertNull($scoreStrategy->getFilter());
+
+        /**
+         * Test with filter.
+         */
+        $scoreStrategy = ScoreStrategy::createDecayFunction(
+            ScoreStrategy::DECAY_GAUSS,
+            'field',
+            '1m',
+            'scale',
+            '10',
+            1.0,
+            5.50,
+            $this->prophesize(Filter::class)->reveal()
+        );
+        $this->assertEquals(
+            5.50,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertEquals(
+            5.50,
+            $scoreStrategy->getWeight()
+        );
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
+        );
+        $scoreStrategy = ScoreStrategy::createFromArray($scoreStrategy->toArray());
+        $this->assertInstanceOf(
+            Filter::class,
+            $scoreStrategy->getFilter()
         );
     }
 }

@@ -18,6 +18,7 @@ namespace Apisearch\Query;
 use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\HttpTransportable;
+use Apisearch\Model\Item;
 
 /**
  * Class SortBy.
@@ -249,7 +250,7 @@ class SortBy implements HttpTransportable
     ): SortBy {
         $this->sortsBy[] = [
             'type' => self::TYPE_FIELD,
-            Filter::getFilterPathByField($field) => [
+            Item::getPathByField($field) => [
                 'order' => $order,
             ],
         ];
@@ -298,7 +299,7 @@ class SortBy implements HttpTransportable
         Filter $filter,
         string $mode = self::MODE_AVG
     ): SortBy {
-        $fieldPath = Filter::getFilterPathByField($filter->getField());
+        $fieldPath = Item::getPathByField($filter->getField());
         $filterAsArray = $filter->toArray();
         $filterAsArray['field'] = $fieldPath;
         $filter = Filter::createFromArray($filterAsArray);
