@@ -219,7 +219,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 Http::getAppQueryValues($this, $indexUUID)
             );
 
-        if ($response === null) {
+        if (null === $response) {
             return false;
         }
 
@@ -249,7 +249,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 ]
             );
 
-        if ($response === null) {
+        if (null === $response) {
             return;
         }
 

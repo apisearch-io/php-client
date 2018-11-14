@@ -23,58 +23,178 @@ use Apisearch\Model\HttpTransportable;
 class ScoreStrategy implements HttpTransportable
 {
     /**
-     * @var int
+     * @var string
      *
      * Default score strategy
      */
-    const DEFAULT = 0;
+    const DEFAULT_TYPE = 'default';
 
     /**
-     * @var int
+     * @var float
+     *
+     * Default weight
+     */
+    const DEFAULT_WEIGHT = 1.0;
+
+    /**
+     * @var string
+     *
+     * Boosting by field value
+     */
+    const BOOSTING_FIELD_VALUE = 'field_value';
+
+    /**
+     * @var string
      *
      * Boosting by relevance field
      */
-    const BOOSTING_RELEVANCE_FIELD = 1;
+    const CUSTOM_FUNCTION = 'custom_function';
 
     /**
-     * @var int
+     * @var string
+     *
+     * Decay linear
+     */
+    const DECAY_LINEAR = 'linear';
+
+    /**
+     * @var string
+     *
+     * Decay exp
+     */
+    const DECAY_EXP = 'exp';
+
+    /**
+     * @var string
+     *
+     * Decay exp
+     */
+    const DECAY_GAUSS = 'gauss';
+
+    /**
+     * @var string
      *
      * Boosting by relevance field
      */
-    const CUSTOM_FUNCTION = 2;
+    const DECAY = 'decay';
 
     /**
-     * @var int
+     * @var string
+     *
+     * Modifier none
+     */
+    const MODIFIER_NONE = 'none';
+
+    /**
+     * @var string
+     *
+     * Modifier sqrt
+     */
+    const MODIFIER_SQRT = 'sqrt';
+
+    /**
+     * @var string
+     *
+     * Modifier log
+     */
+    const MODIFIER_LOG = 'log';
+
+    /**
+     * @var string
+     *
+     * Modifier log natural
+     */
+    const MODIFIER_LN = 'ln';
+
+    /**
+     * @var string
+     *
+     * Modifier square
+     */
+    const MODIFIER_SQUARE = 'square';
+
+    /**
+     * @var float
+     *
+     * Default missing
+     */
+    const DEFAULT_MISSING = 1.0;
+
+    /**
+     * @var float
+     *
+     * Default factor
+     */
+    const DEFAULT_FACTOR = 1.0;
+
+    /**
+     * @var string
      *
      * Scoring type
      */
-    private $type = self::DEFAULT;
+    private $type = self::DEFAULT_TYPE;
 
     /**
-     * @var null|string
+     * Filter.
      *
-     * Scoring function
+     * @var Filter
      */
-    private $function = null;
+    private $filter;
+
+    /**
+     * @var float
+     *
+     * Weight
+     */
+    private $weight;
+
+    /**
+     * Configuration.
+     *
+     * @var array
+     */
+    private $configuration = [];
 
     /**
      * Get type.
      *
-     * @return int
+     * @return string
      */
-    public function getType(): int
+    public function getType(): string
     {
         return $this->type;
     }
 
     /**
-     * Get function.
+     * Get configuration value.
      *
-     * @return null|string
+     * @param string $element
+     *
+     * @return null|mixed
      */
-    public function getFunction(): ? string
+    public function getConfigurationValue(string $element)
     {
-        return $this->function;
+        return $this->configuration[$element] ?? null;
+    }
+
+    /**
+     * Get weight.
+     *
+     * @return float
+     */
+    public function getWeight(): float
+    {
+        return $this->weight;
+    }
+
+    /**
+     * Get filter.
+     *
+     * @return Filter|null
+     */
+    public function getFilter(): ? Filter
+    {
+        return $this->filter;
     }
 
     /**
@@ -88,32 +208,96 @@ class ScoreStrategy implements HttpTransportable
     }
 
     /**
-     * Create default relevance scoring.
+     * Create default field scoring.
+     *
+     * @param string $field
+     * @param float  $factor
+     * @param float  $missing
+     * @param string $modifier
+     * @param float  $weight
+     * @param Filter $filter
      *
      * @return self
      */
-    public static function createRelevanceBoosting(): self
-    {
-        $score = self::createDefault();
-        $score->type = self::BOOSTING_RELEVANCE_FIELD;
+    public static function createFieldBoosting(
+        string $field,
+        float $factor = self::DEFAULT_FACTOR,
+        float $missing = self::DEFAULT_MISSING,
+        string $modifier = self::MODIFIER_NONE,
+        float $weight = self::DEFAULT_WEIGHT,
+        Filter $filter = null
+    ): self {
+        $scoreStrategy = self::createDefault();
+        $scoreStrategy->type = self::BOOSTING_FIELD_VALUE;
+        $scoreStrategy->configuration['field'] = $field;
+        $scoreStrategy->configuration['factor'] = $factor;
+        $scoreStrategy->configuration['missing'] = $missing;
+        $scoreStrategy->configuration['modifier'] = $modifier;
+        $scoreStrategy->weight = $weight;
+        $scoreStrategy->filter = $filter;
 
-        return $score;
+        return $scoreStrategy;
     }
 
     /**
      * Create custom function scoring.
      *
      * @param string $function
+     * @param float  $weight
+     * @param Filter $filter
      *
      * @return self
      */
-    public static function createCustomFunction(string $function): self
-    {
-        $score = self::createDefault();
-        $score->type = self::CUSTOM_FUNCTION;
-        $score->function = $function;
+    public static function createCustomFunction(
+        string $function,
+        float $weight = self::DEFAULT_WEIGHT,
+        Filter $filter = null
+    ): self {
+        $scoreStrategy = self::createDefault();
+        $scoreStrategy->type = self::CUSTOM_FUNCTION;
+        $scoreStrategy->configuration['function'] = $function;
+        $scoreStrategy->weight = $weight;
+        $scoreStrategy->filter = $filter;
 
-        return $score;
+        return $scoreStrategy;
+    }
+
+    /**
+     * Create custom function scoring.
+     *
+     * @param string $type
+     * @param string $field
+     * @param string $origin
+     * @param string $scale
+     * @param string $offset
+     * @param float  $decay
+     * @param float  $weight
+     * @param Filter $filter
+     *
+     * @return self
+     */
+    public static function createDecayFunction(
+        string $type,
+        string $field,
+        string $origin,
+        string $scale,
+        string $offset,
+        float $decay,
+        float $weight = self::DEFAULT_WEIGHT,
+        Filter $filter = null
+    ): self {
+        $scoreStrategy = self::createDefault();
+        $scoreStrategy->type = self::DECAY;
+        $scoreStrategy->configuration['type'] = $type;
+        $scoreStrategy->configuration['field'] = $field;
+        $scoreStrategy->configuration['origin'] = $origin;
+        $scoreStrategy->configuration['scale'] = $scale;
+        $scoreStrategy->configuration['offset'] = $offset;
+        $scoreStrategy->configuration['decay'] = $decay;
+        $scoreStrategy->weight = $weight;
+        $scoreStrategy->filter = $filter;
+
+        return $scoreStrategy;
     }
 
     /**
@@ -125,7 +309,9 @@ class ScoreStrategy implements HttpTransportable
     {
         return [
             'type' => $this->type,
-            'function' => $this->function,
+            'configuration' => $this->configuration,
+            'weight' => $this->weight,
+            'filter' => $this->filter,
         ];
     }
 
@@ -138,10 +324,12 @@ class ScoreStrategy implements HttpTransportable
      */
     public static function createFromArray(array $array)
     {
-        $score = new self();
-        $score->type = $array['type'] ?: self::DEFAULT;
-        $score->function = $array['function'] ?: null;
+        $scoreStrategy = new self();
+        $scoreStrategy->type = $array['type'] ?: self::DEFAULT_TYPE;
+        $scoreStrategy->configuration = $array['configuration'] ?? [];
+        $scoreStrategy->weight = $array['weight'] ?? self::DEFAULT_WEIGHT;
+        $scoreStrategy->filter = $array['filter'] ?? null;
 
-        return $score;
+        return $scoreStrategy;
     }
 }

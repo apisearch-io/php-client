@@ -327,5 +327,10 @@ class SortByTest extends TestCase
             4,
             $sortBy->all()
         );
+
+        $this->assertCount(
+            4,
+            SortBy::createFromArray($sortBy->toArray())->all()
+        );
     }
 }
