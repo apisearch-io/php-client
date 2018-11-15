@@ -46,7 +46,7 @@ class ScoreStrategies implements HttpTransportable
     /**
      * @var string
      *
-     * Score mode avg
+     * Score mode max
      */
     const MAX = 'max';
 

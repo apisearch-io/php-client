@@ -36,12 +36,20 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getType()
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
         $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::DEFAULT_TYPE,
             $scoreStrategy->getType()
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
     }
 
     /**
@@ -75,6 +83,10 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getWeight()
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
         $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::BOOSTING_FIELD_VALUE,
@@ -101,6 +113,10 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getWeight()
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
 
         $scoreStrategy = ScoreStrategy::createFieldBoosting(
             'relevance',
@@ -108,7 +124,8 @@ class ScoreStrategyTest extends TestCase
             2.0,
             ScoreStrategy::MODIFIER_LN,
             4.00,
-            Filter::create('x', [], 0, '')
+            Filter::create('x', [], 0, ''),
+            ScoreStrategy::SCORE_MODE_MIN
         );
         $this->assertEquals(
             1.0,
@@ -129,6 +146,10 @@ class ScoreStrategyTest extends TestCase
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
+        );
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_MIN,
+            $scoreStrategy->getScoreMode()
         );
         $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
@@ -150,6 +171,10 @@ class ScoreStrategyTest extends TestCase
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
+        );
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_MIN,
+            $scoreStrategy->getScoreMode()
         );
     }
 
@@ -174,6 +199,10 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getConfigurationValue('function')
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
         $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::CUSTOM_FUNCTION,
@@ -188,6 +217,10 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getConfigurationValue('function')
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
 
         /**
          * Test with filter.
@@ -195,7 +228,8 @@ class ScoreStrategyTest extends TestCase
         $scoreStrategy = ScoreStrategy::createCustomFunction(
             'xxx',
             2.34,
-            Filter::create('x', [], 0, '')
+            Filter::create('x', [], 0, ''),
+            ScoreStrategy::SCORE_MODE_MAX
         );
         $this->assertEquals(
             2.34,
@@ -210,6 +244,10 @@ class ScoreStrategyTest extends TestCase
             Filter::class,
             $scoreStrategy->getFilter()
         );
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_MAX,
+            $scoreStrategy->getScoreMode()
+        );
         $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             2.34,
@@ -223,6 +261,10 @@ class ScoreStrategyTest extends TestCase
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
+        );
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_MAX,
+            $scoreStrategy->getScoreMode()
         );
     }
 
@@ -272,6 +314,10 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getConfigurationValue('decay')
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
         $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             ScoreStrategy::DECAY,
@@ -306,6 +352,10 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getConfigurationValue('decay')
         );
         $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_AVG,
+            $scoreStrategy->getScoreMode()
+        );
 
         /**
          * Test with filter.
@@ -318,7 +368,8 @@ class ScoreStrategyTest extends TestCase
             '10',
             1.0,
             5.50,
-            Filter::create('x', [], 0, '')
+            Filter::create('x', [], 0, ''),
+            ScoreStrategy::SCORE_MODE_NONE
         );
         $this->assertEquals(
             5.50,
@@ -333,6 +384,10 @@ class ScoreStrategyTest extends TestCase
             Filter::class,
             $scoreStrategy->getFilter()
         );
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_NONE,
+            $scoreStrategy->getScoreMode()
+        );
         $scoreStrategy = HttpHelper::emulateHttpTransport($scoreStrategy);
         $this->assertEquals(
             5.50,
@@ -346,6 +401,10 @@ class ScoreStrategyTest extends TestCase
         $this->assertInstanceOf(
             Filter::class,
             $scoreStrategy->getFilter()
+        );
+        $this->assertEquals(
+            ScoreStrategy::SCORE_MODE_NONE,
+            $scoreStrategy->getScoreMode()
         );
     }
 }

@@ -54,6 +54,13 @@ class ScoreStrategy implements HttpTransportable
     /**
      * @var string
      *
+     * Boosting by relevance field
+     */
+    const DECAY = 'decay';
+
+    /**
+     * @var string
+     *
      * Decay linear
      */
     const DECAY_LINEAR = 'linear';
@@ -71,13 +78,6 @@ class ScoreStrategy implements HttpTransportable
      * Decay exp
      */
     const DECAY_GAUSS = 'gauss';
-
-    /**
-     * @var string
-     *
-     * Boosting by relevance field
-     */
-    const DECAY = 'decay';
 
     /**
      * @var string
@@ -113,6 +113,40 @@ class ScoreStrategy implements HttpTransportable
      * Modifier square
      */
     const MODIFIER_SQUARE = 'square';
+    /**
+     * @var string
+     *
+     * Score mode none
+     */
+    const SCORE_MODE_NONE = 'none';
+
+    /**
+     * @var string
+     *
+     * Score mode sum
+     */
+    const SCORE_MODE_SUM = 'sum';
+
+    /**
+     * @var string
+     *
+     * Score mode avg
+     */
+    const SCORE_MODE_AVG = 'avg';
+
+    /**
+     * @var string
+     *
+     * Score mode max
+     */
+    const SCORE_MODE_MAX = 'max';
+
+    /**
+     * @var string
+     *
+     * Score mode min
+     */
+    const SCORE_MODE_MIN = 'min';
 
     /**
      * @var float
@@ -147,7 +181,14 @@ class ScoreStrategy implements HttpTransportable
      *
      * Weight
      */
-    private $weight;
+    private $weight = self::DEFAULT_WEIGHT;
+
+    /**
+     * @var string
+     *
+     * Score mode
+     */
+    private $scoreMode = self::SCORE_MODE_AVG;
 
     /**
      * Configuration.
@@ -189,6 +230,16 @@ class ScoreStrategy implements HttpTransportable
     }
 
     /**
+     * Get ScoreMode.
+     *
+     * @return string
+     */
+    public function getScoreMode(): string
+    {
+        return $this->scoreMode;
+    }
+
+    /**
      * Get filter.
      *
      * @return Filter|null
@@ -201,9 +252,9 @@ class ScoreStrategy implements HttpTransportable
     /**
      * Create empty.
      *
-     * @return self
+     * @return ScoreStrategy
      */
-    public static function createDefault(): self
+    public static function createDefault(): ScoreStrategy
     {
         return new self();
     }
@@ -217,8 +268,9 @@ class ScoreStrategy implements HttpTransportable
      * @param string $modifier
      * @param float  $weight
      * @param Filter $filter
+     * @param string $scoreMode
      *
-     * @return self
+     * @return ScoreStrategy
      */
     public static function createFieldBoosting(
         string $field,
@@ -226,8 +278,9 @@ class ScoreStrategy implements HttpTransportable
         float $missing = self::DEFAULT_MISSING,
         string $modifier = self::MODIFIER_NONE,
         float $weight = self::DEFAULT_WEIGHT,
-        Filter $filter = null
-    ): self {
+        Filter $filter = null,
+        string $scoreMode = self::SCORE_MODE_AVG
+    ): ScoreStrategy {
         $scoreStrategy = self::createDefault();
         $scoreStrategy->type = self::BOOSTING_FIELD_VALUE;
         $scoreStrategy->configuration['field'] = $field;
@@ -236,6 +289,7 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->configuration['modifier'] = $modifier;
         $scoreStrategy->weight = $weight;
         $scoreStrategy->filter = self::fixFilterFieldPath($filter);
+        $scoreStrategy->scoreMode = $scoreMode;
 
         return $scoreStrategy;
     }
@@ -246,19 +300,22 @@ class ScoreStrategy implements HttpTransportable
      * @param string $function
      * @param float  $weight
      * @param Filter $filter
+     * @param string $scoreMode
      *
-     * @return self
+     * @return ScoreStrategy
      */
     public static function createCustomFunction(
         string $function,
         float $weight = self::DEFAULT_WEIGHT,
-        Filter $filter = null
-    ): self {
+        Filter $filter = null,
+        string $scoreMode = self::SCORE_MODE_AVG
+    ): ScoreStrategy {
         $scoreStrategy = self::createDefault();
         $scoreStrategy->type = self::CUSTOM_FUNCTION;
         $scoreStrategy->configuration['function'] = $function;
         $scoreStrategy->weight = $weight;
         $scoreStrategy->filter = self::fixFilterFieldPath($filter);
+        $scoreStrategy->scoreMode = $scoreMode;
 
         return $scoreStrategy;
     }
@@ -274,8 +331,9 @@ class ScoreStrategy implements HttpTransportable
      * @param float  $decay
      * @param float  $weight
      * @param Filter $filter
+     * @param string $scoreMode
      *
-     * @return self
+     * @return ScoreStrategy
      */
     public static function createDecayFunction(
         string $type,
@@ -285,8 +343,9 @@ class ScoreStrategy implements HttpTransportable
         string $offset,
         float $decay,
         float $weight = self::DEFAULT_WEIGHT,
-        Filter $filter = null
-    ): self {
+        Filter $filter = null,
+        string $scoreMode = self::SCORE_MODE_AVG
+    ): ScoreStrategy {
         $scoreStrategy = self::createDefault();
         $scoreStrategy->type = self::DECAY;
         $scoreStrategy->configuration['type'] = $type;
@@ -297,6 +356,7 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->configuration['decay'] = $decay;
         $scoreStrategy->weight = $weight;
         $scoreStrategy->filter = self::fixFilterFieldPath($filter);
+        $scoreStrategy->scoreMode = $scoreMode;
 
         return $scoreStrategy;
     }
@@ -331,6 +391,7 @@ class ScoreStrategy implements HttpTransportable
             'type' => $this->type,
             'configuration' => $this->configuration,
             'weight' => $this->weight,
+            'score_mode' => $this->scoreMode,
             'filter' => ($this->filter instanceof Filter
                 ? $this
                     ->filter
@@ -352,6 +413,7 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->type = $array['type'] ?: self::DEFAULT_TYPE;
         $scoreStrategy->configuration = $array['configuration'] ?? [];
         $scoreStrategy->weight = $array['weight'] ?? self::DEFAULT_WEIGHT;
+        $scoreStrategy->scoreMode = $array['score_mode'] ?? self::SCORE_MODE_AVG;
         $scoreStrategy->filter = is_array($array['filter'])
             ? Filter::createFromArray($array['filter'])
             : null;
