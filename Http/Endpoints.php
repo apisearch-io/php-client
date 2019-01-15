@@ -135,6 +135,22 @@ class Endpoints
                 'path' => '/v1/interactions',
                 'verb' => 'delete',
             ],
+
+            /*
+             * Consumers endpoints
+             */
+            'v1-pause-consumers' => [
+                'name' => 'Pause consumers',
+                'description' => 'Pause all available consumers',
+                'path' => '/v1/consumers/pause',
+                'verb' => 'post',
+            ],
+            'v1-resume-consumers' => [
+                'name' => 'Resume consumers',
+                'description' => 'Resume all available consumers',
+                'path' => '/v1/consumers/resume',
+                'verb' => 'post',
+            ],
         ];
     }
 
