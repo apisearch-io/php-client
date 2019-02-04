@@ -26,13 +26,6 @@ class Token implements HttpTransportable
     /**
      * @var int
      *
-     * Default ttl
-     */
-    const DEFAULT_TTL = 60;
-
-    /**
-     * @var int
-     *
      * No cache
      */
     const NO_CACHE = 0;
@@ -40,16 +33,9 @@ class Token implements HttpTransportable
     /**
      * @var int
      *
-     * Infinite duration
+     * Default ttl
      */
-    const INFINITE_DURATION = 0;
-
-    /**
-     * @var int
-     *
-     * Infinite hits per query
-     */
-    const INFINITE_HITS_PER_QUERY = 0;
+    const DEFAULT_TTL = 60;
 
     /**
      * @var TokenUUID
@@ -87,27 +73,6 @@ class Token implements HttpTransportable
     private $indices;
 
     /**
-     * @var int
-     *
-     * Seconds valid
-     */
-    private $secondsValid;
-
-    /**
-     * @var int
-     *
-     * Max hits per query
-     */
-    private $maxHitsPerQuery;
-
-    /**
-     * @var string[]
-     *
-     * HTTP Referrers
-     */
-    private $httpReferrers;
-
-    /**
      * @var array
      *
      * Endpoints enabled
@@ -129,40 +94,41 @@ class Token implements HttpTransportable
     private $ttl;
 
     /**
+     * @var array
+     *
+     * Metadata
+     */
+    private $metadata = [];
+
+    /**
      * PushToken constructor.
      *
      * @param TokenUUID   $tokenUUID
      * @param AppUUID     $appUUID
      * @param IndexUUID[] $indices
-     * @param string[]    $httpReferrers
      * @param string[]    $endpoints
      * @param string[]    $plugins
-     * @param int         $secondsValid
-     * @param int         $maxHitsPerQuery
      * @param int         $ttl
+     * @param array       $metadata
      */
     public function __construct(
         TokenUUID $tokenUUID,
         AppUUID $appUUID,
         array $indices = [],
-        array $httpReferrers = [],
         array $endpoints = [],
         array $plugins = [],
-        int $secondsValid = self::INFINITE_DURATION,
-        int $maxHitsPerQuery = self::INFINITE_HITS_PER_QUERY,
-        int $ttl = self::DEFAULT_TTL
+        int $ttl = self::DEFAULT_TTL,
+        array $metadata = []
     ) {
         $this->tokenUUID = $tokenUUID;
         $this->appUUID = $appUUID;
         $this->createdAt = Carbon::now('UTC')->timestamp;
         $this->updatedAt = $this->createdAt;
         $this->setIndices($indices);
-        $this->setHttpReferrers($httpReferrers);
         $this->setEndpoints($endpoints);
         $this->setPlugins($plugins);
-        $this->secondsValid = $secondsValid;
-        $this->maxHitsPerQuery = $maxHitsPerQuery;
         $this->ttl = $ttl;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -223,72 +189,6 @@ class Token implements HttpTransportable
     public function setIndices(array $indices)
     {
         $this->indices = $indices;
-    }
-
-    /**
-     * Get SecondsValid.
-     *
-     * @return int
-     */
-    public function getSecondsValid(): int
-    {
-        return $this->secondsValid;
-    }
-
-    /**
-     * Set SecondsValid.
-     *
-     * @param int $secondsValid
-     */
-    public function setSecondsValid(int $secondsValid)
-    {
-        $this->secondsValid = $secondsValid;
-    }
-
-    /**
-     * Get MaxHitsPerQuery.
-     *
-     * @return int
-     */
-    public function getMaxHitsPerQuery(): int
-    {
-        return $this->maxHitsPerQuery;
-    }
-
-    /**
-     * Set MaxHitsPerQuery.
-     *
-     * @param int $maxHitsPerQuery
-     */
-    public function setMaxHitsPerQuery(int $maxHitsPerQuery)
-    {
-        $this->maxHitsPerQuery = $maxHitsPerQuery;
-    }
-
-    /**
-     * Get HttpReferrers.
-     *
-     * @return string[]
-     */
-    public function getHttpReferrers(): array
-    {
-        return $this->httpReferrers;
-    }
-
-    /**
-     * Set HttpReferrers.
-     *
-     * @param string[] $httpReferrers
-     */
-    public function setHttpReferrers(array $httpReferrers)
-    {
-        $this->httpReferrers = array_values(
-            array_unique(
-                array_filter(
-                    $httpReferrers
-                )
-            )
-        );
     }
 
     /**
@@ -361,7 +261,7 @@ class Token implements HttpTransportable
     }
 
     /**
-     * Get Ttl.
+     * Get TTL.
      *
      * @return int
      */
@@ -371,13 +271,31 @@ class Token implements HttpTransportable
     }
 
     /**
-     * Set Ttl.
+     * Set metadata value.
      *
-     * @param int $ttl
+     * @param string $field
+     * @param mixed  $value
      */
-    public function setTtl(int $ttl)
-    {
-        $this->ttl = $ttl;
+    public function setMetadataValue(
+        string $field,
+        $value
+    ) {
+        $this->metadata[$field] = $value;
+    }
+
+    /**
+     * Get metadata value.
+     *
+     * @param string $field
+     * @param mixed  $defaultValue
+     *
+     * @return mixed|null
+     */
+    public function getMetadataValue(
+        string $field,
+        $defaultValue = null
+    ) {
+        return $this->metadata[$field] ?? $defaultValue;
     }
 
     /**
@@ -395,12 +313,10 @@ class Token implements HttpTransportable
             'indices' => array_map(function (IndexUUID $indexUUID) {
                 return $indexUUID->toArray();
             }, $this->indices),
-            'seconds_valid' => $this->secondsValid,
-            'max_hits_per_query' => $this->maxHitsPerQuery,
-            'http_referrers' => $this->httpReferrers,
             'endpoints' => $this->endpoints,
             'plugins' => $this->plugins,
             'ttl' => $this->ttl,
+            'metadata' => $this->metadata,
         ];
     }
 
@@ -428,12 +344,10 @@ class Token implements HttpTransportable
             array_map(function (array $indexUUIDAsArray) {
                 return IndexUUID::createFromArray($indexUUIDAsArray);
             }, ($array['indices'] ?? [])),
-            $array['http_referrers'] ?? [],
             $array['endpoints'] ?? [],
             $array['plugins'] ?? [],
-            $array['seconds_valid'] ?? self::INFINITE_DURATION,
-            $array['max_hits_per_query'] ?? self::INFINITE_HITS_PER_QUERY,
-            $array['ttl'] ?? self::DEFAULT_TTL
+            $array['ttl'] ?? self::DEFAULT_TTL,
+            $array['metadata'] ?? []
         );
 
         $token->createdAt = $array['created_at'];
