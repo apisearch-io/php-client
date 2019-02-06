@@ -73,11 +73,18 @@ class Index implements HttpTransportable
     private $replicas;
 
     /**
-     * Miscellanea.
+     * Fields.
+     *
+     * @var string[]
+     */
+    private $fields = [];
+
+    /**
+     * Metadata.
      *
      * @var array
      */
-    private $miscellanea;
+    private $metadata;
 
     /**
      * Index constructor.
@@ -89,7 +96,8 @@ class Index implements HttpTransportable
      * @param string    $size
      * @param int       $shards
      * @param int       $replicas
-     * @param array     $miscellanea
+     * @param string[]  $fields
+     * @param array     $metadata
      */
     public function __construct(
         IndexUUID $uuid,
@@ -99,7 +107,8 @@ class Index implements HttpTransportable
         string $size,
         int $shards,
         int $replicas,
-        array $miscellanea = []
+        array $fields = [],
+        array $metadata = []
     ) {
         $this->uuid = $uuid;
         $this->appUUID = $appUUID;
@@ -108,7 +117,8 @@ class Index implements HttpTransportable
         $this->size = $size;
         $this->shards = $shards;
         $this->replicas = $replicas;
-        $this->miscellanea = $miscellanea;
+        $this->fields = $fields;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -180,13 +190,23 @@ class Index implements HttpTransportable
     }
 
     /**
-     * Get Miscellanea.
+     * Get fields.
+     *
+     * @return string[]
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    /**
+     * Get Metadata.
      *
      * @return array
      */
-    public function getMiscellanea(): array
+    public function getMetadata(): array
     {
-        return $this->miscellanea;
+        return $this->metadata;
     }
 
     /**
@@ -204,7 +224,8 @@ class Index implements HttpTransportable
             'size' => $this->size,
             'shards' => $this->shards,
             'replicas' => $this->replicas,
-            'miscellanea' => $this->miscellanea,
+            'fields' => $this->fields,
+            'metadata' => $this->metadata,
         ];
     }
 
@@ -231,7 +252,8 @@ class Index implements HttpTransportable
             $array['size'] ?? '0kb',
             $array['shards'] ?? Config::DEFAULT_SHARDS,
             $array['replicas'] ?? Config::DEFAULT_REPLICAS,
-            $array['miscellanea'] ?? []
+            $array['fields'] ?? [],
+            $array['metadata'] ?? []
         );
     }
 }

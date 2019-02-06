@@ -67,7 +67,10 @@ class IndexTest extends TestCase
             'size' => '1kb',
             'shards' => 3,
             'replicas' => 4,
-            'miscellanea' => ['hello'],
+            'fields' => [
+                'hello' => 'string',
+            ],
+            'metadata' => ['hello'],
         ]);
 
         $this->assertEquals('testId', $index1->getUUID()->getId());
@@ -77,9 +80,10 @@ class IndexTest extends TestCase
         $this->assertEquals('1kb', $index1->getSize());
         $this->assertEquals(3, $index1->getShards());
         $this->assertEquals(4, $index1->getReplicas());
-        $this->assertEquals(['hello'], $index1->getMiscellanea());
+        $this->assertEquals(['hello'], $index1->getMetadata());
+        $this->assertEquals(['hello' => 'string'], $index1->getFields());
 
-        $index2 = new Index(IndexUUID::createById('testId'), AppUUID::createById('testAppId'), true, 20, '2kb', 3, 4, ['hello']);
+        $index2 = new Index(IndexUUID::createById('testId'), AppUUID::createById('testAppId'), true, 20, '2kb', 3, 4, ['hello' => 'string'], ['hello']);
         $this->assertEquals('testId', $index2->getUUID()->getId());
         $this->assertEquals('testAppId', $index2->getAppUUID()->composeUUID());
         $this->assertTrue($index2->isOK());
@@ -87,7 +91,8 @@ class IndexTest extends TestCase
         $this->assertEquals('2kb', $index2->getSize());
         $this->assertEquals(3, $index2->getShards());
         $this->assertEquals(4, $index2->getReplicas());
-        $this->assertEquals(['hello'], $index2->getMiscellanea());
+        $this->assertEquals(['hello' => 'string'], $index2->getFields());
+        $this->assertEquals(['hello'], $index2->getMetadata());
 
         $this->assertEquals('testId', $index2->toArray()['uuid']['id']);
         $this->assertEquals('testAppId', $index2->toArray()['app_id']['id']);
@@ -96,7 +101,7 @@ class IndexTest extends TestCase
         $this->assertEquals('2kb', $index2->toArray()['size']);
         $this->assertEquals(3, $index2->toArray()['shards']);
         $this->assertEquals(4, $index2->toArray()['replicas']);
-        $this->assertEquals(['hello'], $index2->toArray()['miscellanea']);
+        $this->assertEquals(['hello'], $index2->toArray()['metadata']);
 
         $index3 = Index::createFromArray([
             'uuid' => [
@@ -105,15 +110,15 @@ class IndexTest extends TestCase
             'app_id' => [
                 'id' => 'testAppId',
             ],
-            'shards' => 3,
-            'replicas' => 4,
-            'miscellanea' => ['hello'],
+            'shards' => 9,
+            'replicas' => 8,
         ]);
         $this->assertFalse($index3->toArray()['is_ok']);
         $this->assertEquals(0, $index3->toArray()['doc_count']);
         $this->assertEquals('0kb', $index3->toArray()['size']);
-        $this->assertEquals(3, $index2->getShards());
-        $this->assertEquals(4, $index2->getReplicas());
-        $this->assertEquals(['hello'], $index2->getMiscellanea());
+        $this->assertEquals(9, $index3->getShards());
+        $this->assertEquals(8, $index3->getReplicas());
+        $this->assertEquals([], $index3->getMetadata());
+        $this->assertEquals([], $index3->getFields());
     }
 }
