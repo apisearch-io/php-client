@@ -19,7 +19,7 @@ use Apisearch\Exception\InvalidFormatException;
 use Carbon\Carbon;
 
 /**
- * File header placeholder.
+ * Class Token.
  */
 class Token implements HttpTransportable
 {
