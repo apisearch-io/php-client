@@ -36,7 +36,7 @@ abstract class HttpRepositoryWithCredentials extends RepositoryWithCredentials
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient)
+    public function __construct(HttpClient $httpClient = null)
     {
         $this->httpClient = $httpClient;
     }
