@@ -271,6 +271,16 @@ class Token implements HttpTransportable
     }
 
     /**
+     * Get metadata
+     *
+     * @return array
+     */
+    public function getMetadata() : array
+    {
+        return $this->metadata;
+    }
+
+    /**
      * Set metadata value.
      *
      * @param string $field
