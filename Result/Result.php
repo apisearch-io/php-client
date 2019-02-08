@@ -46,7 +46,7 @@ class Result implements HttpTransportable
     private $suggests = [];
 
     /**
-     * @var null|Aggregations
+     * @var Aggregations|null
      *
      * Aggregations
      */
@@ -203,7 +203,7 @@ class Result implements HttpTransportable
     /**
      * Get first result.
      *
-     * @return null|Item
+     * @return Item|null
      */
     public function getFirstItem()
     {
@@ -231,7 +231,7 @@ class Result implements HttpTransportable
     /**
      * Get aggregations.
      *
-     * @return null|Aggregations
+     * @return Aggregations|null
      */
     public function getAggregations(): ? Aggregations
     {
@@ -243,7 +243,7 @@ class Result implements HttpTransportable
      *
      * @param string $name
      *
-     * @return null|Aggregation
+     * @return Aggregation|null
      */
     public function getAggregation(string $name): ? Aggregation
     {

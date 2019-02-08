@@ -841,7 +841,7 @@ class Query implements HttpTransportable
      *
      * @param string $aggregationName
      *
-     * @return null|Aggregation
+     * @return Aggregation|null
      */
     public function getAggregation(string $aggregationName): ? Aggregation
     {
@@ -878,7 +878,7 @@ class Query implements HttpTransportable
      *
      * @param string $universeFilterName
      *
-     * @return null|Filter
+     * @return Filter|null
      */
     public function getUniverseFilter(string $universeFilterName): ? Filter
     {
@@ -900,7 +900,7 @@ class Query implements HttpTransportable
      *
      * @param string $filterName
      *
-     * @return null|Filter
+     * @return Filter|null
      */
     public function getFilter(string $filterName): ? Filter
     {
@@ -912,7 +912,7 @@ class Query implements HttpTransportable
      *
      * @param string $fieldName
      *
-     * @return null|Filter
+     * @return Filter|null
      */
     public function getFilterByField(string $fieldName): ? Filter
     {
@@ -1202,7 +1202,7 @@ class Query implements HttpTransportable
     /**
      * Get Fuzziness.
      *
-     * @return null|float|string|array
+     * @return float|string|array|null
      */
     public function getFuzziness()
     {
@@ -1288,7 +1288,7 @@ class Query implements HttpTransportable
     /**
      * Get User.
      *
-     * @return null|User
+     * @return User|null
      */
     public function getUser(): ? User
     {

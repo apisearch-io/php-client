@@ -75,14 +75,14 @@ class Campaign implements HttpTransportable
     private $boostClauses = [];
 
     /**
-     * @var null|DateTime
+     * @var DateTime|null
      *
      * From
      */
     private $from;
 
     /**
-     * @var null|DateTime
+     * @var DateTime|null
      *
      * To
      */
@@ -99,8 +99,8 @@ class Campaign implements HttpTransportable
      * Campaign constructor.
      *
      * @param string        $name
-     * @param null|DateTime $from
-     * @param null|DateTime $to
+     * @param DateTime|null $from
+     * @param DateTime|null $to
      */
     public function __construct(
         string $name,

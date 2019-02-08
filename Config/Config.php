@@ -81,7 +81,7 @@ class Config implements HttpTransportable
     /**
      * Config constructor.
      *
-     * @param null|string $language
+     * @param string|null $language
      * @param bool        $storeSearchableMetadata
      * @param int         $shards
      * @param int         $replicas
@@ -102,7 +102,7 @@ class Config implements HttpTransportable
     /**
      * Get language.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getLanguage(): ? string
     {

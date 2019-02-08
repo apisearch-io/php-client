@@ -23,13 +23,20 @@ use Apisearch\Repository\RepositoryWithCredentials;
 class InMemoryUserRepository extends RepositoryWithCredentials implements UserRepository
 {
     /**
+     * @var Interaction[]
+     *
+     * Interactions
+     */
+    private $interactions = [];
+
+    /**
      * Add interaction.
      *
      * @param Interaction $interaction
      */
     public function addInteraction(Interaction $interaction)
     {
-        // TODO: Implement addInteraction() method.
+        $this->interactions[] = $interaction;
     }
 
     /**
@@ -37,6 +44,6 @@ class InMemoryUserRepository extends RepositoryWithCredentials implements UserRe
      */
     public function deleteAllInteractions()
     {
-        // TODO: Implement deleteAllInteractions() method.
+        $this->interactions = [];
     }
 }

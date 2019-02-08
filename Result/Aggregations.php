@@ -77,7 +77,7 @@ class Aggregations implements IteratorAggregate, HttpTransportable
      *
      * @param string $name
      *
-     * @return null|Aggregation
+     * @return Aggregation|null
      */
     public function getAggregation(string $name): ? Aggregation
     {

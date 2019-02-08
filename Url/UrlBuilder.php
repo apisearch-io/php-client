@@ -248,7 +248,7 @@ class UrlBuilder
      *
      * @param Result $result
      *
-     * @return null|string
+     * @return string|null
      */
     public function addPrevPage(Result $result): ? string
     {
@@ -274,7 +274,7 @@ class UrlBuilder
      *
      * @param Result $result
      *
-     * @return null|string
+     * @return string|null
      */
     public function addNextPage(Result $result): ? string
     {

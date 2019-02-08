@@ -212,7 +212,7 @@ class ScoreStrategy implements HttpTransportable
      *
      * @param string $element
      *
-     * @return null|mixed
+     * @return mixed|null
      */
     public function getConfigurationValue(string $element)
     {

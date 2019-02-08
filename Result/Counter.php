@@ -64,7 +64,7 @@ class Counter implements HttpTransportable
     /**
      * Get id.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getId(): ? string
     {
@@ -74,7 +74,7 @@ class Counter implements HttpTransportable
     /**
      * Get name.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getName(): ? string
     {
@@ -84,7 +84,7 @@ class Counter implements HttpTransportable
     /**
      * Get slug.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getSlug(): ? string
     {
@@ -94,7 +94,7 @@ class Counter implements HttpTransportable
     /**
      * Get level.
      *
-     * @return null|int
+     * @return int|null
      */
     public function getLevel(): ? int
     {
@@ -138,7 +138,7 @@ class Counter implements HttpTransportable
      * @param int    $n
      * @param array  $activeElements
      *
-     * @return null|Counter
+     * @return Counter|null
      */
     public static function createByActiveElements(
         string $name,

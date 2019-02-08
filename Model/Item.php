@@ -229,7 +229,7 @@ class Item implements HttpTransportable, UUIDReference
     /**
      * Get Coordinate.
      *
-     * @return null|Coordinate
+     * @return Coordinate|null
      */
     public function getCoordinate(): ? Coordinate
     {
@@ -239,7 +239,7 @@ class Item implements HttpTransportable, UUIDReference
     /**
      * Get Distance.
      *
-     * @return null|float
+     * @return float|null
      */
     public function getDistance(): ? float
     {
@@ -396,7 +396,7 @@ class Item implements HttpTransportable, UUIDReference
      *
      * @param string $key
      *
-     * @return null|mixed
+     * @return mixed|null
      */
     public function get(string $key)
     {

@@ -32,7 +32,7 @@ trait WithTokenTrait
     /**
      * Get Token.
      *
-     * @return null|Token
+     * @return Token|null
      */
     public function getToken(): ?Token
     {
