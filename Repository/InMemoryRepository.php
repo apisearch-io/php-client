@@ -33,7 +33,7 @@ class InMemoryRepository extends Repository
      *
      * Items
      */
-    private $items = [];
+    protected $items = [];
 
     /**
      * Search across the index types.

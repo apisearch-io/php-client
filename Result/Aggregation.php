@@ -182,7 +182,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      *
      * @param string $name
      *
-     * @return null|Counter
+     * @return Counter|null
      */
     public function getCounter(string $name): ? Counter
     {

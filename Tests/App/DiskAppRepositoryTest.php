@@ -16,12 +16,12 @@ declare(strict_types=1);
 namespace Apisearch\Tests\App;
 
 use Apisearch\App\AppRepository;
-use Apisearch\App\InMemoryAppRepository;
+use Apisearch\App\DiskAppRepository;
 
 /**
- * File header placeholder.
+ * Class DiskAppRepositoryTest.
  */
-class InMemoryAppRepositoryTest extends AppRepositoryTest
+class DiskAppRepositoryTest extends AppRepositoryTest
 {
     /**
      * Get repository intance.
@@ -30,6 +30,6 @@ class InMemoryAppRepositoryTest extends AppRepositoryTest
      */
     protected function getRepository(): AppRepository
     {
-        return new InMemoryAppRepository();
+        return new DiskAppRepository(tempnam(sys_get_temp_dir(), 'apisearch'));
     }
 }

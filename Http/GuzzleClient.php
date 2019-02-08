@@ -123,7 +123,7 @@ class GuzzleClient extends Client implements HttpClient
      *
      * @param string     $url
      * @param callable   $callable
-     * @param null|Retry $retry
+     * @param Retry|null $retry
      *
      * @return ResponseInterface
      *
