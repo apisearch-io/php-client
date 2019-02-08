@@ -35,12 +35,17 @@ class TokenTest extends TestCase
             TokenUUID::createById('1234'),
             AppUUID::createById('987'),
             [IndexUUID::createById('index1'), IndexUUID::createById('index2')],
-            ['referrer1', 'referrer2'],
             ['get~~endpoint1', 'post~~endpoint2'],
             ['plugin1', 'plugin2'],
-            4,
-            3,
-            3600
+            3600,
+            [
+                'http_referrers' => ['referrer1', 'referrer2'],
+                'seconds_valid' => 10,
+                'requests_limit' => [
+                    '10/s',
+                    '40',
+                ],
+            ]
         );
 
         $this->assertEquals(
