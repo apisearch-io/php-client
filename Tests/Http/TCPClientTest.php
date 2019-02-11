@@ -16,16 +16,16 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Http;
 
 use Apisearch\Exception\ConnectionException;
-use Apisearch\Http\GuzzleClient;
+use Apisearch\Http\HttpAdapter;
 use Apisearch\Http\RetryMap;
-use GuzzleHttp\Client;
+use Apisearch\Http\TCPClient;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
- * Class GuzzleClientTest.
+ * Class TCPClientTest.
  */
-class GuzzleClientTest extends TestCase
+class TCPClientTest extends TestCase
 {
     /**
      * Test n query retries.
@@ -114,23 +114,16 @@ class GuzzleClientTest extends TestCase
          ?int $microsecondsMinimumExpected,
          ?int $microsecondsMaximumExpected
     ) {
-        $guzzleClient = $this->prophesize(Client::class);
-        $guzzleClient->willBeConstructedWith([
-            'defaults' => [
-                'timeout' => 5,
-                'http_errors' => false,
-            ],
-        ]);
-
+        $httpAdapter = $this->prophesize(HttpAdapter::class);
         $before = microtime(true) * 1000000;
-        $guzzleClient
-            ->get(Argument::cetera())
+        $httpAdapter
+            ->getByRequestParts(Argument::cetera())
             ->shouldBeCalledTimes($triesExpected)
             ->willThrow(ConnectionException::class);
 
-        $apisearchClient = new GuzzleClient(
-            $guzzleClient->reveal(),
+        $apisearchClient = new TCPClient(
             'http://localhost:9999',
+            $httpAdapter->reveal(),
             'v1',
             RetryMap::createFromArray($retryMap)
         );
