@@ -10,9 +10,8 @@
     ],
     "require": {
         "php": ">=7.1",
+        "ext-curl": "*",
         "symfony/event-dispatcher": "^3.4|^4.0",
-        "guzzlehttp/guzzle": "^6.0",
-        "psr/http-message": "^1.0.1",
         "nesbot/carbon": "^1.22"
     },
     "require-dev": {

@@ -16,14 +16,12 @@ declare(strict_types=1);
 namespace Apisearch\Http;
 
 use Apisearch\Exception\ConnectionException;
-use GuzzleHttp\Client as GuzzleHttpClient;
-use GuzzleHttp\Exception\ConnectException as GuzzleConnectException;
-use Psr\Http\Message\ResponseInterface;
+use Exception;
 
 /**
- * Class GuzzleClient.
+ * Class TCPClient.
  */
-class GuzzleClient extends Client implements HttpClient
+class TCPClient extends Client implements HttpClient
 {
     /**
      * @var string
@@ -33,28 +31,28 @@ class GuzzleClient extends Client implements HttpClient
     private $host;
 
     /**
-     * @var GuzzleHttpClient
+     * @var HttpAdapter
      *
-     * Client
+     * Http Adapter
      */
-    private $client;
+    private $httpAdapter;
 
     /**
      * GuzzleClient constructor.
      *
-     * @param GuzzleHttpClient $client
-     * @param string           $host
-     * @param string           $version
-     * @param RetryMap         $retryMap
+     * @param string      $host
+     * @param HttpAdapter $httpAdapter
+     * @param string      $version
+     * @param RetryMap    $retryMap
      */
     public function __construct(
-        GuzzleHttpClient $client,
         string $host,
+        HttpAdapter $httpAdapter,
         string $version,
         RetryMap $retryMap
     ) {
-        $this->client = $client;
         $this->host = $host;
+        $this->httpAdapter = $httpAdapter;
 
         parent::__construct(
             $version,
@@ -91,16 +89,13 @@ class GuzzleClient extends Client implements HttpClient
             $server
         );
 
-        /**
-         * @var ResponseInterface
-         */
-        $response = $this->tryRequest($url, function () use ($method, $requestParts) {
+        return $this->tryRequest(function () use ($method, $requestParts) {
             return $this
-                ->client
-                ->$method(
-                    rtrim($this->host, '/').'/'.ltrim($requestParts->getUrl(), '/'),
-                    $requestParts->getParameters() + ['http_errors' => false],
-                    $requestParts->getOptions()
+                ->httpAdapter
+                ->getByRequestParts(
+                    $this->host,
+                    $method,
+                    $requestParts
                 );
         }, $this
             ->retryMap
@@ -109,11 +104,6 @@ class GuzzleClient extends Client implements HttpClient
                 $method
             )
         );
-
-        return [
-            'code' => $response->getStatusCode(),
-            'body' => json_decode($response->getBody()->getContents(), true),
-        ];
     }
 
     /**
@@ -121,19 +111,17 @@ class GuzzleClient extends Client implements HttpClient
      *
      * Retry n times this connection before returning response.
      *
-     * @param string     $url
      * @param callable   $callable
      * @param Retry|null $retry
      *
-     * @return ResponseInterface
+     * @return array
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function tryRequest(
-        string $url,
         callable $callable,
         ?Retry $retry
-    ): ResponseInterface {
+    ): array {
         $tries = $retry instanceof Retry
             ? $retry->getRetries()
             : 0;
@@ -143,10 +131,6 @@ class GuzzleClient extends Client implements HttpClient
                 return $callable();
             } catch (\Exception $e) {
                 if ($tries-- <= 0) {
-                    if ($e instanceof GuzzleConnectException) {
-                        throw ConnectionException::buildConnectExceptionByUrl($url);
-                    }
-
                     throw $e;
                 }
 

@@ -271,11 +271,11 @@ class Token implements HttpTransportable
     }
 
     /**
-     * Get metadata
+     * Get metadata.
      *
      * @return array
      */
-    public function getMetadata() : array
+    public function getMetadata(): array
     {
         return $this->metadata;
     }
