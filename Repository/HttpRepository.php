@@ -134,9 +134,8 @@ class HttpRepository extends Repository
             ->get(
                 '/',
                 'get',
-                Http::getQueryValues($this),
-                [
-                    Http::QUERY_FIELD => $query->toArray(),
+                Http::getQueryValues($this) + [
+                    Http::QUERY_FIELD => urlencode(json_encode($query->toArray())),
                 ]
             );
 

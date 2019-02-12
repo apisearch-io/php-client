@@ -31,14 +31,7 @@ class QueryTest extends TestCase
     public function testToArray()
     {
         $queryArray = Query::createMatchAll()->toArray();
-        $this->assertFalse(array_key_exists('fields', $queryArray));
-        $this->assertFalse(array_key_exists('coordinate', $queryArray));
-        $this->assertFalse(array_key_exists('filters', $queryArray));
-        $this->assertFalse(array_key_exists('aggregations', $queryArray));
-        $this->assertFalse(array_key_exists('filter_fields', $queryArray));
-        $this->assertFalse(array_key_exists('user', $queryArray));
-        $this->assertFalse(array_key_exists('score_strategy', $queryArray));
-        $this->assertEquals(Query::NO_MIN_SCORE, $queryArray['min_score']);
+        $this->assertEquals([], $queryArray);
     }
 
     /**
@@ -53,7 +46,7 @@ class QueryTest extends TestCase
         $this->assertTrue($query->areAggregationsEnabled());
         $this->assertEquals('', $query->getQueryText());
         $this->assertEquals(Query::DEFAULT_PAGE, $query->getPage());
-        $this->assertEquals(Query::INFINITE_SIZE, $query->getSize());
+        $this->assertEquals(Query::DEFAULT_SIZE, $query->getSize());
     }
 
     /**

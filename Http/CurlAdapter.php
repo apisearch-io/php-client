@@ -40,15 +40,21 @@ class CurlAdapter implements HttpAdapter
     ): array {
         $json = json_encode($requestParts->getParameters()['json']);
         $formattedUrl = rtrim($host, '/').'/'.ltrim($requestParts->getUrl(), '/');
+        $method = strtoupper($method);
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($c, CURLOPT_URL, $formattedUrl);
-        curl_setopt($c, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: '.strlen($json),
-        ]);
+        curl_setopt($c, CURLOPT_HEADER, false);
         curl_setopt($c, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($c, CURLOPT_POSTFIELDS, $json);
+
+        if (!in_array($method, ['GET', 'HEAD'])) {
+            curl_setopt($c, CURLOPT_POSTFIELDS, $json);
+            curl_setopt($c, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: '.strlen($json),
+            ]);
+        }
+
         $content = curl_exec($c);
         $responseCode = curl_getinfo($c, CURLINFO_HTTP_CODE);
         curl_close($c);
