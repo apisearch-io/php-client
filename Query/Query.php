@@ -1303,7 +1303,9 @@ class Query implements HttpTransportable
     public function toArray(): array
     {
         return array_filter([
-            'q' => $this->getQueryText(),
+            'q' => '' !== $this->getQueryText()
+                ? $this->getQueryText()
+                : null,
             'fields' => $this->getFields(),
             'coordinate' => $this->coordinate instanceof HttpTransportable
                 ? $this->coordinate->toArray()
@@ -1345,7 +1347,9 @@ class Query implements HttpTransportable
                 ? $this->scoreStrategies->toArray()
                 : null,
             'fuzziness' => $this->fuzziness,
-            'min_score' => $this->minScore,
+            'min_score' => ($this->minScore > self::NO_MIN_SCORE)
+                ? $this->minScore
+                : null,
             'user' => ($this->user instanceof User)
                 ? $this->user->toArray()
                 : null,
