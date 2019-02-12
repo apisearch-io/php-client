@@ -42,7 +42,7 @@ class ResultTest extends TestCase
         $this->assertFalse(array_key_exists('aggregations', $resultArray));
         $this->assertFalse(array_key_exists('suggests', $resultArray));
         $this->assertEquals(Query::createMatchAll(), $result->getQuery());
-        $this->assertEquals(Query::createMatchAll()->toArray(), $resultArray['query']);
+        $this->assertFalse(array_key_exists('query', $resultArray));
         $this->assertEquals(1, $result->getTotalHits());
         $this->assertEquals(1, $resultArray['total_hits']);
         $this->assertEquals(2, $result->getTotalItems());

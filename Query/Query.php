@@ -265,7 +265,7 @@ class Query implements HttpTransportable
         return self::create(
             '',
             self::DEFAULT_PAGE,
-            self::INFINITE_SIZE
+            self::DEFAULT_SIZE
         );
     }
 
