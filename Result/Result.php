@@ -361,7 +361,7 @@ class Result implements HttpTransportable
     public static function createFromArray(array $array): self
     {
         return self::create(
-            Query::createFromArray($array['query']),
+            Query::createFromArray($array['query'] ?? []),
             $array['total_items'] ?? 0,
             $array['total_hits'] ?? 0,
             isset($array['aggregations'])
