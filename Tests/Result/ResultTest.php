@@ -51,6 +51,7 @@ class ResultTest extends TestCase
         $this->assertNull($result->getFirstItem());
         $this->assertCount(0, $result->getSuggests());
         $this->assertNull($result->getAggregations());
+        $this->assertEquals($resultArray, Result::createFromArray($resultArray)->toArray());
     }
 
     /**
