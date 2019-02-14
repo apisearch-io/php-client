@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace Apisearch\Config;
 
+use Apisearch\Exception\SynonymsException;
+
 /**
  * Class SynonymReader.
  */
@@ -26,6 +28,8 @@ class SynonymReader
      * @param string $filepath
      *
      * @return Synonym[]
+     *
+     * @throws SynonymsException
      */
     public function readSynonymsFromFile(string $filepath): array
     {
@@ -33,13 +37,13 @@ class SynonymReader
             !is_file($filepath) ||
             !is_readable($filepath)
         ) {
-            return [];
+            throw SynonymsException::synonymsFileNotFound($filepath);
         }
 
         $data = file_get_contents($filepath);
 
         if (!is_string($data)) {
-            return [];
+            throw SynonymsException::synonymsMalformedData($filepath);
         }
 
         return array_filter(array_map(function ($line) {
@@ -54,7 +58,7 @@ class SynonymReader
             }
 
             return Synonym::createByWords($words);
-        }, str_getcsv(file_get_contents($filepath), "\n")));
+        }, str_getcsv($data, "\n")));
     }
 
     /**

@@ -58,13 +58,6 @@ class Config implements HttpTransportable
     private $synonyms = [];
 
     /**
-     * @var Campaigns
-     *
-     * Campaigns
-     */
-    private $campaigns = [];
-
-    /**
      * @var int
      *
      * Shards
@@ -96,7 +89,6 @@ class Config implements HttpTransportable
         $this->storeSearchableMetadata = $storeSearchableMetadata;
         $this->shards = $shards;
         $this->replicas = $replicas;
-        $this->campaigns = new Campaigns();
     }
 
     /**
@@ -144,32 +136,6 @@ class Config implements HttpTransportable
     }
 
     /**
-     * Add campaign.
-     *
-     * @param Campaign $campaign
-     *
-     * @return Config
-     */
-    public function addCampaign(Campaign $campaign): Config
-    {
-        $this
-            ->campaigns
-            ->addCampaign($campaign);
-
-        return $this;
-    }
-
-    /**
-     * Get campaigns.
-     *
-     * @return Campaigns
-     */
-    public function getCampaigns(): Campaigns
-    {
-        return $this->campaigns;
-    }
-
-    /**
      * Get Shards.
      *
      * @return int
@@ -202,9 +168,6 @@ class Config implements HttpTransportable
             'synonyms' => array_map(function (Synonym $synonym) {
                 return $synonym->toArray();
             }, $this->synonyms),
-            'campaigns' => $this
-                ->campaigns
-                ->toArray(),
             'shards' => $this->shards,
             'replicas' => $this->replicas,
         ], function ($element) {
@@ -230,7 +193,6 @@ class Config implements HttpTransportable
             ($array['store_searchable_metadata'] ?? true)
         );
 
-        $config->campaigns = Campaigns::createFromArray($array['campaigns'] ?? []);
         $config->synonyms = array_map(function (array $synonym) {
             return Synonym::createFromArray($synonym);
         }, $array['synonyms'] ?? []);

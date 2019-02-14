@@ -18,6 +18,9 @@ namespace Apisearch\Tests\Config;
 use Apisearch\Config\Synonym;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class SynonymTest.
+ */
 class SynonymTest extends TestCase
 {
     /**

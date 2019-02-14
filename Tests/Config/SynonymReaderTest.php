@@ -25,14 +25,13 @@ class SynonymReaderTest extends TestCase
 {
     /**
      * Test non existing file.
+     *
+     * @expectedException \Apisearch\Exception\SynonymsException
      */
     public function testNonExistingFile()
     {
         $synonymReader = new SynonymReader();
-        $this->assertCount(
-            0,
-            $synonymReader->readSynonymsFromFile(__DIR__.'/nonexistingfile276892.csv')
-        );
+        $synonymReader->readSynonymsFromFile(__DIR__.'/nonexistingfile276892.csv');
     }
 
     /**
