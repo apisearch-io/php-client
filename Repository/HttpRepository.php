@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace Apisearch\Repository;
 
-use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Http\Http;
 use Apisearch\Http\HttpClient;
 use Apisearch\Http\HttpResponsesToException;
@@ -122,13 +121,14 @@ class HttpRepository extends Repository
      * Search across the index types.
      *
      * @param Query $query
+     * @param array $parameters
      *
      * @return Result
-     *
-     * @throws ResourceNotAvailableException
      */
-    public function query(Query $query): Result
-    {
+    public function query(
+        Query $query,
+        array $parameters = []
+    ): Result {
         $response = $this
             ->httpClient
             ->get(
@@ -136,7 +136,7 @@ class HttpRepository extends Repository
                 'get',
                 Http::getQueryValues($this) + [
                     Http::QUERY_FIELD => urlencode(json_encode($query->toArray())),
-                ]
+                ] + $parameters
             );
 
         self::throwTransportableExceptionIfNeeded($response);

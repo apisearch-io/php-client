@@ -39,11 +39,14 @@ class InMemoryRepository extends Repository
      * Search across the index types.
      *
      * @param Query $query
+     * @param array $parameters
      *
      * @return Result
      */
-    public function query(Query $query): Result
-    {
+    public function query(
+        Query $query,
+        array $parameters = []
+    ): Result {
         $resultingItems = $this->items[$this->getIndexKey()] ?? [];
 
         if (!empty($query->getFilters())) {
