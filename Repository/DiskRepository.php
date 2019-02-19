@@ -47,11 +47,14 @@ class DiskRepository extends InMemoryRepository
      * Search across the index types.
      *
      * @param Query $query
+     * @param array $parameters
      *
      * @return Result
      */
-    public function query(Query $query): Result
-    {
+    public function query(
+        Query $query,
+        array $parameters = []
+    ): Result {
         $this->load();
 
         return parent::query($query);

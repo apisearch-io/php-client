@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Apisearch\Repository;
 
 use Apisearch\Exception\MockException;
-use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\Changes;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
@@ -45,13 +44,16 @@ class MockRepository extends Repository
      * Search across the index types.
      *
      * @param Query $query
+     * @param array $parameters
      *
      * @return Result
      *
-     * @throws ResourceNotAvailableException
+     * @throws MockException
      */
-    public function query(Query $query): Result
-    {
+    public function query(
+        Query $query,
+        array $parameters = []
+    ): Result {
         $this->throwMockException();
     }
 
@@ -60,6 +62,8 @@ class MockRepository extends Repository
      *
      * @param Query   $query
      * @param Changes $changes
+     *
+     * @throws MockException
      */
     public function updateItems(
         Query $query,

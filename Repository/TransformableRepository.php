@@ -120,16 +120,19 @@ class TransformableRepository extends Repository
      * Search across the index types.
      *
      * @param Query $query
+     * @param array $parameters
      *
      * @return Result
      *
      * @throws ResourceNotAvailableException
      */
-    public function query(Query $query): Result
-    {
+    public function query(
+        Query $query,
+        array $parameters = []
+    ): Result {
         $result = $this
             ->repository
-            ->query($query);
+            ->query($query, $parameters);
 
         return Result::create(
             $result->getQuery(),

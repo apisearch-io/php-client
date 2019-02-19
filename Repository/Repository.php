@@ -178,12 +178,16 @@ abstract class Repository extends RepositoryWithCredentials
      * Search across the index types.
      *
      * @param Query $query
+     * @param array $parameters
      *
      * @return Result
      *
      * @throws ResourceNotAvailableException
      */
-    abstract public function query(Query $query): Result;
+    abstract public function query(
+        Query $query,
+        array $parameters = []
+    ): Result;
 
     /**
      * Update items.
