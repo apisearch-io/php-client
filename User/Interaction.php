@@ -26,6 +26,13 @@ use Apisearch\Model\User;
 class Interaction implements HttpTransportable
 {
     /**
+     * @var int
+     *
+     * No weight
+     */
+    const NO_WEIGHT = 0;
+
+    /**
      * @var User
      *
      * User
@@ -40,6 +47,13 @@ class Interaction implements HttpTransportable
     private $itemUUID;
 
     /**
+     * @var string
+     *
+     * Event name
+     */
+    private $eventName;
+
+    /**
      * @var int
      *
      * Weight
@@ -51,15 +65,18 @@ class Interaction implements HttpTransportable
      *
      * @param User     $user
      * @param ItemUUID $itemUUID
+     * @param string   $eventName
      * @param          $weight
      */
     public function __construct(
         User $user,
         ItemUUID $itemUUID,
-        int $weight
+        string $eventName,
+        int $weight = self::NO_WEIGHT
     ) {
         $this->user = $user;
         $this->itemUUID = $itemUUID;
+        $this->eventName = $eventName;
         $this->weight = $weight;
     }
 
@@ -84,6 +101,16 @@ class Interaction implements HttpTransportable
     }
 
     /**
+     * Get event name.
+     *
+     * @return string
+     */
+    public function getEventName(): string
+    {
+        return $this->eventName;
+    }
+
+    /**
      * Get Weight.
      *
      * @return int
@@ -100,11 +127,14 @@ class Interaction implements HttpTransportable
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'user' => $this->user->toArray(),
             'item_uuid' => $this->itemUUID->toArray(),
-            'weight' => $this->weight,
-        ];
+            'event_name' => $this->eventName,
+            'weight' => self::NO_WEIGHT === $this->weight
+                ? false
+                : $this->weight,
+        ]);
     }
 
     /**
@@ -121,7 +151,8 @@ class Interaction implements HttpTransportable
         return new self(
             User::createFromArray($array['user']),
             ItemUUID::createFromArray($array['item_uuid']),
-            $array['weight']
+            (string) $array['event_name'],
+            (int) ($array['weight'] ?? self::NO_WEIGHT)
         );
     }
 }
