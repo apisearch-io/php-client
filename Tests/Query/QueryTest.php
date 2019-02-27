@@ -18,6 +18,7 @@ namespace Apisearch\Tests\Query;
 use Apisearch\Query\Query;
 use Apisearch\Query\ScoreStrategies;
 use Apisearch\Query\SortBy;
+use Apisearch\Tests\HttpHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -67,6 +68,8 @@ class QueryTest extends TestCase
         $this->assertNull($query->getUser());
         $this->assertNull($query->getScoreStrategies());
         $this->assertEquals(Query::NO_MIN_SCORE, $query->getMinScore());
+        $this->assertEquals([], $query->getMetadata());
+        $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
     }
 
     /**
@@ -105,6 +108,7 @@ class QueryTest extends TestCase
         $this->assertInstanceOf(Query::class, $query->setFuzziness('1..3'));
         $this->assertEquals('AUTO', Query::createMatchAll()->setAutoFuzziness()->getFuzziness());
         $this->assertInstanceOf(Query::class, $query->setAutoFuzziness());
+        $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
     }
 
     /**
@@ -143,5 +147,21 @@ class QueryTest extends TestCase
         $this->assertEquals(2, $query->getPage());
         $this->assertEquals(3, $query->getSize());
         $this->assertEquals(['a', 'b'], $query->getFields());
+        $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
+    }
+
+    /**
+     * Test metadata
+     */
+    public function testMetadata()
+    {
+        $query = Query::createMatchAll();
+        $query->setMetadataValue('a', 'a1');
+        $query->setMetadataValue('b', ['b1', 'b2']);
+        $this->assertEquals([
+            'a' => 'a1',
+            'b' => ['b1', 'b2']
+        ], $query->getMetadata());
+        $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
     }
 }

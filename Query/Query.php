@@ -64,7 +64,7 @@ class Query implements HttpTransportable
     private $coordinate;
 
     /**
-     * @var string
+     * @var string[]
      *
      * Fields
      */
@@ -188,6 +188,13 @@ class Query implements HttpTransportable
      * User associated to query
      */
     private $user;
+
+    /**
+     * @var array
+     *
+     * Metadata
+     */
+    private $metadata = [];
 
     /**
      * Construct.
@@ -1296,6 +1303,34 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Set metadata
+     *
+     * @param string $name
+     * @param mixed $value
+     *
+     * @return Query
+     */
+    public function setMetadataValue(
+        string $name,
+        $value
+    )
+    {
+        $this->metadata[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get metadata
+     *
+     * @return array
+     */
+    public function getMetadata() : array
+    {
+        return $this->metadata;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -1353,6 +1388,7 @@ class Query implements HttpTransportable
             'user' => ($this->user instanceof User)
                 ? $this->user->toArray()
                 : null,
+            'metadata' => $this->metadata,
             'items_promoted' => array_filter(
                 array_map(function (ItemUUID $itemUUID) {
                     return $itemUUID->toArray();
@@ -1419,6 +1455,7 @@ class Query implements HttpTransportable
             ? ScoreStrategies::createFromArray($array['score_strategies'])
             : null;
         $query->minScore = $array['min_score'] ?? self::NO_MIN_SCORE;
+        $query->metadata = $array['metadata'] ?? [];
 
         if (isset($array['user'])) {
             $query->user = User::createFromArray($array['user']);
