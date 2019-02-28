@@ -74,6 +74,13 @@ class Result implements HttpTransportable
     private $itemsGroupedByTypeCache;
 
     /**
+     * @var Result[]
+     *
+     * Subresults
+     */
+    private $subresults = [];
+
+    /**
      * Result constructor.
      *
      * @param Query $query
@@ -119,6 +126,24 @@ class Result implements HttpTransportable
         $result->aggregations = $aggregations;
         $result->suggests = $suggests;
         $result->items = $items;
+
+        return $result;
+    }
+
+    /**
+     * Create multiquery Result.
+     *
+     * @param Query    $query
+     * @param Result[] $subresults
+     *
+     * @return Result
+     */
+    public static function createMultiResult(
+        Query $query,
+        array $subresults
+    ) {
+        $result = new Result($query, 0, 0);
+        $result->subresults = $subresults;
 
         return $result;
     }
@@ -325,6 +350,16 @@ class Result implements HttpTransportable
     }
 
     /**
+     * Get subresults.
+     *
+     * @return Result[]
+     */
+    public function getSubresults(): array
+    {
+        return $this->subresults;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -342,6 +377,9 @@ class Result implements HttpTransportable
                 ? $this->aggregations->toArray()
                 : null,
             'suggests' => $this->suggests,
+            'subresults' => array_map(function (Result $result) {
+                return $result->toArray();
+            }, $this->subresults),
         ], function ($element) {
             return
             !(
@@ -360,7 +398,7 @@ class Result implements HttpTransportable
      */
     public static function createFromArray(array $array): self
     {
-        return self::create(
+        $result = self::create(
             Query::createFromArray($array['query'] ?? []),
             $array['total_items'] ?? 0,
             $array['total_hits'] ?? 0,
@@ -372,5 +410,13 @@ class Result implements HttpTransportable
                 return Item::createFromArray($item);
             }, $array['items'] ?? [])
         );
+
+        $result->subresults = array_filter(
+            array_map(function (array $subresultAsArray) {
+                return Result::createFromArray($subresultAsArray);
+            }, $array['subresults'] ?? [])
+        );
+
+        return $result;
     }
 }

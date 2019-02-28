@@ -151,7 +151,7 @@ class QueryTest extends TestCase
     }
 
     /**
-     * Test metadata
+     * Test metadata.
      */
     public function testMetadata()
     {
@@ -160,8 +160,24 @@ class QueryTest extends TestCase
         $query->setMetadataValue('b', ['b1', 'b2']);
         $this->assertEquals([
             'a' => 'a1',
-            'b' => ['b1', 'b2']
+            'b' => ['b1', 'b2'],
         ], $query->getMetadata());
         $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
+    }
+
+    /**
+     * Test subqueries.
+     */
+    public function testSubqueries()
+    {
+        $query = Query::createMatchAll();
+        $query->addSubQuery('sub1', Query::create('sub1'));
+        $query->addSubQuery('sub2', Query::create('sub2'));
+        $query->addSubQuery('sub3', Query::create('sub3'));
+        $this->assertCount(3, $query->getSubqueries());
+        $subqueries = HttpHelper::emulateHttpTransport($query)->getSubqueries();
+        $this->assertEquals('sub1', $subqueries['sub1']->getQueryText());
+        $this->assertEquals('sub2', $subqueries['sub2']->getQueryText());
+        $this->assertEquals('sub3', $subqueries['sub3']->getQueryText());
     }
 }
