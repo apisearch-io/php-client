@@ -134,18 +134,37 @@ class TransformableRepository extends Repository
             ->repository
             ->query($query, $parameters);
 
-        return Result::create(
-            $result->getQuery(),
-            $result->getTotalItems(),
-            $result->getTotalHits(),
-            $result->getAggregations(),
-            $result->getSuggests(),
-            $this
-                ->transformer
-                ->fromItems(
-                    $result->getItems()
-                )
-        );
+        return $this->applyTransformersToResult($result);
+    }
+
+    /**
+     * Apply transformers on Result.
+     *
+     * @param Result $result
+     *
+     * @return Result
+     */
+    private function applyTransformersToResult(Result $result): Result
+    {
+        return empty($result->getSubresults())
+            ? Result::create(
+                $result->getQuery(),
+                $result->getTotalItems(),
+                $result->getTotalHits(),
+                $result->getAggregations(),
+                $result->getSuggests(),
+                $this
+                    ->transformer
+                    ->fromItems(
+                        $result->getItems()
+                    )
+            )
+            : Result::createMultiResult(
+                $result->getQuery(),
+                array_map(function (Result $subresult) {
+                    return $this->applyTransformersToResult($subresult);
+                }, $result->getSubresults())
+            );
     }
 
     /**

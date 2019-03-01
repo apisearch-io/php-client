@@ -21,6 +21,7 @@ use Apisearch\Query\Query;
 use Apisearch\Result\Aggregation;
 use Apisearch\Result\Aggregations;
 use Apisearch\Result\Result;
+use Apisearch\Tests\HttpHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -192,5 +193,24 @@ class ResultTest extends TestCase
         $this->assertEquals(['sug1', 'sug2'], $result->getSuggests());
         $this->assertCount(2, $result->getItems());
         $this->assertEquals('product', $result->getFirstItem()->getType());
+    }
+
+    /**
+     * Test multi result
+     */
+    public function testMultiResult()
+    {
+        $query = Query::createMatchAll();
+        $result = Result::createMultiResult($query, [
+            'res1' => Result::create($query, 10, 3, null, [], []),
+            'res2' => Result::create($query, 10, 4, null, [], []),
+            'res3' => Result::create($query, 10, 5, null, [], []),
+        ]);
+
+        $this->assertCount(3, $result->getSubresults());
+        $subqueries = HttpHelper::emulateHttpTransport($result)->getSubresults();
+        $this->assertEquals(3, $subqueries['res1']->getTotalHits());
+        $this->assertEquals(4, $subqueries['res2']->getTotalHits());
+        $this->assertEquals(5, $subqueries['res3']->getTotalHits());
     }
 }

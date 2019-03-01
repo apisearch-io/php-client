@@ -197,6 +197,13 @@ class Query implements HttpTransportable
     private $metadata = [];
 
     /**
+     * @var Query[]
+     *
+     * Sub queries
+     */
+    private $subqueries = [];
+
+    /**
      * Construct.
      *
      * @param string $queryText
@@ -311,6 +318,21 @@ class Query implements HttpTransportable
             Filter::AT_LEAST_ONE,
             Filter::TYPE_FIELD
         );
+
+        return $query;
+    }
+
+    /**
+     * Create multiquery.
+     *
+     * @param Query[] $queries
+     *
+     * @return Query
+     */
+    public static function createMultiquery(array $queries)
+    {
+        $query = Query::createMatchAll();
+        $query->subqueries = $queries;
 
         return $query;
     }
@@ -1303,31 +1325,57 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Set metadata
+     * Set metadata.
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return Query
      */
     public function setMetadataValue(
         string $name,
         $value
-    )
-    {
+    ): self {
         $this->metadata[$name] = $value;
 
         return $this;
     }
 
     /**
-     * Get metadata
+     * Get metadata.
      *
      * @return array
      */
-    public function getMetadata() : array
+    public function getMetadata(): array
     {
         return $this->metadata;
+    }
+
+    /**
+     * Add subquery.
+     *
+     * @param string $name
+     * @param Query  $query
+     *
+     * @return Query
+     */
+    public function addSubQuery(
+        string $name,
+        Query $query
+    ): self {
+        $this->subqueries[$name] = $query;
+
+        return $this;
+    }
+
+    /**
+     * Get subqueries.
+     *
+     * @return Query[]
+     */
+    public function getSubqueries(): array
+    {
+        return $this->subqueries;
     }
 
     /**
@@ -1389,6 +1437,11 @@ class Query implements HttpTransportable
                 ? $this->user->toArray()
                 : null,
             'metadata' => $this->metadata,
+            'subqueries' => array_filter(
+                array_map(function (Query $query) {
+                    return $query->toArray();
+                }, $this->subqueries)
+            ),
             'items_promoted' => array_filter(
                 array_map(function (ItemUUID $itemUUID) {
                     return $itemUUID->toArray();
@@ -1460,6 +1513,10 @@ class Query implements HttpTransportable
         if (isset($array['user'])) {
             $query->user = User::createFromArray($array['user']);
         }
+
+        $query->subqueries = array_map(function (array $query) {
+            return Query::createFromArray($query);
+        }, $array['subqueries'] ?? []);
 
         return $query;
     }
