@@ -196,7 +196,7 @@ class ResultTest extends TestCase
     }
 
     /**
-     * Test multi result
+     * Test multi result.
      */
     public function testMultiResult()
     {

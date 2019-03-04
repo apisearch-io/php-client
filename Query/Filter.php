@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Query;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\HttpTransportable;
 
 /**
@@ -278,6 +279,13 @@ class Filter implements HttpTransportable
      */
     public static function createFromArray(array $array): self
     {
+        if (
+            isset($array['values']) &&
+            !is_array($array['values'])
+        ) {
+            throw InvalidFormatException::queryFormatNotValid($array);
+        }
+
         return self::create(
             $array['field'] ?? 'uuid.type',
             $array['values'] ?? [],
