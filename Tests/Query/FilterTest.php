@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Query;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Query\Filter;
 use PHPUnit\Framework\TestCase;
 
@@ -118,5 +119,20 @@ class FilterTest extends TestCase
         $this->assertEquals(Filter::AT_LEAST_ONE, $aggregation->getApplicationType());
         $this->assertEquals(Filter::TYPE_FIELD, $aggregation->getFilterType());
         $this->assertEquals([], $aggregation->getFilterTerms());
+    }
+
+    /**
+     * Test wrong values format.
+     */
+    public function testWrongValuesFormat()
+    {
+        try {
+            Filter::createFromArray([
+                'values' => 'string',
+            ]);
+            $this->fail('InvalidFormatException should be thrown');
+        } catch (InvalidFormatException $exception) {
+            // Silent pass
+        }
     }
 }
