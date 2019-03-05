@@ -18,6 +18,7 @@ namespace Apisearch\Tests\Query;
 use Apisearch\Model\Coordinate;
 use Apisearch\Query\Filter;
 use Apisearch\Query\SortBy;
+use Apisearch\Tests\HttpHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,6 +42,11 @@ class SortByTest extends TestCase
             [],
             $sortBy->toArray()
         );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
+        );
     }
 
     /**
@@ -53,6 +59,11 @@ class SortByTest extends TestCase
         $this->assertEquals(
             [$sortByArray],
             $sortBy->all()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -69,18 +80,21 @@ class SortByTest extends TestCase
             [
                 [
                     'type' => SortBy::TYPE_FIELD,
-                    'indexed_metadata.category' => [
-                        'order' => SortBy::ASC,
-                    ],
+                    'field' => 'indexed_metadata.category',
+                    'order' => SortBy::ASC,
                 ],
                 [
                     'type' => SortBy::TYPE_FIELD,
-                    'indexed_metadata.brand' => [
-                        'order' => SortBy::DESC,
-                    ],
+                    'field' => 'indexed_metadata.brand',
+                    'order' => SortBy::DESC,
                 ],
             ],
             $sortBy->all()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -93,6 +107,11 @@ class SortByTest extends TestCase
         $this->assertEquals(
             [SortBy::SCORE],
             $sortBy->all()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -107,12 +126,16 @@ class SortByTest extends TestCase
             [
                 [
                     'type' => SortBy::TYPE_FIELD,
-                    'indexed_metadata.category' => [
-                        'order' => SortBy::ASC,
-                    ],
+                    'field' => 'indexed_metadata.category',
+                    'order' => SortBy::ASC,
                 ],
             ],
             $sortBy->all()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -128,18 +151,21 @@ class SortByTest extends TestCase
             [
                 [
                     'type' => SortBy::TYPE_FIELD,
-                    'uuid.id' => [
-                        'order' => SortBy::ASC,
-                    ],
+                    'field' => 'uuid.id',
+                    'order' => SortBy::ASC,
                 ],
                 [
                     'type' => SortBy::TYPE_FIELD,
-                    'uuid.type' => [
-                        'order' => SortBy::ASC,
-                    ],
+                    'field' => 'uuid.type',
+                    'order' => SortBy::ASC,
                 ],
             ],
             $sortBy->all()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -159,14 +185,18 @@ class SortByTest extends TestCase
             [
                 [
                     'type' => SortBy::TYPE_NESTED,
-                    'indexed_metadata.category' => [
-                        'order' => SortBy::ASC,
-                    ],
+                    'field' => 'indexed_metadata.category',
+                    'order' => SortBy::ASC,
                     'mode' => SortBy::MODE_AVG,
                     'filter' => Filter::create('uuid.id', [1, 2], Filter::AT_LEAST_ONE, Filter::TYPE_FIELD),
                 ],
             ],
             $sortBy->all()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -177,20 +207,19 @@ class SortByTest extends TestCase
     {
         $sortBy = [
             [
-                'indexed_metadata.category' => [
-                    'order' => SortBy::ASC,
-                ],
+                'type' => SortBy::TYPE_FIELD,
+                'field' => 'indexed_metadata.category',
+                'order' => SortBy::ASC,
             ],
             [
-                'indexed_metadata.brand' => [
-                    'order' => SortBy::ASC,
-                ],
+                'type' => SortBy::TYPE_FIELD,
+                'field' => 'indexed_metadata.brand',
+                'order' => SortBy::ASC,
             ],
             [
                 'type' => SortBy::TYPE_NESTED,
-                'indexed_metadata.brand' => [
-                    'order' => SortBy::ASC,
-                ],
+                'field' => 'indexed_metadata.brand',
+                'order' => SortBy::ASC,
                 'filter' => Filter::create(
                     'a',
                     ['n'],
@@ -203,6 +232,11 @@ class SortByTest extends TestCase
         $this->assertEquals(
             $sortBy,
             SortBy::createFromArray($sortBy)->toArray()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport(SortBy::createFromArray($sortBy))->toArray()
         );
     }
 
@@ -227,6 +261,11 @@ class SortByTest extends TestCase
         $this->assertEquals(
             $sortBy,
             SortBy::createFromArray($sortBy->toArray())
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -256,12 +295,9 @@ class SortByTest extends TestCase
         $this->assertEquals(
             [
                 [
-                    'type' => SortBy::TYPE_FIELD,
-                    '_geo_distance' => [
-                        'coordinate' => $coordinate,
-                        'order' => SortBy::ASC,
-                        'unit' => 'km',
-                    ],
+                    'type' => SortBy::TYPE_DISTANCE,
+                    'coordinate' => $coordinate,
+                    'unit' => 'km',
                 ],
                 SortBy::AL_TUN_TUN,
             ],
@@ -271,11 +307,9 @@ class SortByTest extends TestCase
         $this->assertEquals(
             [
                 [
-                    '_geo_distance' => [
-                        'coordinate' => $coordinate->toArray(),
-                        'order' => SortBy::ASC,
-                        'unit' => 'km',
-                    ],
+                    'type' => SortBy::TYPE_DISTANCE,
+                    'coordinate' => $coordinate->toArray(),
+                    'unit' => 'km',
                 ],
                 SortBy::AL_TUN_TUN,
             ],
@@ -286,14 +320,29 @@ class SortByTest extends TestCase
             $sortBy,
             SortBy::createFromArray([
                 [
-                    '_geo_distance' => [
-                        'coordinate' => $coordinate->toArray(),
-                        'order' => SortBy::ASC,
-                        'unit' => 'km',
-                    ],
+                    'type' => SortBy::TYPE_DISTANCE,
+                    'coordinate' => $coordinate->toArray(),
+                    'unit' => 'km',
                 ],
                 SortBy::AL_TUN_TUN,
             ])
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport(SortBy::createFromArray([
+                [
+                    'type' => SortBy::TYPE_DISTANCE,
+                    'coordinate' => $coordinate->toArray(),
+                    'unit' => 'km',
+                ],
+                SortBy::AL_TUN_TUN,
+            ]))
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 
@@ -331,6 +380,11 @@ class SortByTest extends TestCase
         $this->assertCount(
             4,
             SortBy::createFromArray($sortBy->toArray())->all()
+        );
+
+        $this->assertEquals(
+            $sortBy,
+            HttpHelper::emulateHttpTransport($sortBy)
         );
     }
 }

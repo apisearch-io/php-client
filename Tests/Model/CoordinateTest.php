@@ -68,7 +68,8 @@ class CoordinateTest extends TestCase
             Coordinate::createFromArray([]);
             $this->fail('Coordinate should not be built with empty array');
         } catch (InvalidFormatException $e) {
-            // OK
+            // Silent pass
+            $this->assertTrue(true);
         }
     }
 
@@ -83,7 +84,8 @@ class CoordinateTest extends TestCase
             ]);
             $this->fail('Coordinate should not be built without a latitude');
         } catch (InvalidFormatException $e) {
-            // OK
+            // Silent pass
+            $this->assertTrue(true);
         }
     }
 
@@ -98,7 +100,8 @@ class CoordinateTest extends TestCase
             ]);
             $this->fail('Coordinate should not be built without a longitude');
         } catch (InvalidFormatException $e) {
-            // OK
+            // Silent pass
+            $this->assertTrue(true);
         }
     }
 
