@@ -133,6 +133,7 @@ class FilterTest extends TestCase
             $this->fail('InvalidFormatException should be thrown');
         } catch (InvalidFormatException $exception) {
             // Silent pass
+            $this->assertTrue(true);
         }
     }
 }

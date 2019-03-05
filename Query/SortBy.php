@@ -30,14 +30,18 @@ class SortBy implements HttpTransportable
      *
      * Sort by score
      */
-    const SCORE = ['_score' => ['order' => self::DESC]];
+    const SCORE = [
+        'type' => self::TYPE_SCORE,
+    ];
 
     /**
      * @var array
      *
      * Sort random
      */
-    const RANDOM = ['random' => true];
+    const RANDOM = [
+        'type' => self::TYPE_RANDOM,
+    ];
 
     /**
      * @var array
@@ -51,69 +55,102 @@ class SortBy implements HttpTransportable
      *
      * Sort by id ASC
      */
-    const ID_ASC = ['uuid.id' => ['order' => self::ASC]];
+    const ID_ASC = [
+        'field' => 'uuid.id',
+        'order' => self::ASC,
+    ];
 
     /**
      * @var array
      *
      * Sort by id DESC
      */
-    const ID_DESC = ['uuid.id' => ['order' => self::DESC]];
+    const ID_DESC = [
+        'field' => 'uuid.id',
+        'order' => self::DESC,
+    ];
 
     /**
      * @var array
      *
      * Sort by type ASC
      */
-    const TYPE_ASC = ['uuid.type' => ['order' => self::ASC]];
+    const TYPE_ASC = [
+        'field' => 'uuid.type',
+        'order' => self::ASC,
+    ];
 
     /**
      * @var array
      *
      * Sort by type DESC
      */
-    const TYPE_DESC = ['uuid.type' => ['order' => self::DESC]];
+    const TYPE_DESC = [
+        'field' => 'uuid.type',
+        'order' => self::DESC,
+    ];
 
     /**
      * @var array
      *
      * Sort by location ASC using KM
      */
-    const LOCATION_KM_ASC = ['_geo_distance' => ['order' => self::ASC, 'unit' => 'km']];
+    const LOCATION_KM_ASC = [
+        'type' => self::TYPE_DISTANCE,
+        'unit' => 'km',
+    ];
 
     /**
      * @var array
      *
      * Sort by location ASC using Miles
      */
-    const LOCATION_MI_ASC = ['_geo_distance' => ['order' => self::ASC, 'unit' => 'mi']];
-    /**
-     * @var array
-     *
-     * Sort by id ASC
-     */
-    const OCCURRED_ON_ASC = ['indexed_metadata.occurred_on' => ['order' => self::ASC]];
+    const LOCATION_MI_ASC = [
+        'type' => self::TYPE_DISTANCE,
+        'unit' => 'mi',
+    ];
 
     /**
-     * @var array
-     *
-     * Sort by id DESC
-     */
-    const OCCURRED_ON_DESC = ['indexed_metadata.occurred_on' => ['order' => self::DESC]];
-
-    /**
-     * @var int
+     * @var string
      *
      * Type field
      */
-    const TYPE_FIELD = 1;
+    const TYPE_FIELD = 'field';
 
     /**
-     * @var int
+     * @var string
+     *
+     * Type score
+     */
+    const TYPE_SCORE = 'score';
+
+    /**
+     * @var string
+     *
+     * Type random
+     */
+    const TYPE_RANDOM = 'random';
+
+    /**
+     * @var string
+     *
+     * Type distance
+     */
+    const TYPE_DISTANCE = 'distance';
+
+    /**
+     * @var string
      *
      * Type nested
      */
-    const TYPE_NESTED = 2;
+    const TYPE_NESTED = 'nested';
+
+    /**
+     * @var string
+     *
+     * Type function
+     */
+    const TYPE_FUNCTION = 'function';
 
     /**
      * @var string
@@ -250,9 +287,8 @@ class SortBy implements HttpTransportable
     ): SortBy {
         $this->sortsBy[] = [
             'type' => self::TYPE_FIELD,
-            Item::getPathByField($field) => [
-                'order' => $order,
-            ],
+            'field' => Item::getPathByField($field),
+            'order' => $order,
         ];
 
         return $this;
@@ -275,9 +311,8 @@ class SortBy implements HttpTransportable
         $this->sortsBy[] = [
             'type' => self::TYPE_NESTED,
             'mode' => $mode,
-            "indexed_metadata.$field" => [
-                'order' => $order,
-            ],
+            'field' => "indexed_metadata.$field",
+            'order' => $order,
         ];
 
         return $this;
@@ -307,9 +342,29 @@ class SortBy implements HttpTransportable
             'type' => self::TYPE_NESTED,
             'filter' => $filter,
             'mode' => $mode,
-            "indexed_metadata.$field" => [
-                'order' => $order,
-            ],
+            'field' => "indexed_metadata.$field",
+            'order' => $order,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Sort by function.
+     *
+     * @param string $function
+     * @param string $order
+     *
+     * @return SortBy
+     */
+    public function byFunction(
+        string $function,
+        string $order
+    ): SortBy {
+        $this->sortsBy[] = [
+            'type' => self::TYPE_FUNCTION,
+            'function' => $function,
+            'order' => $order,
         ];
 
         return $this;
@@ -323,7 +378,7 @@ class SortBy implements HttpTransportable
     public function isSortedByGeoDistance(): bool
     {
         foreach ($this->sortsBy as $sortBy) {
-            if (isset($sortBy['_geo_distance'])) {
+            if (self::TYPE_DISTANCE === $sortBy['type']) {
                 return true;
             }
         }
@@ -341,8 +396,8 @@ class SortBy implements HttpTransportable
     public function setCoordinate(Coordinate $coordinate)
     {
         $this->sortsBy = array_map(function (array $sortBy) use ($coordinate) {
-            if (isset($sortBy['_geo_distance'])) {
-                $sortBy['_geo_distance']['coordinate'] = $coordinate;
+            if (self::TYPE_DISTANCE === $sortBy['type']) {
+                $sortBy['coordinate'] = $coordinate;
             }
 
             return $sortBy;
@@ -360,13 +415,6 @@ class SortBy implements HttpTransportable
     {
         return array_map(function (array $sortBy) {
             if (
-                isset($sortBy['type']) &&
-                self::TYPE_FIELD == $sortBy['type']
-            ) {
-                unset($sortBy['type']);
-            }
-
-            if (
                 isset($sortBy['filter']) &&
                 ($sortBy['filter'] instanceof Filter)
             ) {
@@ -374,10 +422,10 @@ class SortBy implements HttpTransportable
             }
 
             if (
-                isset($sortBy['_geo_distance']) &&
-                isset($sortBy['_geo_distance']['coordinate']) &&
-                ($sortBy['_geo_distance']['coordinate'] instanceof Coordinate)) {
-                $sortBy['_geo_distance']['coordinate'] = $sortBy['_geo_distance']['coordinate']->toArray();
+                isset($sortBy['coordinate']) &&
+                $sortBy['coordinate'] instanceof Coordinate
+            ) {
+                $sortBy['coordinate'] = $sortBy['coordinate']->toArray();
             }
 
             return $sortBy;
@@ -409,10 +457,10 @@ class SortBy implements HttpTransportable
             }
 
             if (
-                isset($element['_geo_distance']) &&
-                isset($element['_geo_distance']['coordinate']) &&
-                is_array($element['_geo_distance']['coordinate'])) {
-                $element['_geo_distance']['coordinate'] = Coordinate::createFromArray($element['_geo_distance']['coordinate']);
+                isset($element['coordinate']) &&
+                is_array($element['coordinate'])
+            ) {
+                $element['coordinate'] = Coordinate::createFromArray($element['coordinate']);
             }
 
             return $element;
@@ -429,7 +477,7 @@ class SortBy implements HttpTransportable
     public function hasRandomSort()
     {
         foreach ($this->sortsBy as $sortBy) {
-            if (self::RANDOM === $sortBy) {
+            if (self::TYPE_RANDOM === $sortBy['type']) {
                 return true;
             }
         }
