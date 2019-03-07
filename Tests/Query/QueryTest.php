@@ -179,5 +179,12 @@ class QueryTest extends TestCase
         $this->assertEquals('sub1', $subqueries['sub1']->getQueryText());
         $this->assertEquals('sub2', $subqueries['sub2']->getQueryText());
         $this->assertEquals('sub3', $subqueries['sub3']->getQueryText());
+
+        $query = Query::createMultiquery([
+            'sub1' => Query::create('sub1'),
+            'sub2' => Query::create('sub2'),
+            'sub3' => Query::create('sub3'),
+        ]);
+        $this->assertCount(3, $query->getSubqueries());
     }
 }
