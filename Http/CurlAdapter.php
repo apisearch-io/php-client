@@ -46,6 +46,7 @@ class CurlAdapter implements HttpAdapter
         curl_setopt($c, CURLOPT_URL, $formattedUrl);
         curl_setopt($c, CURLOPT_HEADER, false);
         curl_setopt($c, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($c, CURLOPT_ENCODING, 'gzip, deflate');
 
         if (!in_array($method, ['GET', 'HEAD'])) {
             curl_setopt($c, CURLOPT_POSTFIELDS, $json);
