@@ -148,7 +148,7 @@ class TransformableRepository extends Repository
     {
         return empty($result->getSubresults())
             ? Result::create(
-                $result->getQuery(),
+                $result->getQueryUUID(),
                 $result->getTotalItems(),
                 $result->getTotalHits(),
                 $result->getAggregations(),
@@ -160,7 +160,6 @@ class TransformableRepository extends Repository
                     )
             )
             : Result::createMultiResult(
-                $result->getQuery(),
                 array_map(function (Result $subresult) {
                     return $this->applyTransformersToResult($subresult);
                 }, $result->getSubresults())
