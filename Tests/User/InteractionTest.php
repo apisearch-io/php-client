@@ -34,8 +34,7 @@ class InteractionTest extends TestCase
         $interaction = new Interaction(
             new User('123', ['a' => 1]),
             new ItemUUID('abc', 'article'),
-            'buy',
-            10
+            'buy'
         );
 
         $this->assertEquals(
@@ -46,7 +45,7 @@ class InteractionTest extends TestCase
         $this->assertEquals('123', $interaction->getUser()->getId());
         $this->assertEquals('abc', $interaction->getItemUUID()->getId());
         $this->assertEquals('buy', $interaction->getEventName());
-        $this->assertEquals(10, $interaction->getWeight());
+        $this->assertEquals([], $interaction->getMetadata());
     }
 
     /**
@@ -57,13 +56,14 @@ class InteractionTest extends TestCase
         $interaction = new Interaction(
             new User('123', ['a' => 1]),
             new ItemUUID('abc', 'article'),
-            'buy'
+            'buy',
+            ['field' => 'value']
         );
 
         $this->assertEquals(
             $interaction,
             HttpHelper::emulateHttpTransport($interaction)
         );
-        $this->assertEquals(Interaction::NO_WEIGHT, $interaction->getWeight());
+        $this->assertEquals(['field' => 'value'], $interaction->getMetadata());
     }
 }
