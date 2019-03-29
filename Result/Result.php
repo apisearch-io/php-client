@@ -17,7 +17,6 @@ namespace Apisearch\Result;
 
 use Apisearch\Model\HttpTransportable;
 use Apisearch\Model\Item;
-use Apisearch\Query\Query;
 
 /**
  * Class Result.
@@ -25,11 +24,11 @@ use Apisearch\Query\Query;
 class Result implements HttpTransportable
 {
     /**
-     * @var Query
+     * @var string
      *
-     * Query associated
+     * UUID
      */
-    private $query;
+    private $queryUUID;
 
     /**
      * @var Item[]
@@ -83,16 +82,16 @@ class Result implements HttpTransportable
     /**
      * Result constructor.
      *
-     * @param Query $query
-     * @param int   $totalItems
-     * @param int   $totalHits
+     * @param string|null $queryUUID
+     * @param int         $totalItems
+     * @param int         $totalHits
      */
     public function __construct(
-        Query $query,
+        ?string $queryUUID,
         int $totalItems,
         int $totalHits
     ) {
-        $this->query = $query;
+        $this->queryUUID = $queryUUID;
         $this->totalItems = $totalItems;
         $this->totalHits = $totalHits;
     }
@@ -100,7 +99,7 @@ class Result implements HttpTransportable
     /**
      * Create by.
      *
-     * @param Query             $query
+     * @param string|null       $queryUUID
      * @param int               $totalItems
      * @param int               $totalHits
      * @param Aggregations|null $aggregations
@@ -110,7 +109,7 @@ class Result implements HttpTransportable
      * @return Result
      */
     public static function create(
-        Query $query,
+        ?string $queryUUID,
         int $totalItems,
         int $totalHits,
         ? Aggregations $aggregations,
@@ -118,7 +117,7 @@ class Result implements HttpTransportable
         array $items
     ): self {
         $result = new self(
-            $query,
+            $queryUUID,
             $totalItems,
             $totalHits
         );
@@ -133,16 +132,13 @@ class Result implements HttpTransportable
     /**
      * Create multiquery Result.
      *
-     * @param Query    $query
      * @param Result[] $subresults
      *
      * @return Result
      */
-    public static function createMultiResult(
-        Query $query,
-        array $subresults
-    ) {
-        $result = new Result($query, 0, 0);
+    public static function createMultiResult(array $subresults)
+    {
+        $result = new Result(null, 0, 0);
         $result->subresults = $subresults;
 
         return $result;
@@ -320,13 +316,13 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Get query.
+     * Get query UUID.
      *
-     * @return Query
+     * @return string|null
      */
-    public function getQuery(): Query
+    public function getQueryUUID(): ? string
     {
-        return $this->query;
+        return $this->queryUUID;
     }
 
     /**
@@ -367,7 +363,7 @@ class Result implements HttpTransportable
     public function toArray(): array
     {
         return array_filter([
-            'query' => $this->query->toArray(),
+            'query_uuid' => $this->queryUUID,
             'total_items' => $this->totalItems,
             'total_hits' => $this->totalHits,
             'items' => array_map(function (Item $item) {
@@ -399,7 +395,7 @@ class Result implements HttpTransportable
     public static function createFromArray(array $array): self
     {
         $result = self::create(
-            Query::createFromArray($array['query'] ?? []),
+            $array['query_uuid'] ?? '',
             $array['total_items'] ?? 0,
             $array['total_hits'] ?? 0,
             isset($array['aggregations'])

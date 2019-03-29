@@ -70,6 +70,7 @@ class QueryTest extends TestCase
         $this->assertEquals(Query::NO_MIN_SCORE, $query->getMinScore());
         $this->assertEquals([], $query->getMetadata());
         $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
+        $this->assertNull($query->getUUID());
     }
 
     /**
@@ -186,5 +187,16 @@ class QueryTest extends TestCase
             'sub3' => Query::create('sub3'),
         ]);
         $this->assertCount(3, $query->getSubqueries());
+    }
+
+    /**
+     * Test identifier.
+     */
+    public function testIdentifier()
+    {
+        $query = Query::createMatchAll()->identifyWith('123');
+        $this->assertEquals('123', $query->getUUID());
+        $query = HttpHelper::emulateHttpTransport($query);
+        $this->assertEquals('123', $query->getUUID());
     }
 }

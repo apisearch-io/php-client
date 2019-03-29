@@ -101,13 +101,6 @@ class Http
     const TO_FIELD = 'to';
 
     /**
-     * @var string
-     *
-     * Purge Query object from response
-     */
-    const PURGE_QUERY_FROM_RESPONSE_FIELD = 'incl_query';
-
-    /**
      * Get common query values.
      *
      * @param RepositoryWithCredentials $repository

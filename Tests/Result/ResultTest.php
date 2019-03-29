@@ -17,7 +17,6 @@ namespace Apisearch\Tests\Result;
 
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
-use Apisearch\Query\Query;
 use Apisearch\Result\Aggregation;
 use Apisearch\Result\Aggregations;
 use Apisearch\Result\Result;
@@ -35,15 +34,14 @@ class ResultTest extends TestCase
     public function testToArray()
     {
         $result = new Result(
-            Query::createMatchAll(),
+            '123',
             2, 1
         );
         $resultArray = $result->toArray();
         $this->assertFalse(array_key_exists('items', $resultArray));
         $this->assertFalse(array_key_exists('aggregations', $resultArray));
         $this->assertFalse(array_key_exists('suggests', $resultArray));
-        $this->assertEquals(Query::createMatchAll(), $result->getQuery());
-        $this->assertFalse(array_key_exists('query', $resultArray));
+        $this->assertEquals('123', $result->getQueryUUID());
         $this->assertEquals(1, $result->getTotalHits());
         $this->assertEquals(1, $resultArray['total_hits']);
         $this->assertEquals(2, $result->getTotalItems());
@@ -61,7 +59,7 @@ class ResultTest extends TestCase
     public function testItems()
     {
         $result = new Result(
-            Query::createMatchAll(),
+            '123',
             2, 1
         );
         $result->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
@@ -79,7 +77,7 @@ class ResultTest extends TestCase
     public function testAggregations()
     {
         $result = new Result(
-            Query::createMatchAll(),
+            '123',
             2, 1
         );
         $aggregations = new Aggregations(2);
@@ -103,7 +101,7 @@ class ResultTest extends TestCase
     public function testSuggests()
     {
         $result = new Result(
-            Query::createMatchAll(),
+            '123',
             2, 1
         );
         $result->addSuggest('hola');
@@ -118,7 +116,7 @@ class ResultTest extends TestCase
     public function testGetItemsGroupedByType()
     {
         $result = new Result(
-            Query::createMatchAll(),
+            '123',
             1, 1
         );
 
@@ -153,9 +151,7 @@ class ResultTest extends TestCase
     public function testCreateFromArrayAllValues()
     {
         $resultAsArray = [
-            'query' => [
-                'q' => 'engonga',
-            ],
+            'query_uuid' => '123',
             'total_items' => 10,
             'total_hits' => 20,
             'aggregations' => [
@@ -186,7 +182,7 @@ class ResultTest extends TestCase
         ];
 
         $result = Result::createFromArray($resultAsArray);
-        $this->assertEquals(Query::create('engonga'), $result->getQuery());
+        $this->assertEquals('123', $result->getQueryUUID());
         $this->assertEquals(10, $result->getTotalItems());
         $this->assertEquals(20, $result->getTotalHits());
         $this->assertInstanceof(Aggregation::class, $result->getAggregation('gogo'));
@@ -200,11 +196,10 @@ class ResultTest extends TestCase
      */
     public function testMultiResult()
     {
-        $query = Query::createMatchAll();
-        $result = Result::createMultiResult($query, [
-            'res1' => Result::create($query, 10, 3, null, [], []),
-            'res2' => Result::create($query, 10, 4, null, [], []),
-            'res3' => Result::create($query, 10, 5, null, [], []),
+        $result = Result::createMultiResult([
+            'res1' => Result::create('1', 10, 3, null, [], []),
+            'res2' => Result::create('2', 10, 4, null, [], []),
+            'res3' => Result::create('3', 10, 5, null, [], []),
         ]);
 
         $this->assertCount(3, $result->getSubresults());

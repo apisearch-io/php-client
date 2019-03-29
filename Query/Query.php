@@ -57,6 +57,13 @@ class Query implements HttpTransportable
     const NO_MIN_SCORE = 0.0;
 
     /**
+     * @var string
+     *
+     * UUID
+     */
+    private $UUID;
+
+    /**
      * @var Coordinate
      *
      * Coordinate
@@ -1379,6 +1386,30 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Identify it.
+     *
+     * @param string $UUID
+     *
+     * @return Query
+     */
+    public function identifyWith(string $UUID)
+    {
+        $this->UUID = $UUID;
+
+        return $this;
+    }
+
+    /**
+     * Get identification.
+     *
+     * @return string|null
+     */
+    public function getUUID(): ? string
+    {
+        return $this->UUID;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -1386,6 +1417,7 @@ class Query implements HttpTransportable
     public function toArray(): array
     {
         return array_filter([
+            'uuid' => $this->UUID,
             'q' => '' !== $this->getQueryText()
                 ? $this->getQueryText()
                 : null,
@@ -1517,6 +1549,10 @@ class Query implements HttpTransportable
         $query->subqueries = array_map(function (array $query) {
             return Query::createFromArray($query);
         }, $array['subqueries'] ?? []);
+
+        if (isset($array['uuid'])) {
+            $query->UUID = $array['uuid'];
+        }
 
         return $query;
     }
