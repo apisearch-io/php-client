@@ -26,13 +26,6 @@ use Apisearch\Model\User;
 class Interaction implements HttpTransportable
 {
     /**
-     * @var int
-     *
-     * No weight
-     */
-    const NO_WEIGHT = 0;
-
-    /**
      * @var User
      *
      * User
@@ -54,11 +47,11 @@ class Interaction implements HttpTransportable
     private $eventName;
 
     /**
-     * @var int
+     * @var array
      *
-     * Weight
+     * Metadata
      */
-    private $weight;
+    private $metadata;
 
     /**
      * Interaction constructor.
@@ -66,18 +59,18 @@ class Interaction implements HttpTransportable
      * @param User     $user
      * @param ItemUUID $itemUUID
      * @param string   $eventName
-     * @param          $weight
+     * @param array    $metadata
      */
     public function __construct(
         User $user,
         ItemUUID $itemUUID,
         string $eventName,
-        int $weight = self::NO_WEIGHT
+        array $metadata = []
     ) {
         $this->user = $user;
         $this->itemUUID = $itemUUID;
         $this->eventName = $eventName;
-        $this->weight = $weight;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -111,13 +104,13 @@ class Interaction implements HttpTransportable
     }
 
     /**
-     * Get Weight.
+     * Get Metadata.
      *
-     * @return int
+     * @return array
      */
-    public function getWeight(): int
+    public function getMetadata(): array
     {
-        return $this->weight;
+        return $this->metadata;
     }
 
     /**
@@ -131,9 +124,7 @@ class Interaction implements HttpTransportable
             'user' => $this->user->toArray(),
             'item_uuid' => $this->itemUUID->toArray(),
             'event_name' => $this->eventName,
-            'weight' => self::NO_WEIGHT === $this->weight
-                ? false
-                : $this->weight,
+            'metadata' => $this->metadata,
         ]);
     }
 
@@ -152,7 +143,7 @@ class Interaction implements HttpTransportable
             User::createFromArray($array['user']),
             ItemUUID::createFromArray($array['item_uuid']),
             (string) $array['event_name'],
-            (int) ($array['weight'] ?? self::NO_WEIGHT)
+            $array['metadata'] ?? []
         );
     }
 }
