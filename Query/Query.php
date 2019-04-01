@@ -1469,11 +1469,9 @@ class Query implements HttpTransportable
                 ? $this->user->toArray()
                 : null,
             'metadata' => $this->metadata,
-            'subqueries' => array_filter(
-                array_map(function (Query $query) {
-                    return $query->toArray();
-                }, $this->subqueries)
-            ),
+            'subqueries' => array_map(function (Query $query) {
+                return $query->toArray();
+            }, $this->subqueries),
             'items_promoted' => array_filter(
                 array_map(function (ItemUUID $itemUUID) {
                     return $itemUUID->toArray();
