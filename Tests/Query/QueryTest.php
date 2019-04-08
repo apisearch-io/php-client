@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Query;
 
+use Apisearch\Model\IndexUUID;
 use Apisearch\Query\Query;
 use Apisearch\Query\ScoreStrategies;
 use Apisearch\Query\SortBy;
@@ -71,6 +72,7 @@ class QueryTest extends TestCase
         $this->assertEquals([], $query->getMetadata());
         $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
         $this->assertNull($query->getUUID());
+        $this->assertNull($query->getIndexUUID());
     }
 
     /**
@@ -201,5 +203,19 @@ class QueryTest extends TestCase
         $this->assertEquals('123', $query->getUUID());
         $query = HttpHelper::emulateHttpTransport($query);
         $this->assertEquals('123', $query->getUUID());
+    }
+
+    /**
+     * Test indexUUID.
+     */
+    public function testIndexUUID()
+    {
+        $indexUUID = IndexUUID::createById('123');
+        $query = Query::createMatchAll()->forceIndexUUID($indexUUID);
+        $this->assertEquals($indexUUID, $query->getIndexUUID());
+        $this->assertEquals($indexUUID->toArray(), $query->toArray()['index_uuid']);
+        $query = HttpHelper::emulateHttpTransport($query);
+        $this->assertEquals($indexUUID, $query->getIndexUUID());
+        $this->assertEquals($indexUUID->toArray(), $query->toArray()['index_uuid']);
     }
 }
