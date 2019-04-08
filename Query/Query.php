@@ -19,6 +19,7 @@ use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Geo\LocationRange;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\HttpTransportable;
+use Apisearch\Model\IndexUUID;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Apisearch\Model\User;
@@ -209,6 +210,13 @@ class Query implements HttpTransportable
      * Sub queries
      */
     private $subqueries = [];
+
+    /**
+     * @var IndexUUID
+     *
+     * Index UUID
+     */
+    private $indexUUID;
 
     /**
      * Construct.
@@ -1410,6 +1418,30 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Force Index UUID.
+     *
+     * @param IndexUUID $indexUUID
+     *
+     * @return Query
+     */
+    public function forceIndexUUID(IndexUUID $indexUUID): Query
+    {
+        $this->indexUUID = $indexUUID;
+
+        return $this;
+    }
+
+    /**
+     * Get index UUID.
+     *
+     * @return IndexUUID|null
+     */
+    public function getIndexUUID(): ? IndexUUID
+    {
+        return $this->indexUUID;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -1477,6 +1509,9 @@ class Query implements HttpTransportable
                     return $itemUUID->toArray();
                 }, $this->itemsPromoted)
             ),
+            'index_uuid' => ($this->indexUUID instanceof IndexUUID)
+                ? $this->indexUUID->toArray()
+                : null,
         ], function ($element) {
             return
             !(
@@ -1550,6 +1585,9 @@ class Query implements HttpTransportable
 
         if (isset($array['uuid'])) {
             $query->UUID = $array['uuid'];
+        }
+        if (isset($array['index_uuid'])) {
+            $query->indexUUID = IndexUUID::createFromArray($array['index_uuid']);
         }
 
         return $query;
