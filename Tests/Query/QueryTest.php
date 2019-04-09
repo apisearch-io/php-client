@@ -73,6 +73,7 @@ class QueryTest extends TestCase
         $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
         $this->assertNull($query->getUUID());
         $this->assertNull($query->getIndexUUID());
+        $this->assertEquals([], $query->getsearchableFields());
     }
 
     /**
@@ -217,5 +218,17 @@ class QueryTest extends TestCase
         $query = HttpHelper::emulateHttpTransport($query);
         $this->assertEquals($indexUUID, $query->getIndexUUID());
         $this->assertEquals($indexUUID->toArray(), $query->toArray()['index_uuid']);
+    }
+
+    /**
+     * Test searchable fields.
+     */
+    public function testSearchableFields()
+    {
+        $query = Query::createMatchAll()->setsearchableFields(['field1']);
+        $this->assertEquals(['field1'], $query->getsearchableFields());
+        $this->assertEquals(['field1'], $query->toArray()['searchable_fields']);
+        $query = HttpHelper::emulateHttpTransport($query);
+        $this->assertEquals(['field1'], $query->getsearchableFields());
     }
 }
