@@ -386,8 +386,8 @@ class Item implements HttpTransportable, UUIDReference
     public function getAllMetadata(): array
     {
         return array_merge(
-            $this->metadata,
-            $this->indexedMetadata
+            $this->indexedMetadata,
+            $this->metadata
         );
     }
 
