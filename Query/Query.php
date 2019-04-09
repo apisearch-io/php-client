@@ -165,9 +165,9 @@ class Query implements HttpTransportable
     /**
      * @var string[]
      *
-     * Filter fields
+     * Searchable fields
      */
-    private $filterFields = [];
+    private $searchableFields = [];
 
     /**
      * @var ScoreStrategies
@@ -720,13 +720,13 @@ class Query implements HttpTransportable
     /**
      * Set filter fields.
      *
-     * @param string[] $filterFields
+     * @param string[] $searchableFields
      *
      * @return Query
      */
-    public function setFilterFields(array $filterFields)
+    public function setsearchableFields(array $searchableFields)
     {
-        $this->filterFields = $filterFields;
+        $this->searchableFields = $searchableFields;
 
         return $this;
     }
@@ -736,9 +736,9 @@ class Query implements HttpTransportable
      *
      * @return string[]
      */
-    public function getFilterFields(): array
+    public function getsearchableFields(): array
     {
-        return $this->filterFields;
+        return $this->searchableFields;
     }
 
     /**
@@ -1489,7 +1489,7 @@ class Query implements HttpTransportable
             'aggregations_enabled' => $this->aggregationsEnabled
                 ? null
                 : false,
-            'filter_fields' => $this->filterFields,
+            'searchable_fields' => $this->searchableFields,
             'score_strategies' => $this->scoreStrategies instanceof ScoreStrategies
                 ? $this->scoreStrategies->toArray()
                 : null,
@@ -1568,7 +1568,7 @@ class Query implements HttpTransportable
             return ItemUUID::createFromArray($itemUUID);
         }, $array['items_promoted'] ?? []));
         $query->fuzziness = $array['fuzziness'] ?? null;
-        $query->filterFields = $array['filter_fields'] ?? [];
+        $query->searchableFields = $array['searchable_fields'] ?? [];
         $query->scoreStrategies = isset($array['score_strategies'])
             ? ScoreStrategies::createFromArray($array['score_strategies'])
             : null;
