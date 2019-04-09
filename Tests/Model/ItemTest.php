@@ -291,6 +291,22 @@ class ItemTest extends TestCase
     }
 
     /**
+     * Test all metadata priorities.
+     */
+    public function testAllMetadataPriorities()
+    {
+        $item = Item::createFromArray([
+            'uuid' => [
+                'id' => '1',
+                'type' => 'product',
+            ],
+            'metadata' => ['a' => 'Hola'],
+            'indexed_metadata' => ['a' => 'hola'],
+        ]);
+        $this->assertEquals('Hola', $item->getAllMetadata()['a']);
+    }
+
+    /**
      * Test item to array with default values.
      */
     public function testToArrayDefaultValues()
