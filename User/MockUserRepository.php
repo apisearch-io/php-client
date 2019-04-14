@@ -34,14 +34,6 @@ class MockUserRepository extends HttpRepositoryWithCredentials implements UserRe
     }
 
     /**
-     * Delete all interactions.
-     */
-    public function deleteAllInteractions()
-    {
-        $this->throwMockException();
-    }
-
-    /**
      * Throw exception.
      *
      * @throws MockException

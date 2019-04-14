@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
-use Apisearch\Model\IndexUUID;
 use Apisearch\Repository\RepositoryWithCredentials;
 
 /**
@@ -26,14 +25,7 @@ class Http
     /**
      * @var string
      *
-     * App_id query param field
-     */
-    const APP_ID_FIELD = 'app_id';
-
-    /**
-     * @var string
-     *
-     * App_id query param field
+     * Index query param field
      */
     const INDEX_FIELD = 'index';
 
@@ -43,13 +35,6 @@ class Http
      * Token query param field
      */
     const TOKEN_FIELD = 'token';
-
-    /**
-     * @var string
-     *
-     * Items query param field
-     */
-    const ITEMS_FIELD = 'items';
 
     /**
      * @var string
@@ -75,13 +60,6 @@ class Http
     /**
      * @var string
      *
-     * Interaction param field
-     */
-    const INTERACTION_FIELD = 'interaction';
-
-    /**
-     * @var string
-     *
      * Language query param field
      */
     const LANGUAGE_FIELD = 'language';
@@ -101,39 +79,31 @@ class Http
     const TO_FIELD = 'to';
 
     /**
-     * Get common query values.
+     * @var string
      *
-     * @param RepositoryWithCredentials $repository
-     *
-     * @return string[]
+     * App ID Header
      */
-    public static function getQueryValues(RepositoryWithCredentials $repository): array
-    {
-        return [
-            self::APP_ID_FIELD => $repository->getAppUUID()->composeUUID(),
-            self::INDEX_FIELD => $repository->getIndexUUID()->composeUUID(),
-            self::TOKEN_FIELD => $repository->getTokenUUID()->composeUUID(),
-        ];
-    }
+    const APP_ID_HEADER = 'APISEARCH-APP-ID';
+
+    /**
+     * @var string
+     *
+     * Token ID Header
+     */
+    const TOKEN_ID_HEADER = 'APISEARCH-TOKEN-ID';
 
     /**
      * Get common query values.
      *
      * @param RepositoryWithCredentials $repository
-     * @param IndexUUID                 $indexUUID
      *
      * @return string[]
      */
-    public static function getAppQueryValues(
-        RepositoryWithCredentials $repository,
-        IndexUUID $indexUUID = null
-    ): array {
-        return array_filter([
-            self::APP_ID_FIELD => $repository->getAppUUID()->composeUUID(),
-            self::INDEX_FIELD => $indexUUID instanceof IndexUUID
-                ? $indexUUID->composeUUID()
-                : false,
-            self::TOKEN_FIELD => $repository->getTokenUUID()->composeUUID(),
-        ]);
+    public static function getApisearchHeaders(RepositoryWithCredentials $repository): array
+    {
+        return [
+            self::APP_ID_HEADER => $repository->getAppUUID()->composeUUID(),
+            self::TOKEN_ID_HEADER => $repository->getTokenUUID()->composeUUID(),
+        ];
     }
 }

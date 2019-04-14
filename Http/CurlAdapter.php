@@ -41,6 +41,11 @@ class CurlAdapter implements HttpAdapter
         $json = json_encode($requestParts->getParameters()['json']);
         $formattedUrl = rtrim($host, '/').'/'.ltrim($requestParts->getUrl(), '/');
         $method = strtoupper($method);
+        $headers = [];
+        foreach ($requestParts->getParameters()['headers'] ?? [] as $header => $value) {
+            $headers[] = "$header: $value";
+        }
+
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($c, CURLOPT_URL, $formattedUrl);
@@ -50,23 +55,27 @@ class CurlAdapter implements HttpAdapter
 
         if (!in_array($method, ['GET', 'HEAD'])) {
             curl_setopt($c, CURLOPT_POSTFIELDS, $json);
-            curl_setopt($c, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                'Content-Length: '.strlen($json),
-            ]);
+            $headers[] = 'Content-Type: application/json';
+            $headers[] = 'Content-Length: '.strlen($json);
         }
 
+        curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
         $content = curl_exec($c);
         $responseCode = curl_getinfo($c, CURLINFO_HTTP_CODE);
         curl_close($c);
 
-        if (false === $content) {
+        if (
+            'HEAD' !== $method &&
+            false === $content
+        ) {
             throw ConnectionException::buildConnectExceptionByUrl($requestParts->getUrl());
         }
 
         return [
             'code' => (int) $responseCode,
-            'body' => json_decode($content, true),
+            'body' => empty($content)
+                ? []
+                : json_decode($content, true),
         ];
     }
 }

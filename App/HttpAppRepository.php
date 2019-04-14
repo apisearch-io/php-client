@@ -40,12 +40,11 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/token',
-                'post',
-                Http::getAppQueryValues($this),
-                [
-                    Http::TOKEN_FIELD => $token->toArray(),
-                ]
+                sprintf('/%s/tokens', $this->getAppUUID()->getId()),
+                'put',
+                [],
+                $token->toArray(),
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -61,12 +60,15 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/token',
+                sprintf(
+                    '/%s/tokens/%s',
+                    $this->getAppUUID()->composeUUID(),
+                    $tokenUUID->composeUUID()
+                ),
                 'delete',
-                Http::getAppQueryValues($this),
-                [
-                    Http::TOKEN_FIELD => $tokenUUID->toArray(),
-                ]
+                [],
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -82,9 +84,14 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/tokens',
+                sprintf(
+                    '/%s/tokens',
+                    $this->getAppUUID()->getId()
+                ),
                 'get',
-                Http::getAppQueryValues($this)
+                [],
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -102,9 +109,14 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/tokens',
+                sprintf(
+                    '/%s/tokens',
+                    $this->getAppUUID()->getId()
+                ),
                 'delete',
-                Http::getAppQueryValues($this)
+                [],
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -120,9 +132,14 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/indices',
+                sprintf(
+                    '/%s/indices',
+                    $this->getAppUUID()->getId()
+                ),
                 'get',
-                Http::getAppQueryValues($this)
+                [],
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -150,13 +167,17 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/index',
+                sprintf(
+                    '/%s/indices',
+                    $this->getAppUUID()->getId()
+                ),
                 'put',
-                Http::getAppQueryValues($this),
+                [],
                 [
                     Http::INDEX_FIELD => $indexUUID->toArray(),
                     Http::CONFIG_FIELD => $config->toArray(),
-                ]
+                ],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -174,9 +195,15 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/index',
+                sprintf(
+                    '/%s/indices/%s',
+                    $this->getAppUUID()->composeUUID(),
+                    $indexUUID->composeUUID()
+                ),
                 'delete',
-                Http::getAppQueryValues($this, $indexUUID)
+                [],
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -194,9 +221,15 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/index/reset',
+                sprintf(
+                    '/%s/indices/%s/reset',
+                    $this->getAppUUID()->composeUUID(),
+                    $indexUUID->composeUUID()
+                ),
                 'post',
-                Http::getAppQueryValues($this, $indexUUID)
+                [],
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -214,9 +247,15 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/index',
+                sprintf(
+                    '/%s/indices/%s',
+                    $this->getAppUUID()->composeUUID(),
+                    $indexUUID->composeUUID()
+                ),
                 'head',
-                Http::getAppQueryValues($this, $indexUUID)
+                [],
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         if (null === $response) {
@@ -241,12 +280,15 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
         $response = $this
             ->httpClient
             ->get(
-                '/index',
+                sprintf(
+                    '/%s/indices/%s/configure',
+                    $this->getAppUUID()->composeUUID(),
+                    $indexUUID->composeUUID()
+                ),
                 'post',
-                Http::getAppQueryValues($this, $indexUUID),
-                [
-                    Http::CONFIG_FIELD => $config->toArray(),
-                ]
+                [],
+                $config->toArray(),
+                Http::getApisearchHeaders($this)
             );
 
         if (null === $response) {

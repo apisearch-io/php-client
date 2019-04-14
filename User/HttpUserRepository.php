@@ -33,28 +33,12 @@ class HttpUserRepository extends HttpRepositoryWithCredentials implements UserRe
         $response = $this
             ->httpClient
             ->get(
-                '/interaction',
+                '/interactions',
                 'get',
                 Http::getQueryValues($this),
                 [
                     'interaction' => $interaction->toArray(),
                 ]);
-
-        self::throwTransportableExceptionIfNeeded($response);
-    }
-
-    /**
-     * Delete all interactions.
-     */
-    public function deleteAllInteractions()
-    {
-        $response = $this
-            ->httpClient
-            ->get(
-                '/interactions',
-                'delete',
-                Http::getQueryValues($this)
-            );
 
         self::throwTransportableExceptionIfNeeded($response);
     }

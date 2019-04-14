@@ -210,11 +210,9 @@ class Token implements HttpTransportable
     {
         $this->endpoints = array_values(
             array_unique(
-                array_map(function ($endpoint) {
-                    list($method, $route) = explode('~~', $endpoint);
-
-                    return $method.'~~'.trim($route, '/');
-                }, array_filter($endpoints))
+                array_filter(
+                    $endpoints
+                )
             )
         );
     }
