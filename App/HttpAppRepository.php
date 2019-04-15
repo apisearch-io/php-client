@@ -168,15 +168,13 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
             ->httpClient
             ->get(
                 sprintf(
-                    '/%s/indices',
-                    $this->getAppUUID()->getId()
+                    '/%s/indices/%s',
+                    $this->getAppUUID()->getId(),
+                    $indexUUID->composeUUID()
                 ),
                 'put',
                 [],
-                [
-                    Http::INDEX_FIELD => $indexUUID->toArray(),
-                    Http::CONFIG_FIELD => $config->toArray(),
-                ],
+                $config->toArray(),
                 Http::getApisearchHeaders($this)
             );
 
