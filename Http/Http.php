@@ -25,13 +25,6 @@ class Http
     /**
      * @var string
      *
-     * Index query param field
-     */
-    const INDEX_FIELD = 'index';
-
-    /**
-     * @var string
-     *
      * Token query param field
      */
     const TOKEN_FIELD = 'token';
@@ -49,34 +42,6 @@ class Http
      * Query query param field
      */
     const QUERY_FIELD = 'query';
-
-    /**
-     * @var string
-     *
-     * Config param field
-     */
-    const CONFIG_FIELD = 'config';
-
-    /**
-     * @var string
-     *
-     * Language query param field
-     */
-    const LANGUAGE_FIELD = 'language';
-
-    /**
-     * @var string
-     *
-     * From field
-     */
-    const FROM_FIELD = 'from';
-
-    /**
-     * @var string
-     *
-     * From field
-     */
-    const TO_FIELD = 'to';
 
     /**
      * @var string
