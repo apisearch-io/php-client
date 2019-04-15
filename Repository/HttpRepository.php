@@ -64,14 +64,18 @@ class HttpRepository extends Repository
             $response = $this
                 ->httpClient
                 ->get(
-                    '/items',
-                    'post',
-                    Http::getQueryValues($this),
-                    [
-                        'items' => array_map(function (Item $item) {
-                            return $item->toArray();
-                        }, $itemsToUpdate),
-                    ]);
+                    sprintf(
+                        '/%s/indices/%s/items',
+                        $this->getAppUUID()->composeUUID(),
+                        $this->getIndexUUID()->composeUUID()
+                    ),
+                    'put',
+                    [],
+                    array_map(function (Item $item) {
+                        return $item->toArray();
+                    }, $itemsToUpdate),
+                    Http::getApisearchHeaders($this)
+                );
 
             self::throwTransportableExceptionIfNeeded($response);
         }
@@ -79,14 +83,19 @@ class HttpRepository extends Repository
         if (!empty($itemsToDelete)) {
             $response = $this
                 ->httpClient
-                ->get('/items',
+                ->get(
+                    sprintf(
+                        '/%s/indices/%s/items',
+                        $this->getAppUUID()->composeUUID(),
+                        $this->getIndexUUID()->composeUUID()
+                    ),
                     'delete',
-                    Http::getQueryValues($this),
-                    [
-                        'items' => array_map(function (ItemUUID $itemUUID) {
-                            return $itemUUID->toArray();
-                        }, $itemsToDelete),
-                    ]);
+                    [],
+                    array_map(function (ItemUUID $itemUUID) {
+                        return $itemUUID->toArray();
+                    }, $itemsToDelete),
+                    Http::getApisearchHeaders($this)
+                );
 
             self::throwTransportableExceptionIfNeeded($response);
         }
@@ -105,13 +114,18 @@ class HttpRepository extends Repository
         $response = $this
             ->httpClient
             ->get(
-                '/items',
-                'put',
-                Http::getQueryValues($this),
+                sprintf(
+                    '/%s/indices/%s/items/update-by-query',
+                    $this->getAppUUID()->composeUUID(),
+                    $this->getIndexUUID()->composeUUID()
+                ),
+                'post',
+                [],
                 [
                     Http::QUERY_FIELD => $query->toArray(),
                     Http::CHANGES_FIELD => $changes->toArray(),
-                ]
+                ],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);
@@ -132,11 +146,17 @@ class HttpRepository extends Repository
         $response = $this
             ->httpClient
             ->get(
-                '/',
+                sprintf(
+                    '/%s/indices/%s',
+                    $this->getAppUUID()->composeUUID(),
+                    $this->getIndexUUID()->composeUUID()
+                ),
                 'get',
-                Http::getQueryValues($this) + [
+                [
                     Http::QUERY_FIELD => urlencode(json_encode($query->toArray())),
-                ] + $parameters
+                ] + $parameters,
+                [],
+                Http::getApisearchHeaders($this)
             );
 
         self::throwTransportableExceptionIfNeeded($response);

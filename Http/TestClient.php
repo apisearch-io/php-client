@@ -76,6 +76,11 @@ class TestClient extends Client implements HttpClient
             $server
         );
 
+        $headersFormatted = [];
+        foreach ($server as $key => $value) {
+            $headersFormatted['HTTP_'.str_replace('-', '_', $key)] = $value;
+        }
+
         $this
             ->client
             ->request(
@@ -83,9 +88,9 @@ class TestClient extends Client implements HttpClient
                 '/'.$requestParts->getUrl(),
                 [],
                 [],
-                $server + [
+                array_merge($headersFormatted, [
                     'CONTENT_TYPE' => 'application/json',
-                ],
+                ]),
                 json_encode($requestParts->getParameters()['json'])
             );
 

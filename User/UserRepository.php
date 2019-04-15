@@ -28,9 +28,4 @@ interface UserRepository extends WithRepositoryReference
      * @param Interaction $interaction
      */
     public function addInteraction(Interaction $interaction);
-
-    /**
-     * Delete all interactions.
-     */
-    public function deleteAllInteractions();
 }

@@ -38,12 +38,4 @@ class InMemoryUserRepository extends RepositoryWithCredentials implements UserRe
     {
         $this->interactions[] = $interaction;
     }
-
-    /**
-     * Delete all interactions.
-     */
-    public function deleteAllInteractions()
-    {
-        $this->interactions = [];
-    }
 }
