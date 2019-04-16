@@ -33,12 +33,15 @@ class HttpUserRepository extends HttpRepositoryWithCredentials implements UserRe
         $response = $this
             ->httpClient
             ->get(
-                '/interactions',
-                'get',
-                Http::getQueryValues($this),
-                [
-                    'interaction' => $interaction->toArray(),
-                ]);
+                sprintf(
+                    '/%s/interactions',
+                    $this->getAppUUID()->composeUUID()
+                ),
+                'post',
+                [],
+                $interaction->toArray(),
+                Http::getApisearchHeaders($this)
+            );
 
         self::throwTransportableExceptionIfNeeded($response);
     }
