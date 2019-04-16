@@ -155,13 +155,13 @@ class InvalidFormatException extends TransportableException
     /**
      * Campaign format not valid.
      *
-     * @param mixed $campaignBeforeHydration
+     * @param mixed $interactionBeforeHydration
      *
      * @return InvalidFormatException
      */
-    public static function campaignFormatNotValid($campaignBeforeHydration): self
+    public static function interactionFormatNotValid($interactionBeforeHydration): self
     {
-        return new static('Campaign Format not valid. Expecting a Campaign serialized but found malformed data');
+        return new static('Interaction Format not valid. Expecting an Interaction serialized but found malformed data');
     }
 
     /**
@@ -174,18 +174,6 @@ class InvalidFormatException extends TransportableException
     public static function changesFormatNotValid($changesBeforeHydration): self
     {
         return new static('Changes Format not valid. Expecting a Changes serialized but found malformed data');
-    }
-
-    /**
-     * Boost clause format not valid.
-     *
-     * @param mixed $boostClauseBeforeHydration
-     *
-     * @return InvalidFormatException
-     */
-    public static function boostClauseFormatNotValid($boostClauseBeforeHydration): self
-    {
-        return new static('Boost clause Format not valid. Expecting a Boost clause serialized but found malformed data');
     }
 
     /**
