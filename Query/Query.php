@@ -724,7 +724,7 @@ class Query implements HttpTransportable
      *
      * @return Query
      */
-    public function setsearchableFields(array $searchableFields)
+    public function setSearchableFields(array $searchableFields)
     {
         $this->searchableFields = $searchableFields;
 
@@ -736,7 +736,7 @@ class Query implements HttpTransportable
      *
      * @return string[]
      */
-    public function getsearchableFields(): array
+    public function getSearchableFields(): array
     {
         return $this->searchableFields;
     }
