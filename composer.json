@@ -20,7 +20,9 @@
         "friendsofphp/php-cs-fixer": "^2.5.0"
     },
     "suggest": {
-        "symfony/yaml": "Install for Yaml import/export"
+        "symfony/yaml": "Install for Yaml import/export",
+        "clue/block-react": "Install to work with Test client",
+        "apisearch-io/symfony-async-http-kernel": "Install to work with Test client"
     },
     "autoload": {
         "psr-4": {
