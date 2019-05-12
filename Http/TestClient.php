@@ -15,7 +15,9 @@ declare(strict_types=1);
 
 namespace Apisearch\Http;
 
-use Symfony\Component\BrowserKit\Client as BrowserKitClient;
+use Clue\React\Block;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\AsyncKernel;
 
 /**
  * Class TestClient.
@@ -23,25 +25,25 @@ use Symfony\Component\BrowserKit\Client as BrowserKitClient;
 class TestClient extends Client implements HttpClient
 {
     /**
-     * @var BrowserKitClient
+     * @var AsyncKernel
      *
-     * test client
+     * Async kernel
      */
-    private $client;
+    private $kernel;
 
     /**
      * TestClient constructor.
      *
-     * @param BrowserKitClient $client
-     * @param string           $version
-     * @param RetryMap         $retryMap
+     * @param AsyncKernel $kernel
+     * @param string      $version
+     * @param RetryMap    $retryMap
      */
     public function __construct(
-        BrowserKitClient $client,
+        AsyncKernel $kernel,
         string $version,
         RetryMap $retryMap
     ) {
-        $this->client = $client;
+        $this->kernel = $kernel;
 
         parent::__construct(
             $version,
@@ -81,22 +83,32 @@ class TestClient extends Client implements HttpClient
             $headersFormatted['HTTP_'.str_replace('-', '_', $key)] = $value;
         }
 
-        $this
-            ->client
-            ->request(
-                $method,
-                '/'.$requestParts->getUrl(),
-                [],
-                [],
-                array_merge($headersFormatted, [
-                    'CONTENT_TYPE' => 'application/json',
-                ]),
-                json_encode($requestParts->getParameters()['json'])
-            );
+        $request = new Request(
+            array_map('urldecode', $query),
+            [],
+            [],
+            [],
+            [],
+            array_merge($headersFormatted, [
+                'CONTENT_TYPE' => 'application/json',
+            ]),
+            json_encode($requestParts->getParameters()['json'])
+        );
 
-        $response = $this
-            ->client
-            ->getResponse();
+        $request->setMethod($method);
+        $request->server->set('REQUEST_URI', $requestParts->getUrl());
+
+        $promise = $this
+            ->kernel
+            ->handleAsync($request);
+
+        $response = Block\await(
+            $promise,
+            $this
+                ->kernel
+                ->getContainer()
+                ->get('reactphp.event_loop')
+        );
 
         return [
             'code' => $response->getStatusCode(),
