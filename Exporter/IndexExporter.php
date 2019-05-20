@@ -74,7 +74,7 @@ class IndexExporter
         string $format
     ): string {
         $allItems = [];
-        $iteration = 0;
+        $iteration = 1;
         while (true) {
             $items = $repository
                 ->query(Query::create('', $iteration, 10000))
