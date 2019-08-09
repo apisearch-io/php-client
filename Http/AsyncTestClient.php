@@ -91,6 +91,7 @@ class AsyncTestClient extends Client implements HttpClient
             [],
             array_merge($headersFormatted, [
                 'CONTENT_TYPE' => 'application/json',
+                'HTTP_REFERER' => 'http://localhost',
             ]),
             json_encode($requestParts->getParameters()['json'])
         );
