@@ -18,6 +18,7 @@ namespace Apisearch\Transformer;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 /**
  * Class Transformer.
@@ -142,15 +143,29 @@ class Transformer
         foreach ($this->writeTransformers as $writeTransformer) {
             if ($writeTransformer->isValidObject($object)) {
                 $item = $writeTransformer->toItem($object);
-                $this
-                    ->eventDispatcher
-                    ->dispatch(
-                        'apisearch.item_transformed',
-                        new ItemTransformed(
-                            $item,
-                            $object
-                        )
-                    );
+
+                if ($this->eventDispatcher instanceof ContractsEventDispatcherInterface) {
+                    $this
+                        ->eventDispatcher
+                        ->dispatch(
+                            new ItemTransformed(
+                                $item,
+                                $object
+                            ),
+                            'apisearch.item_transformed'
+                        );
+                } else {
+                    $this
+                        ->eventDispatcher
+                        ->dispatch(
+                            'apisearch.item_transformed',
+                            new ItemTransformed(
+                                $item,
+                                $object
+                            )
+                        );
+                }
+
 
                 return $item;
             }
