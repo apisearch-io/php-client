@@ -35,12 +35,12 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
      *
      * @param Token $token
      */
-    public function addToken(Token $token)
+    public function putToken(Token $token)
     {
         $response = $this
             ->httpClient
             ->get(
-                sprintf('/%s/tokens', $this->getAppUUID()->getId()),
+                sprintf('/%s/tokens/%s', $this->getAppUUID()->getId(), $token->getTokenUUID()->composeUUID()),
                 'put',
                 [],
                 $token->toArray(),

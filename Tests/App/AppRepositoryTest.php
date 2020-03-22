@@ -154,11 +154,11 @@ abstract class AppRepositoryTest extends TestCase
         $inMemoryAppRepository = $this->getRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
         $token = new Token(TokenUUID::createById('lll'), AppUUID::createById('xxx'));
-        $inMemoryAppRepository->addToken($token);
-        $inMemoryAppRepository->addToken($token);
+        $inMemoryAppRepository->putToken($token);
+        $inMemoryAppRepository->putToken($token);
         $this->assertCount(1, $inMemoryAppRepository->getTokens());
         $token2 = new Token(TokenUUID::createById('uuu'), AppUUID::createById('xxx'));
-        $inMemoryAppRepository->addToken($token2);
+        $inMemoryAppRepository->putToken($token2);
         $this->assertCount(2, $inMemoryAppRepository->getTokens());
     }
 
@@ -171,7 +171,7 @@ abstract class AppRepositoryTest extends TestCase
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
         $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $token = new Token(TokenUUID::createById('lll'), AppUUID::createById('xxx'));
-        $inMemoryAppRepository->addToken($token);
+        $inMemoryAppRepository->putToken($token);
         $this->assertCount(1, $inMemoryAppRepository->getTokens());
         $inMemoryAppRepository->deleteToken(TokenUUID::createById('nono'));
         $this->assertCount(1, $inMemoryAppRepository->getTokens());
@@ -188,9 +188,9 @@ abstract class AppRepositoryTest extends TestCase
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
         $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $token = new Token(TokenUUID::createById('lll'), AppUUID::createById('xxx'));
-        $inMemoryAppRepository->addToken($token);
+        $inMemoryAppRepository->putToken($token);
         $token2 = new Token(TokenUUID::createById('uuu'), AppUUID::createById('xxx'));
-        $inMemoryAppRepository->addToken($token2);
+        $inMemoryAppRepository->putToken($token2);
         $this->assertCount(2, $inMemoryAppRepository->getTokens());
         $inMemoryAppRepository->deleteTokens();
         $this->assertCount(0, $inMemoryAppRepository->getTokens());

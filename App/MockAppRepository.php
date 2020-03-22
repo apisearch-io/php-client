@@ -35,7 +35,7 @@ class MockAppRepository extends HttpRepositoryWithCredentials implements AppRepo
      *
      * @param Token $token
      */
-    public function addToken(Token $token)
+    public function putToken(Token $token)
     {
         $this->throwMockException();
     }

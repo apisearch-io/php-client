@@ -34,7 +34,7 @@ interface AppRepository extends WithRepositoryReference
      *
      * @param Token $token
      */
-    public function addToken(Token $token);
+    public function putToken(Token $token);
 
     /**
      * Delete token.
