@@ -160,7 +160,7 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
      *
      * @param Token $token
      */
-    public function addToken(Token $token)
+    public function putToken(Token $token)
     {
         $this->tokens[$this->getAppKey()][$token->getTokenUUID()->composeUUID()] = $token;
     }

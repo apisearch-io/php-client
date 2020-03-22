@@ -140,10 +140,10 @@ class DiskAppRepository extends InMemoryAppRepository
      *
      * @param Token $token
      */
-    public function addToken(Token $token)
+    public function putToken(Token $token)
     {
         $this->load();
-        parent::addToken($token);
+        parent::putToken($token);
         $this->save();
     }
 
