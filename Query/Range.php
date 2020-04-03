@@ -25,14 +25,14 @@ class Range
      *
      * zero
      */
-    const ZERO = 0;
+    const MINUS_INFINITE = null;
 
     /**
      * @var int
      *
      * Infinite
      */
-    const INFINITE = -1;
+    const INFINITE = null;
 
     /**
      * @var string
@@ -52,7 +52,7 @@ class Range
     {
         list($from, $to) = explode(self::SEPARATOR, $string);
         $from = empty($from)
-            ? self::ZERO
+            ? self::MINUS_INFINITE
             : (is_numeric($from)
                 ? (int) $from
                 : $from);
@@ -75,7 +75,7 @@ class Range
      */
     public static function arrayToString(array $values): string
     {
-        if (self::ZERO == $values[0]) {
+        if (self::MINUS_INFINITE == $values[0]) {
             $values[0] = '';
         }
         if (self::INFINITE == $values[1]) {
