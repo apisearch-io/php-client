@@ -51,13 +51,13 @@ class Range
     public static function stringToArray(string $string): array
     {
         list($from, $to) = explode(self::SEPARATOR, $string);
-        $from = empty($from)
+        $from = '' === $from
             ? self::MINUS_INFINITE
             : (is_numeric($from)
                 ? (int) $from
                 : $from);
 
-        $to = empty($to)
+        $to = '' === $to
             ? self::INFINITE
             : (is_numeric($to)
                 ? (int) $to

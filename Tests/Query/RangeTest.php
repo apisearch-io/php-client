@@ -33,7 +33,7 @@ class RangeTest extends TestCase
      */
     public function testStringToArray(string $string, array $result)
     {
-        $this->assertEquals(
+        $this->assertSame(
             $result,
             Range::stringToArray($string)
         );
@@ -53,6 +53,8 @@ class RangeTest extends TestCase
             ['0..100', [0, 100]],
             ['-100..0', [-100, 0]],
             ['..', [Range::MINUS_INFINITE, Range::INFINITE]],
+            ['0..', [0, Range::INFINITE]],
+            ['..0', [Range::MINUS_INFINITE, 0]],
         ];
     }
 
@@ -66,7 +68,7 @@ class RangeTest extends TestCase
      */
     public function testArrayToString(array $array, string $result)
     {
-        $this->assertEquals(
+        $this->assertSame(
             $result,
             Range::arrayToString($array)
         );
@@ -94,7 +96,7 @@ class RangeTest extends TestCase
      */
     public function testCreateRanges()
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 '1..3',
                 '3..5',
@@ -103,7 +105,7 @@ class RangeTest extends TestCase
             Range::createRanges(1, 7, 2)
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 '0..2',
                 '2..4',
