@@ -50,6 +50,8 @@ class RangeTest extends TestCase
             ['2..5', [2, 5]],
             ['..10', [Range::MINUS_INFINITE, 10]],
             ['2..', [2, Range::INFINITE]],
+            ['0..100', [0, 100]],
+            ['-100..0', [-100, 0]],
             ['..', [Range::MINUS_INFINITE, Range::INFINITE]],
         ];
     }
@@ -82,6 +84,8 @@ class RangeTest extends TestCase
             [[Range::MINUS_INFINITE, 10], '..10'],
             [[2, Range::INFINITE], '2..'],
             [[Range::MINUS_INFINITE, Range::INFINITE], '..'],
+            [[0, 100], '0..100'],
+            [[-100, 0], '-100..0'],
         ];
     }
 

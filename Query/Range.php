@@ -75,10 +75,10 @@ class Range
      */
     public static function arrayToString(array $values): string
     {
-        if (self::MINUS_INFINITE == $values[0]) {
+        if (self::MINUS_INFINITE === $values[0]) {
             $values[0] = '';
         }
-        if (self::INFINITE == $values[1]) {
+        if (self::INFINITE === $values[1]) {
             $values[1] = '';
         }
 
