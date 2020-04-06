@@ -72,23 +72,31 @@ class Config implements HttpTransportable
     private $replicas;
 
     /**
+     * @var array
+     */
+    private $metadata;
+
+    /**
      * Config constructor.
      *
      * @param string|null $language
      * @param bool        $storeSearchableMetadata
      * @param int         $shards
      * @param int         $replicas
+     * @param array       $metadata
      */
     public function __construct(
         ?string $language = null,
         bool $storeSearchableMetadata = true,
         int $shards = self::DEFAULT_SHARDS,
-        int $replicas = self::DEFAULT_REPLICAS
+        int $replicas = self::DEFAULT_REPLICAS,
+        array $metadata = []
     ) {
         $this->language = $language;
         $this->storeSearchableMetadata = $storeSearchableMetadata;
         $this->shards = $shards;
         $this->replicas = $replicas;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -156,6 +164,29 @@ class Config implements HttpTransportable
     }
 
     /**
+     * @param string $key
+     * @param $value
+     *
+     * @return Config
+     */
+    public function addMetadataValue(
+        string $key,
+        $value
+    ): Config {
+        $this->metadata[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -170,6 +201,7 @@ class Config implements HttpTransportable
             }, $this->synonyms),
             'shards' => $this->shards,
             'replicas' => $this->replicas,
+            'metadata' => $this->metadata,
         ], function ($element) {
             return
             !(
@@ -198,6 +230,7 @@ class Config implements HttpTransportable
         }, $array['synonyms'] ?? []);
         $config->shards = (int) ($array['shards'] ?? self::DEFAULT_SHARDS);
         $config->replicas = (int) ($array['replicas'] ?? self::DEFAULT_REPLICAS);
+        $config->metadata = $array['metadata'] ?? [];
 
         return $config;
     }

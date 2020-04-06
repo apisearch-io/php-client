@@ -34,6 +34,7 @@ class ConfigTest extends TestCase
         $this->assertTrue($config->shouldSearchableMetadataBeStored());
         $this->assertEquals(Config::DEFAULT_SHARDS, $config->getShards());
         $this->assertEquals(Config::DEFAULT_REPLICAS, $config->getReplicas());
+        $this->assertEmpty($config->getMetadata());
     }
 
     /**
@@ -155,5 +156,29 @@ class ConfigTest extends TestCase
         ]);
         $this->assertEquals(5, $config->getShards());
         $this->assertEquals(10, $config->getReplicas());
+    }
+
+    /**
+     * Test metadata.
+     */
+    public function testMetadata()
+    {
+        $config = new Config('es', true, 6, 3, [
+            'key1' => 'val1',
+            'key2' => 'val2',
+        ]);
+        $config->addMetadataValue('key3', 'val3');
+
+        $this->assertEquals('val1', $config->getMetadata()['key1']);
+        $this->assertEquals('val2', $config->getMetadata()['key2']);
+        $this->assertEquals('val3', $config->getMetadata()['key3']);
+        $this->assertFalse(array_key_exists('key4', $config->getMetadata()));
+
+        $newConfig = Config::createFromArray($config->toArray());
+
+        $this->assertEquals('val1', $newConfig->getMetadata()['key1']);
+        $this->assertEquals('val2', $newConfig->getMetadata()['key2']);
+        $this->assertEquals('val3', $config->getMetadata()['key3']);
+        $this->assertFalse(array_key_exists('key4', $config->getMetadata()));
     }
 }

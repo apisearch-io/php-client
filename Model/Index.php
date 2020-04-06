@@ -103,7 +103,7 @@ class Index implements HttpTransportable
         IndexUUID $uuid,
         AppUUID $appUUID,
         bool $isOK,
-        int $docCount = 0,
+        int $docCount,
         string $size,
         int $shards,
         int $replicas,
@@ -207,6 +207,18 @@ class Index implements HttpTransportable
     public function getMetadata(): array
     {
         return $this->metadata;
+    }
+
+    /**
+     * Get Metadata value.
+     *
+     * @param string $key
+     *
+     * @return mixed|null
+     */
+    public function getMetadataValue(string $key)
+    {
+        return $this->metadata[$key] ?? null;
     }
 
     /**

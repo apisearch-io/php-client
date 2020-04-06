@@ -16,28 +16,30 @@ declare(strict_types=1);
 namespace Apisearch\Transformer;
 
 use Apisearch\Model\Item;
-use Symfony\Contracts\EventDispatcher\Event as ContractEvent;
 use Symfony\Component\EventDispatcher\Event as ComponentEvent;
+use Symfony\Contracts\EventDispatcher\Event as ContractEvent;
 
-/**
+/*
  * This code adds usability with Symfony 3.4 -> 5.0
  */
 if (class_exists("Symfony\Contracts\EventDispatcher\Event")) {
-
     /**
      * Class BaseTransformed.
      */
-    class BaseTransformed extends ContractEvent {}
+    class BaseTransformed extends ContractEvent
+    {
+    }
 } else {
-
     /**
      * Class BaseTransformed.
      */
-    class BaseTransformed extends ComponentEvent {}
+    class BaseTransformed extends ComponentEvent
+    {
+    }
 }
 
 /**
- * Class ItemTransformed
+ * Class ItemTransformed.
  */
 class ItemTransformed extends BaseTransformed
 {
