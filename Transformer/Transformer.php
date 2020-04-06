@@ -166,7 +166,6 @@ class Transformer
                         );
                 }
 
-
                 return $item;
             }
         }
