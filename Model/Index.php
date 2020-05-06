@@ -222,6 +222,19 @@ class Index implements HttpTransportable
     }
 
     /**
+     * With metadata value. Useful for metadata completion across layers.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function withMetadataValue(
+        string $key,
+        $value
+    ) {
+        $this->metadata[$key] = $value;
+    }
+
+    /**
      * To array.
      *
      * @return array
