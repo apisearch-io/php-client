@@ -121,4 +121,28 @@ class IndexTest extends TestCase
         $this->assertEquals([], $index3->getMetadata());
         $this->assertEquals([], $index3->getFields());
     }
+
+    /**
+     * Test with metadata value.
+     */
+    public function testWithMetadataValue()
+    {
+        $index = Index::createFromArray([
+            'uuid' => [
+                'id' => 'testId',
+            ],
+            'app_id' => [
+                'id' => 'testAppId',
+            ],
+            'is_ok' => true,
+            'doc_count' => 10,
+            'size' => '1kb',
+        ]);
+
+        $this->assertNull($index->getMetadataValue('key1'));
+        $index->withMetadataValue('key1', 'val1');
+        $this->assertEquals('val1', $index->getMetadataValue('key1'));
+        $index = Index::createFromArray($index->toArray());
+        $this->assertEquals('val1', $index->getMetadataValue('key1'));
+    }
 }
