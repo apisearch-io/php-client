@@ -199,4 +199,11 @@ abstract class Repository extends RepositoryWithCredentials
         Query $query,
         Changes $changes
     );
+
+    /**
+     * Delete items by query
+     *
+     * @param Query $query
+     */
+    abstract public function deleteItemsByQuery(Query $query);
 }

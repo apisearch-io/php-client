@@ -73,6 +73,16 @@ class MockRepository extends Repository
     }
 
     /**
+     * Delete items by query
+     *
+     * @param Query $query
+     */
+    public function deleteItemsByQuery(Query $query)
+    {
+        $this->throwMockException();
+    }
+
+    /**
      * Throw exception.
      *
      * @throws MockException
