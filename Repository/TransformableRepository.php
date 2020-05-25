@@ -185,6 +185,18 @@ class TransformableRepository extends Repository
     }
 
     /**
+     * Delete items by query
+     *
+     * @param Query $query
+     */
+    public function deleteItemsByQuery(Query $query)
+    {
+        $this
+            ->repository
+            ->deleteItemsByQuery($query);
+    }
+
+    /**
      * Generate item document by a simple object.
      *
      * @param mixed $object

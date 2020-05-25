@@ -132,6 +132,30 @@ class HttpRepository extends Repository
     }
 
     /**
+     * Delete items by query
+     *
+     * @param Query $query
+     */
+    public function deleteItemsByQuery(Query $query)
+    {
+        $response = $this
+            ->httpClient
+            ->get(
+                sprintf(
+                    '/%s/indices/%s/items/by-query',
+                    $this->getAppUUID()->composeUUID(),
+                    $this->getIndexUUID()->composeUUID()
+                ),
+                'delete',
+                [],
+                $query->toArray(),
+                Http::getApisearchHeaders($this)
+            );
+
+        self::throwTransportableExceptionIfNeeded($response);
+    }
+
+    /**
      * Search across the index types.
      *
      * @param Query $query

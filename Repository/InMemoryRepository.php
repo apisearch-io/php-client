@@ -98,6 +98,16 @@ class InMemoryRepository extends Repository
     }
 
     /**
+     * Delete items by query
+     *
+     * @param Query $query
+     */
+    public function deleteItemsByQuery(Query $query)
+    {
+        throw new LogicException('Update endpoint cannot be tested against memory implementation, but only in final implementation');
+    }
+
+    /**
      * Get items.
      *
      * @return array
