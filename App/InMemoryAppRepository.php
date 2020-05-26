@@ -141,12 +141,14 @@ class InMemoryAppRepository extends RepositoryWithCredentials implements AppRepo
      *
      * @param IndexUUID $indexUUID
      * @param Config    $config
+     * @param bool $forceReindex
      *
      * @throws ResourceNotAvailableException
      */
     public function configureIndex(
         IndexUUID $indexUUID,
-        Config $config
+        Config $config,
+        bool $forceReindex = false
     ) {
         if (!array_key_exists($this->getIndexKey($indexUUID), $this->indices)) {
             throw ResourceNotAvailableException::indexNotAvailable('Index not available in InMemoryRepository');
