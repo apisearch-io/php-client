@@ -268,12 +268,14 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
      *
      * @param IndexUUID $indexUUID
      * @param Config    $config
+     * @param bool $forceReindex
      *
      * @throws ResourceNotAvailableException
      */
     public function configureIndex(
         IndexUUID $indexUUID,
-        Config $config
+        Config $config,
+        bool $forceReindex = false
     ) {
         $response = $this
             ->httpClient
@@ -284,7 +286,9 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                     $indexUUID->composeUUID()
                 ),
                 'post',
-                [],
+                [
+                    'force_reindex' => $forceReindex
+                ],
                 $config->toArray(),
                 Http::getApisearchHeaders($this)
             );

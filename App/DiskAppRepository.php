@@ -120,17 +120,20 @@ class DiskAppRepository extends InMemoryAppRepository
      *
      * @param IndexUUID $indexUUID
      * @param Config    $config
+     * @param bool $forceReindex
      *
      * @throws ResourceNotAvailableException
      */
     public function configureIndex(
         IndexUUID $indexUUID,
-        Config $config
+        Config $config,
+        bool $forceReindex = false
     ) {
         $this->load();
         parent::configureIndex(
             $indexUUID,
-            $config
+            $config,
+            $forceReindex
         );
         $this->save();
     }

@@ -107,11 +107,13 @@ interface AppRepository extends WithRepositoryReference
      *
      * @param IndexUUID $indexUUID
      * @param Config    $config
+     * @param bool $forceReindex
      *
      * @throws ResourceNotAvailableException
      */
     public function configureIndex(
         IndexUUID $indexUUID,
-        Config $config
+        Config $config,
+        bool $forceReindex = false
     );
 }
