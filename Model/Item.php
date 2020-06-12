@@ -101,9 +101,14 @@ class Item implements HttpTransportable, UUIDReference
     private $score;
 
     /**
-     * @var RepositoryReference
+     * @var AppUUID|null
      */
-    private $repositoryReference;
+    private $appUUID;
+
+    /**
+     * @var IndexUUID|null
+     */
+    private $indexUUID;
 
     /**
      * Item constructor.
@@ -496,19 +501,28 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
-     * @return RepositoryReference|null
-     */
-    public function getRepositoryReference():? RepositoryReference
-    {
-        return $this->repositoryReference;
-    }
-
-    /**
      * @param RepositoryReference $repositoryReference
      */
     public function setRepositoryReference(RepositoryReference $repositoryReference)
     {
-        $this->repositoryReference = $repositoryReference;
+        $this->appUUID = $repositoryReference->getAppUUID();
+        $this->indexUUID = $repositoryReference->getIndexUUID();
+    }
+
+    /**
+     * @return AppUUID|null
+     */
+    public function getAppUUID(): ?AppUUID
+    {
+        return $this->appUUID;
+    }
+
+    /**
+     * @return IndexUUID|null
+     */
+    public function getIndexUUID(): ?IndexUUID
+    {
+        return $this->indexUUID;
     }
 
     /**
@@ -532,8 +546,11 @@ class Item implements HttpTransportable, UUIDReference
             'highlights' => $this->highlights,
             'is_promoted' => !$this->promoted ? null : true,
             'score' => $this->score,
-            'repository_reference' => $this->repositoryReference instanceof RepositoryReference
-                ? $this->repositoryReference->compose()
+            'app_uuid' => $this->appUUID instanceof AppUUID
+                ? $this->appUUID->toArray()
+                : null,
+            'index_uuid' => $this->indexUUID instanceof IndexUUID
+                ? $this->indexUUID->toArray()
                 : null,
         ], function ($element) {
             return
@@ -602,8 +619,12 @@ class Item implements HttpTransportable, UUIDReference
             $item->setScore((float) $array['score']);
         }
 
-        if (isset($array['repository_reference']) && !is_null($array['repository_reference'])) {
-            $item->setRepositoryReference(RepositoryReference::createFromComposed($array['repository_reference']));
+        if (isset($array['app_uuid']) && !is_null($array['app_uuid'])) {
+            $item->appUUID = AppUUID::createFromArray($array['app_uuid']);
+        }
+
+        if (isset($array['index_uuid']) && !is_null($array['index_uuid'])) {
+            $item->indexUUID = IndexUUID::createFromArray($array['index_uuid']);
         }
 
         return $item;

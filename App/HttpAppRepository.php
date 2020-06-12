@@ -268,7 +268,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
      *
      * @param IndexUUID $indexUUID
      * @param Config    $config
-     * @param bool $forceReindex
+     * @param bool      $forceReindex
      *
      * @throws ResourceNotAvailableException
      */
@@ -287,7 +287,7 @@ class HttpAppRepository extends HttpRepositoryWithCredentials implements AppRepo
                 ),
                 'post',
                 [
-                    'force_reindex' => $forceReindex
+                    'force_reindex' => $forceReindex,
                 ],
                 $config->toArray(),
                 Http::getApisearchHeaders($this)

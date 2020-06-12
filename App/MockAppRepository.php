@@ -134,7 +134,7 @@ class MockAppRepository extends HttpRepositoryWithCredentials implements AppRepo
      *
      * @param IndexUUID $indexUUID
      * @param Config    $config
-     * @param bool $forceReindex
+     * @param bool      $forceReindex
      *
      * @throws ResourceNotAvailableException
      */

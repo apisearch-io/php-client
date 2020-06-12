@@ -98,7 +98,7 @@ class InMemoryRepository extends Repository
     }
 
     /**
-     * Delete items by query
+     * Delete items by query.
      *
      * @param Query $query
      */
