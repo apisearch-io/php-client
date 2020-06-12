@@ -15,9 +15,12 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Model;
 
+use Apisearch\Model\AppUUID;
 use Apisearch\Model\Coordinate;
+use Apisearch\Model\IndexUUID;
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
+use Apisearch\Repository\RepositoryReference;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -425,5 +428,34 @@ class ItemTest extends TestCase
         $this->assertEquals(5.5, $item->getScore());
         $this->assertEquals(5.5, $item->toArray()['score']);
         $this->assertEquals(5.5, Item::createFromArray($item->toArray())->getScore());
+    }
+
+    /**
+     * Test index and app UUID
+     */
+    public function testIndexAndAppUUID()
+    {
+        $appUUID = AppUUID::createById('app1');
+        $indexUUID = IndexUUID::createById('index1');
+        $repositoryReference = RepositoryReference::create($appUUID, $indexUUID);
+
+        $item = Item::create(ItemUUID::createByComposedUUID('1~item'));
+        $this->assertNull($item->getRepositoryReference());
+        $item = Item::createFromArray($item->toArray());
+        $this->assertNull($item->getRepositoryReference());
+
+
+
+        $item = Item::create(ItemUUID::createByComposedUUID('1~item'));
+        $item->setRepositoryReference($repositoryReference);
+        $this->assertEquals(
+            $repositoryReference,
+            $item->getRepositoryReference()
+        );
+        $item = Item::createFromArray($item->toArray());
+        $this->assertEquals(
+            $repositoryReference,
+            $item->getRepositoryReference()
+        );
     }
 }

@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Apisearch\Model;
 
 use Apisearch\Exception\InvalidFormatException;
+use Apisearch\Repository\RepositoryReference;
 
 /**
  * Class Item.
@@ -98,6 +99,11 @@ class Item implements HttpTransportable, UUIDReference
      * Score
      */
     private $score;
+
+    /**
+     * @var RepositoryReference
+     */
+    private $repositoryReference;
 
     /**
      * Item constructor.
@@ -490,6 +496,22 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
+     * @return RepositoryReference|null
+     */
+    public function getRepositoryReference():? RepositoryReference
+    {
+        return $this->repositoryReference;
+    }
+
+    /**
+     * @param RepositoryReference $repositoryReference
+     */
+    public function setRepositoryReference(RepositoryReference $repositoryReference)
+    {
+        $this->repositoryReference = $repositoryReference;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -510,6 +532,9 @@ class Item implements HttpTransportable, UUIDReference
             'highlights' => $this->highlights,
             'is_promoted' => !$this->promoted ? null : true,
             'score' => $this->score,
+            'repository_reference' => $this->repositoryReference instanceof RepositoryReference
+                ? $this->repositoryReference->compose()
+                : null,
         ], function ($element) {
             return
             !(
@@ -575,6 +600,10 @@ class Item implements HttpTransportable, UUIDReference
 
         if (isset($array['score']) && !is_null($array['score'])) {
             $item->setScore((float) $array['score']);
+        }
+
+        if (isset($array['repository_reference']) && !is_null($array['repository_reference'])) {
+            $item->setRepositoryReference(RepositoryReference::createFromComposed($array['repository_reference']));
         }
 
         return $item;
