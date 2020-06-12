@@ -201,7 +201,7 @@ abstract class Repository extends RepositoryWithCredentials
     );
 
     /**
-     * Delete items by query
+     * Delete items by query.
      *
      * @param Query $query
      */

@@ -431,7 +431,7 @@ class ItemTest extends TestCase
     }
 
     /**
-     * Test index and app UUID
+     * Test index and app UUID.
      */
     public function testIndexAndAppUUID()
     {
@@ -440,22 +440,30 @@ class ItemTest extends TestCase
         $repositoryReference = RepositoryReference::create($appUUID, $indexUUID);
 
         $item = Item::create(ItemUUID::createByComposedUUID('1~item'));
-        $this->assertNull($item->getRepositoryReference());
+        $this->assertNull($item->getAppUUID());
+        $this->assertNull($item->getIndexUUID());
         $item = Item::createFromArray($item->toArray());
-        $this->assertNull($item->getRepositoryReference());
-
-
+        $this->assertNull($item->getAppUUID());
+        $this->assertNull($item->getIndexUUID());
 
         $item = Item::create(ItemUUID::createByComposedUUID('1~item'));
         $item->setRepositoryReference($repositoryReference);
         $this->assertEquals(
-            $repositoryReference,
-            $item->getRepositoryReference()
+            $repositoryReference->getIndexUUID(),
+            $item->getIndexUUID()
+        );
+        $this->assertEquals(
+            $repositoryReference->getAppUUID(),
+            $item->getAppUUID()
         );
         $item = Item::createFromArray($item->toArray());
         $this->assertEquals(
-            $repositoryReference,
-            $item->getRepositoryReference()
+            $repositoryReference->getAppUUID(),
+            $item->getAppUUID()
+        );
+        $this->assertEquals(
+            $repositoryReference->getAppUUID(),
+            $item->getAppUUID()
         );
     }
 }

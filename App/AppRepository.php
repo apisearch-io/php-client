@@ -107,7 +107,7 @@ interface AppRepository extends WithRepositoryReference
      *
      * @param IndexUUID $indexUUID
      * @param Config    $config
-     * @param bool $forceReindex
+     * @param bool      $forceReindex
      *
      * @throws ResourceNotAvailableException
      */
