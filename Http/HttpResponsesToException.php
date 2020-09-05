@@ -58,7 +58,7 @@ trait HttpResponsesToException
             case ForbiddenException::getTransportableHTTPError():
                 throw new ForbiddenException($response['body']['message']);
             case ConnectionException::getTransportableHTTPError():
-                throw new ConnectionException('Apisearch returned an internal error code [500]');
+                throw new ConnectionException('Apisearch returned an internal error code [500] - ' . $response['body']['message']);
         }
     }
 }
