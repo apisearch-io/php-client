@@ -21,6 +21,7 @@ use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Exception\InvalidTokenException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
+use Apisearch\Exception\TooManyRequestsException;
 
 /**
  * Class HttpResponsesToException.
@@ -57,6 +58,8 @@ trait HttpResponsesToException
                 throw new ResourceExistsException($response['body']['message']);
             case ForbiddenException::getTransportableHTTPError():
                 throw new ForbiddenException($response['body']['message']);
+            case TooManyRequestsException::getTransportableHTTPError();
+                throw new TooManyRequestsException($response['body']['message']);
             case ConnectionException::getTransportableHTTPError():
                 throw new ConnectionException('Apisearch returned an internal error code [500] - ' . $response['body']['message']);
         }
