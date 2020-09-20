@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Apisearch\Exception;
 
 /**
- * Class TooManyRequestsException
+ * Class TooManyRequestsException.
  */
 class TooManyRequestsException extends TransportableException
 {

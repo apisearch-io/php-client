@@ -120,4 +120,23 @@ class CoordinateTest extends TestCase
             $coordinate->toArray()
         );
     }
+
+    /**
+     * Test string values.
+     */
+    public function testAsString()
+    {
+        $coordinateAsArray = [
+            'lat' => '1.20',
+            'lon' => '2.10',
+        ];
+        $coordinate = Coordinate::createFromArray($coordinateAsArray);
+        $this->assertEquals(
+            [
+                'lat' => 1.20,
+                'lon' => 2.10,
+            ],
+            $coordinate->toArray()
+        );
+    }
 }

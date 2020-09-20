@@ -100,8 +100,8 @@ class Coordinate implements HttpTransportable
         }
 
         return new self(
-            $array['lat'],
-            $array['lon']
+            \floatval($array['lat']),
+            \floatval($array['lon'])
         );
     }
 }
