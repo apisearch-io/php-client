@@ -186,7 +186,7 @@ class ResultTest extends TestCase
         $this->assertEquals(10, $result->getTotalItems());
         $this->assertEquals(20, $result->getTotalHits());
         $this->assertInstanceof(Aggregation::class, $result->getAggregation('gogo'));
-        $this->assertEquals(['sug1', 'sug2'], $result->getSuggests());
+        $this->assertEquals(['sug1', 'sug2'], $result->getSuggestions());
         $this->assertCount(2, $result->getItems());
         $this->assertEquals('product', $result->getFirstItem()->getType());
     }
@@ -207,5 +207,22 @@ class ResultTest extends TestCase
         $this->assertEquals(3, $subqueries['res1']->getTotalHits());
         $this->assertEquals(4, $subqueries['res2']->getTotalHits());
         $this->assertEquals(5, $subqueries['res3']->getTotalHits());
+    }
+
+    /**
+     * Test suggests are a simple array.
+     */
+    public function testSuggest()
+    {
+        $result = new Result('aa', 1, 1);
+        $result->addSuggest('str1');
+        $result->addSuggestion('str1');
+        $result->addSuggestion('str2');
+
+        $this->assertEquals(['str1', 'str2'], $result->getSuggests());
+        $this->assertEquals($result->getSuggests(), $result->getSuggestions());
+        $this->assertEquals(['str1', 'str2'], $result->toArray()['suggests']);
+        $this->assertEquals(['str1', 'str2'], Result::createFromArray($result->toArray())->getSuggests());
+        $this->assertEquals(['str1', 'str2'], Result::createFromArray($result->toArray())->getSuggestions());
     }
 }

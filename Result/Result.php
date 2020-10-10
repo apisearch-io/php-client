@@ -40,9 +40,9 @@ class Result implements HttpTransportable
     /**
      * @var array
      *
-     * Suggests
+     * Suggestions
      */
-    private $suggests = [];
+    private $suggestions = [];
 
     /**
      * @var Aggregations|null
@@ -103,7 +103,7 @@ class Result implements HttpTransportable
      * @param int               $totalItems
      * @param int               $totalHits
      * @param Aggregations|null $aggregations
-     * @param string[]          $suggests
+     * @param string[]          $suggestions
      * @param Item[]            $items
      *
      * @return Result
@@ -113,7 +113,7 @@ class Result implements HttpTransportable
         int $totalItems,
         int $totalHits,
         ? Aggregations $aggregations,
-        array $suggests,
+        array $suggestions,
         array $items
     ): self {
         $result = new self(
@@ -123,7 +123,7 @@ class Result implements HttpTransportable
         );
 
         $result->aggregations = $aggregations;
-        $result->suggests = $suggests;
+        $result->suggestions = $suggestions;
         $result->items = $items;
 
         return $result;
@@ -298,21 +298,45 @@ class Result implements HttpTransportable
     /**
      * Add suggest.
      *
-     * @param string $suggest
+     * @param string $suggestion
+     *
+     * @deprecated Use addSuggestion instead
      */
-    public function addSuggest(string $suggest)
+    public function addSuggest(string $suggestion)
     {
-        $this->suggests[$suggest] = $suggest;
+        $this->addSuggestion($suggestion);
+    }
+
+    /**
+     * Add suggestion.
+     *
+     * @param string $suggestion
+     */
+    public function addSuggestion(string $suggestion)
+    {
+        $this->suggestions[$suggestion] = $suggestion;
     }
 
     /**
      * Get suggests.
      *
      * @return string[]
+     *
+     * @deprecated Use getSuggestions instead
      */
     public function getSuggests(): array
     {
-        return array_values($this->suggests);
+        return array_values($this->suggestions);
+    }
+
+    /**
+     * Get suggestions.
+     *
+     * @return string[]
+     */
+    public function getSuggestions(): array
+    {
+        return array_values($this->suggestions);
     }
 
     /**
@@ -372,7 +396,7 @@ class Result implements HttpTransportable
             'aggregations' => $this->aggregations instanceof Aggregations
                 ? $this->aggregations->toArray()
                 : null,
-            'suggests' => $this->suggests,
+            'suggests' => array_keys($this->suggestions),
             'subresults' => array_map(function (Result $result) {
                 return $result->toArray();
             }, $this->subresults),
@@ -401,7 +425,9 @@ class Result implements HttpTransportable
             isset($array['aggregations'])
                 ? Aggregations::createFromArray($array['aggregations'])
                 : null,
-            $array['suggests'] ?? [],
+            isset($array['suggests'])
+                ? array_combine($array['suggests'], $array['suggests'])
+                : [],
             array_map(function (array $item) {
                 return Item::createFromArray($item);
             }, $array['items'] ?? [])
