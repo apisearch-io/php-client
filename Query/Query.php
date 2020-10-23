@@ -1244,6 +1244,21 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Add score strategy.
+     *
+     * @param ScoreStrategy $scoreStrategy
+     *
+     * @return Query
+     */
+    public function addScoreStrategy(ScoreStrategy $scoreStrategy)
+    {
+        $this->scoreStrategies = $this->scoreStrategies ?: ScoreStrategies::createEmpty();
+        $this->scoreStrategies->addScoreStrategy($scoreStrategy);
+
+        return $this;
+    }
+
+    /**
      * Get Fuzziness.
      *
      * @return float|string|array|null

@@ -56,6 +56,13 @@ class ScoreStrategy implements HttpTransportable
      *
      * Boosting by relevance field
      */
+    const WEIGHT = 'weight';
+
+    /**
+     * @var string
+     *
+     * Boosting by relevance field
+     */
     const DECAY = 'decay';
 
     /**
@@ -316,6 +323,29 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->weight = $weight;
         $scoreStrategy->filter = self::fixFilterFieldPath($filter);
         $scoreStrategy->scoreMode = $scoreMode;
+
+        return $scoreStrategy;
+    }
+
+    /**
+     * Create custom function scoring.
+     *
+     * @param float  $weight
+     * @param Filter $filter
+     * @param bool   $matchMainQuery
+     *
+     * @return ScoreStrategy
+     */
+    public static function createWeightFunction(
+        float $weight = self::DEFAULT_WEIGHT,
+        Filter $filter = null,
+        bool $matchMainQuery = true
+    ): ScoreStrategy {
+        $scoreStrategy = self::createDefault();
+        $scoreStrategy->type = 'weight';
+        $scoreStrategy->weight = $weight;
+        $scoreStrategy->filter = self::fixFilterFieldPath($filter);
+        $scoreStrategy->configuration['match_main_query'] = $matchMainQuery;
 
         return $scoreStrategy;
     }
