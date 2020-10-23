@@ -18,6 +18,7 @@ namespace Apisearch\Tests\Query;
 use Apisearch\Model\IndexUUID;
 use Apisearch\Query\Query;
 use Apisearch\Query\ScoreStrategies;
+use Apisearch\Query\ScoreStrategy;
 use Apisearch\Query\SortBy;
 use Apisearch\Tests\HttpHelper;
 use PHPUnit\Framework\TestCase;
@@ -230,5 +231,17 @@ class QueryTest extends TestCase
         $this->assertEquals(['field1'], $query->toArray()['searchable_fields']);
         $query = HttpHelper::emulateHttpTransport($query);
         $this->assertEquals(['field1'], $query->getsearchableFields());
+    }
+
+    /**
+     * Test add score strategy when empty.
+     */
+    public function testAddScoreStrategyWhenEmpty()
+    {
+        $query = Query::createMatchAll();
+        $this->assertNull($query->getScoreStrategies());
+        $query->addScoreStrategy(ScoreStrategy::createDefault());
+        $this->assertInstanceof(ScoreStrategies::class, $query->getScoreStrategies());
+        $this->assertCount(1, $query->getScoreStrategies()->getScoreStrategies());
     }
 }
