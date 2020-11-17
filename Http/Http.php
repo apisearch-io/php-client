@@ -22,44 +22,14 @@ use Apisearch\Repository\RepositoryWithCredentials;
  */
 class Http
 {
-    /**
-     * @var string
-     *
-     * Token query param field
-     */
     const TOKEN_FIELD = 'token';
-
-    /**
-     * @var string
-     *
-     * Changes query param field
-     */
     const CHANGES_FIELD = 'changes';
-
-    /**
-     * @var string
-     *
-     * Query query param field
-     */
     const QUERY_FIELD = 'query';
 
-    /**
-     * @var string
-     *
-     * App ID Header
-     */
     const APP_ID_HEADER = 'APISEARCH-APP-ID';
-
-    /**
-     * @var string
-     *
-     * Token ID Header
-     */
     const TOKEN_ID_HEADER = 'APISEARCH-TOKEN-ID';
 
     /**
-     * Get common query values.
-     *
      * @param RepositoryWithCredentials $repository
      *
      * @return string[]

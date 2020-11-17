@@ -250,7 +250,7 @@ class Query implements HttpTransportable
         int $page = self::DEFAULT_PAGE,
         int $size = self::DEFAULT_SIZE
     ) {
-        $query = self::create(
+        $query = static::create(
             $queryText,
             $page,
             $size
@@ -291,7 +291,7 @@ class Query implements HttpTransportable
      */
     public static function createMatchAll(): self
     {
-        return self::create(
+        return static::create(
             '',
             self::DEFAULT_PAGE,
             self::DEFAULT_SIZE
@@ -307,7 +307,7 @@ class Query implements HttpTransportable
      */
     public static function createByUUID(ItemUUID $uuid): self
     {
-        return self::createByUUIDs([$uuid]);
+        return static::createByUUIDs([$uuid]);
     }
 
     /**
@@ -323,7 +323,7 @@ class Query implements HttpTransportable
             return $uuid->composeUUID();
         }, $uuids);
 
-        $query = self::create('', self::DEFAULT_PAGE, count($uuids))
+        $query = static::create('', self::DEFAULT_PAGE, count($uuids))
             ->disableAggregations()
             ->disableSuggestions();
 
@@ -1546,16 +1546,16 @@ class Query implements HttpTransportable
     public static function createFromArray(array $array): self
     {
         $query = isset($array['coordinate'])
-            ? self::createLocated(
+            ? static::createLocated(
                 Coordinate::createFromArray($array['coordinate']),
                 $array['q'] ?? '',
-                (int) ($array['page'] ?? self::DEFAULT_PAGE),
-                (int) ($array['size'] ?? self::DEFAULT_SIZE)
+                (int) ($array['page'] ?? static::DEFAULT_PAGE),
+                (int) ($array['size'] ?? static::DEFAULT_SIZE)
             )
-            : self::create(
+            : static::create(
                 $array['q'] ?? '',
-                (int) ($array['page'] ?? self::DEFAULT_PAGE),
-                (int) ($array['size'] ?? self::DEFAULT_SIZE)
+                (int) ($array['page'] ?? static::DEFAULT_PAGE),
+                (int) ($array['size'] ?? static::DEFAULT_SIZE)
             );
         $query->fields = $array['fields'] ?? [];
         $query->aggregations = array_map(function (array $aggregation) {
@@ -1587,7 +1587,7 @@ class Query implements HttpTransportable
         $query->scoreStrategies = isset($array['score_strategies'])
             ? ScoreStrategies::createFromArray($array['score_strategies'])
             : null;
-        $query->minScore = $array['min_score'] ?? self::NO_MIN_SCORE;
+        $query->minScore = $array['min_score'] ?? static::NO_MIN_SCORE;
         $query->metadata = $array['metadata'] ?? [];
 
         if (isset($array['user'])) {
