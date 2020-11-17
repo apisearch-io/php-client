@@ -276,7 +276,7 @@ class Query implements HttpTransportable
         int $size = self::DEFAULT_SIZE
     ): self {
         $page = (int) (max(1, $page));
-        $query = new self($queryText);
+        $query = new static($queryText);
         $query->from = ($page - 1) * $size;
         $query->size = $size;
         $query->page = $page;
