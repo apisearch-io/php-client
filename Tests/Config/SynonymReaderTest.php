@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Config;
 
 use Apisearch\Config\SynonymReader;
+use Apisearch\Exception\SynonymsException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,12 +26,11 @@ class SynonymReaderTest extends TestCase
 {
     /**
      * Test non existing file.
-     *
-     * @expectedException \Apisearch\Exception\SynonymsException
      */
     public function testNonExistingFile()
     {
         $synonymReader = new SynonymReader();
+        $this->expectException(SynonymsException::class);
         $synonymReader->readSynonymsFromFile(__DIR__.'/nonexistingfile276892.csv');
     }
 

@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Repository;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\AppUUID;
 use Apisearch\Model\IndexUUID;
 use Apisearch\Repository\RepositoryReference;
@@ -120,11 +121,10 @@ class RepositoryReferenceTest extends TestCase
 
     /**
      * Test bad ids.
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testBadIds()
     {
+        $this->expectException(InvalidFormatException::class);
         RepositoryReference::create(
             AppUUID::createById('1_2_3'),
             IndexUUID::createById('4_5_6')

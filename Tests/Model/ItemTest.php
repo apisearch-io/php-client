@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Model;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\AppUUID;
 use Apisearch\Model\Coordinate;
 use Apisearch\Model\IndexUUID;
@@ -136,11 +137,10 @@ class ItemTest extends TestCase
      * Test create item with bad formatted UUID.
      *
      * @dataProvider dataItemBadFormattedUUID
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testItemBadFormattedUUID($data)
     {
+        $this->expectException(InvalidFormatException::class);
         Item::createFromArray($data);
     }
 
@@ -167,11 +167,10 @@ class ItemTest extends TestCase
      * Test create Coordinate with bad formatted.
      *
      * @dataProvider dataCoordinateBadFormattedUUID
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCoordinateFormattedUUID($data)
     {
+        $this->expectException(InvalidFormatException::class);
         Item::createFromArray(array_merge(['uuid' => [
                 'id' => '1',
                 'type' => 'product',
@@ -465,5 +464,26 @@ class ItemTest extends TestCase
             $repositoryReference->getAppUUID(),
             $item->getAppUUID()
         );
+    }
+
+    /**
+     * Test delete methods.
+     */
+    public function testDeleteMethods()
+    {
+        $item = Item::createFromArray([
+            'uuid' => ['id' => 'A', 'type' => 'B'],
+            'metadata' => ['A' => 1],
+            'indexed_metadata' => ['B' => 2],
+            'searchable_metadata' => ['C' => 3],
+            'exact_matching_metadata' => ['D' => 4],
+        ]);
+
+        $item->deleteMetadata('A');
+        $item->deleteIndexedMetadata('B');
+        $item->deleteSearchableMetadata('C');
+        $item->deleteExactMatchingMetadata('D');
+
+        $this->assertEquals(['uuid' => ['id' => 'A', 'type' => 'B']], $item->toArray());
     }
 }

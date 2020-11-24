@@ -17,6 +17,8 @@ namespace Apisearch\Tests\App;
 
 use Apisearch\App\AppRepository;
 use Apisearch\Config\Config;
+use Apisearch\Exception\ResourceExistsException;
+use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Model\AppUUID;
 use Apisearch\Model\IndexUUID;
 use Apisearch\Model\Token;
@@ -49,14 +51,13 @@ abstract class AppRepositoryTest extends TestCase
 
     /**
      * Test create index already created.
-     *
-     * @expectedException \Apisearch\Exception\ResourceExistsException
      */
     public function testCreateIndexAlreadyCreated()
     {
         $inMemoryAppRepository = $this->getRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
         $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
+        $this->expectException(ResourceExistsException::class);
         $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
     }
 
@@ -75,8 +76,6 @@ abstract class AppRepositoryTest extends TestCase
 
     /**
      * Test delete index.
-     *
-     * @expectedException \Apisearch\Exception\ResourceNotAvailableException
      */
     public function testDeleteIndexAlreadyDeleted()
     {
@@ -84,30 +83,29 @@ abstract class AppRepositoryTest extends TestCase
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
         $inMemoryAppRepository->createIndex(IndexUUID::createById('yyy'), new Config());
         $inMemoryAppRepository->deleteIndex(IndexUUID::createById('yyy'));
+        $this->expectException(ResourceNotAvailableException::class);
         $inMemoryAppRepository->deleteIndex(IndexUUID::createById('yyy'));
     }
 
     /**
      * Test delete non existing index.
-     *
-     * @expectedException \Apisearch\Exception\ResourceNotAvailableException
      */
     public function testDeleteNotExistingIndex()
     {
         $inMemoryAppRepository = $this->getRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
+        $this->expectException(ResourceNotAvailableException::class);
         $inMemoryAppRepository->resetIndex(IndexUUID::createById('yyy'));
     }
 
     /**
      * Test configure non existing index.
-     *
-     * @expectedException \Apisearch\Exception\ResourceNotAvailableException
      */
     public function testConfigureNotExistingIndex()
     {
         $inMemoryAppRepository = $this->getRepository();
         $inMemoryAppRepository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx')));
+        $this->expectException(ResourceNotAvailableException::class);
         $inMemoryAppRepository->configureIndex(IndexUUID::createById('yyy'), Config::createFromArray([]));
     }
 

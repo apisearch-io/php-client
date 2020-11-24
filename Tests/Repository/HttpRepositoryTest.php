@@ -33,8 +33,6 @@ class HttpRepositoryTest extends TestCase
 {
     /**
      * Test add, delete and query items by UUID.
-     *
-     * @expectedException \Apisearch\Exception\ConnectionException
      */
     public function testNullResponse()
     {
@@ -42,13 +40,12 @@ class HttpRepositoryTest extends TestCase
         $client->get(Argument::cetera())->willReturn(['code' => 0, 'body' => null]);
         $repository = new HttpRepository($client->reveal());
         $repository->setCredentials(RepositoryReference::create(AppUUID::createById('123'), IndexUUID::createById('456')), TokenUUID::createById('000'));
+        $this->expectException(ConnectionException::class);
         $repository->query(Query::createMatchAll());
     }
 
     /**
      * Test add, delete and query items by UUID.
-     *
-     * @expectedException \Apisearch\Exception\ConnectionException
      */
     public function testConnectionExceptionResponse()
     {
@@ -56,6 +53,7 @@ class HttpRepositoryTest extends TestCase
         $client->get(Argument::cetera())->willThrow(ConnectionException::buildConnectExceptionByUrl('http://xxx.xx'));
         $repository = new HttpRepository($client->reveal());
         $repository->setCredentials(RepositoryReference::create(AppUUID::createById('123'), IndexUUID::createById('456')), TokenUUID::createById('000'));
+        $this->expectException(ConnectionException::class);
         $repository->query(Query::createMatchAll());
     }
 }

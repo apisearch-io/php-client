@@ -157,13 +157,12 @@ abstract class RepositoryTest extends TestCase
      * Test invalid queries.
      *
      * @dataProvider dataInvalidQueries
-     *
-     * @expectedException \Exception
      */
     public function testInvalidQueries(Query $query)
     {
         $repository = $this->getRepository();
         $repository->setRepositoryReference(RepositoryReference::create(AppUUID::createById('xxx'), IndexUUID::createById('xxx')));
+        $this->expectException(\Exception::class);
         $repository->query($query);
     }
 
