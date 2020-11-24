@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Exporter;
 
+use Apisearch\Exception\ExporterFormatNotImplementedException;
 use Apisearch\Exporter\CSVExporter;
 use Apisearch\Exporter\ExporterCollection;
 use Apisearch\Exporter\JSONExporter;
@@ -41,14 +42,13 @@ class ExporterCollectionTest extends TestCase
 
     /**
      * Test collection with exception.
-     *
-     * @expectedException \Apisearch\Exception\ExporterFormatNotImplementedException
      */
     public function testCollectionException()
     {
         $exporterCollection = new ExporterCollection();
         $exporterCollection->addExporter(new JSONExporter());
         $exporterCollection->addExporter(new CSVExporter());
+        $this->expectException(ExporterFormatNotImplementedException::class);
         $exporterCollection->getExporterByName('xml');
     }
 }

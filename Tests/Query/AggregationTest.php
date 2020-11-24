@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Query;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Query\Aggregation;
 use Apisearch\Query\Filter;
 use PHPUnit\Framework\TestCase;
@@ -50,21 +51,19 @@ class AggregationTest extends TestCase
 
     /**
      * Test creation with bad name.
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCreateBadName()
     {
+        $this->expectException(InvalidFormatException::class);
         Aggregation::createFromArray([]);
     }
 
     /**
      * Test creation with empty name.
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCreateEmptyName()
     {
+        $this->expectException(InvalidFormatException::class);
         Aggregation::createFromArray([
             'name' => '',
         ]);

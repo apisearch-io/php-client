@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Model;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\IndexUUID;
 use PHPUnit\Framework\TestCase;
 
@@ -27,11 +28,10 @@ class IndexUUIDTest extends TestCase
      * Test creation with bad data.
      *
      * @dataProvider dataEmptyCreation
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testEmptyCreation(array $data): void
     {
+        $this->expectException(InvalidFormatException::class);
         IndexUUID::createFromArray($data);
     }
 

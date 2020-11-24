@@ -291,6 +291,14 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
+     * @param string $key
+     */
+    public function deleteMetadata(string $key)
+    {
+        unset($this->metadata[$key]);
+    }
+
+    /**
      * Get IndexedMetadata.
      *
      * @return array
@@ -321,6 +329,14 @@ class Item implements HttpTransportable, UUIDReference
         $value
     ) {
         $this->indexedMetadata[$key] = $value;
+    }
+
+    /**
+     * @param string $key
+     */
+    public function deleteIndexedMetadata(string $key)
+    {
+        unset($this->indexedMetadata[$key]);
     }
 
     /**
@@ -357,6 +373,14 @@ class Item implements HttpTransportable, UUIDReference
     }
 
     /**
+     * @param string $key
+     */
+    public function deleteSearchableMetadata(string $key)
+    {
+        unset($this->searchableMetadata[$key]);
+    }
+
+    /**
      * Get ExactMatchingMetadata.
      *
      * @return array
@@ -387,6 +411,14 @@ class Item implements HttpTransportable, UUIDReference
         $value
     ) {
         $this->exactMatchingMetadata[$key] = $value;
+    }
+
+    /**
+     * @param string $key
+     */
+    public function deleteExactMatchingMetadata(string $key)
+    {
+        unset($this->exactMatchingMetadata[$key]);
     }
 
     /**

@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Model;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\TokenUUID;
 use PHPUnit\Framework\TestCase;
 
@@ -27,11 +28,10 @@ class TokenUUIDTest extends TestCase
      * Test creation with bad data.
      *
      * @dataProvider dataEmptyCreation
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testEmptyCreation(array $data): void
     {
+        $this->expectException(InvalidFormatException::class);
         TokenUUID::createFromArray($data);
     }
 

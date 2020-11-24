@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Model;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\User;
 use PHPUnit\Framework\TestCase;
 
@@ -54,11 +55,10 @@ class UserTest extends TestCase
      * Test create from array with exception.
      *
      * @dataProvider dataCreateFromArrayException
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCreateFromArrayException(array $user)
     {
+        $this->expectException(InvalidFormatException::class);
         User::createFromArray($user);
     }
 

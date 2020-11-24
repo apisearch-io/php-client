@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Apisearch\Tests\Model;
 
+use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Model\ItemUUID;
 use PHPUnit\Framework\TestCase;
 
@@ -56,11 +57,10 @@ class ItemUUIDTest extends TestCase
      * Test create by composed UUID with exception.
      *
      * @dataProvider dataCreateByComposedUUIDException
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCreateByComposedUUIDException(string $composedUUID)
     {
+        $this->expectException(InvalidFormatException::class);
         ItemUUID::createByComposedUUID($composedUUID);
     }
 
@@ -96,11 +96,10 @@ class ItemUUIDTest extends TestCase
      * Test create from array with exception.
      *
      * @dataProvider dataCreateFromArrayException
-     *
-     * @expectedException \Apisearch\Exception\InvalidFormatException
      */
     public function testCreateFromArrayException(array $composedUUID)
     {
+        $this->expectException(InvalidFormatException::class);
         ItemUUID::createFromArray($composedUUID);
     }
 
