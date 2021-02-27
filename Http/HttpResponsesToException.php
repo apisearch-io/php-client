@@ -19,6 +19,7 @@ use Apisearch\Exception\ConnectionException;
 use Apisearch\Exception\ForbiddenException;
 use Apisearch\Exception\InvalidFormatException;
 use Apisearch\Exception\InvalidTokenException;
+use Apisearch\Exception\PayloadTooLargeException;
 use Apisearch\Exception\ResourceExistsException;
 use Apisearch\Exception\ResourceNotAvailableException;
 use Apisearch\Exception\TooManyRequestsException;
@@ -60,6 +61,8 @@ trait HttpResponsesToException
                 throw new ForbiddenException($response['body']['message']);
             case TooManyRequestsException::getTransportableHTTPError():
                 throw new TooManyRequestsException($response['body']['message']);
+            case PayloadTooLargeException::getTransportableHTTPError():
+                throw new PayloadTooLargeException($response['body']['message']);
             case ConnectionException::getTransportableHTTPError():
                 throw new ConnectionException('Apisearch returned an internal error code [500] - '.$response['body']['message']);
         }
