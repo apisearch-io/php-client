@@ -25,106 +25,86 @@ class Filter implements HttpTransportable
 {
     /**
      * @var int
-     *
-     * Filter by all of them
      */
     const MUST_ALL = 4;
 
     /**
      * @var int
-     *
-     * Filter by all of them, with levels
      */
     const MUST_ALL_WITH_LEVELS = 5;
 
     /**
      * @var int
-     *
-     * Filter by, at least, one
      */
     const AT_LEAST_ONE = 8;
 
     /**
      * @var int
-     *
-     * Exclude all of them
      */
     const EXCLUDE = 16;
 
     /**
      * @var int
-     *
-     * Promote all of them
      */
     const PROMOTE = 32;
 
     /**
      * @var string
-     *
-     * Filter type field
      */
     const TYPE_FIELD = 'field';
 
     /**
      * @var string
-     *
-     * Filter type field
      */
     const TYPE_RANGE = 'range';
 
     /**
      * @var string
-     *
-     * Filter type field
      */
     const TYPE_DATE_RANGE = 'date_range';
 
     /**
      * @var string
-     *
-     * Filter type field
+     */
+    const TYPE_RANGE_WITH_MIN_MAX = 'range_min_max';
+
+    /**
+     * @var string
+     */
+    const TYPE_DATE_RANGE_WITH_MIN_MAX = 'date_range_min_max';
+
+    /**
+     * @var string
      */
     const TYPE_GEO = 'geo';
 
     /**
      * @var string
-     *
-     * Filter type query
      */
     const TYPE_QUERY = 'query';
 
     /**
      * @var string
-     *
-     * Field
      */
     private $field;
 
     /**
      * @var array
-     *
-     * Values
      */
     private $values;
 
     /**
      * @var int
-     *
-     * Type
      */
     private $applicationType;
 
     /**
      * @var string
-     *
-     * Filter type
      */
     private $filterType;
 
     /**
      * @var array
-     *
-     * Terms to filter
      */
     private $filterTerms;
 

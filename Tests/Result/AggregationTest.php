@@ -34,7 +34,11 @@ class AggregationTest extends TestCase
             'name',
             0,
             10,
-            ['1', '2']
+            ['1', '2'],
+            [
+                'a' => 1,
+                'b' => 2
+            ]
         );
 
         $this->assertEquals('name', $aggregation->getName());
@@ -46,6 +50,10 @@ class AggregationTest extends TestCase
         $this->assertFalse($aggregation->hasLevels());
         $this->assertFalse($aggregation->isFilter());
         $this->assertFalse($aggregation->isEmpty());
+        $this->assertEquals([
+            'a' => 1,
+            'b' => 2
+        ], $aggregation->getMetadata());
     }
 
     /**
@@ -115,6 +123,7 @@ class AggregationTest extends TestCase
             []
         );
         $this->assertTrue($aggregation->isEmpty());
+        $this->assertEquals([], $aggregation->getMetadata());
     }
 
     /**
@@ -184,7 +193,7 @@ class AggregationTest extends TestCase
      */
     public function testToArrayAllValues()
     {
-        $aggregation = new Aggregation('name', Filter::MUST_ALL, 100, ['1']);
+        $aggregation = new Aggregation('name', Filter::MUST_ALL, 100, ['1'], ['a' => 1, 'b' => 2 ]);
         $aggregation->addCounter('1', 10);
         $aggregation->addCounter('2', 10);
         $this->assertEquals(
@@ -199,6 +208,7 @@ class AggregationTest extends TestCase
                     '1',
                 ],
                 'total_elements' => 100,
+                'metadata' => ['a' => 1, 'b' => 2 ]
             ],
             $aggregation->toArray()
         );
@@ -232,6 +242,7 @@ class AggregationTest extends TestCase
                 '1',
             ],
             'total_elements' => 100,
+            'metadata' => ['a' => 1, 'b' => 2 ]
         ]);
         $this->assertEquals('agg1', $aggregation->getName());
         $this->assertCount(2, $aggregation->getCounters());

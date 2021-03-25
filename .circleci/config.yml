@@ -2,6 +2,32 @@ version: 2
 
 jobs:
 
+  php72:
+    docker:
+      - image: circleci/php:7.2-cli
+
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run:
+          name: Run tests - minimum
+          command: |
+            composer update -n --prefer-dist --prefer-lowest
+            php vendor/bin/phpunit
+
+  php73:
+    docker:
+      - image: circleci/php:7.3-cli
+
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run:
+          name: Run tests - minimum
+          command: |
+            composer update -n --prefer-dist --prefer-lowest
+            php vendor/bin/phpunit
+
   php74:
     docker:
       - image: circleci/php:7.4-cli
@@ -10,13 +36,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Run tests / Symfony 4^3
-          command: |
-            composer update -n --prefer-dist --prefer-stable
-            php vendor/bin/phpunit
-
-      - run:
-          name: Run tests / Symfony 5^0
+          name: Run tests
           command: |
             composer update -n --prefer-dist
             php vendor/bin/phpunit
@@ -38,5 +58,7 @@ workflows:
   version: 2
   test:
     jobs:
+      - php72
+      - php73
       - php74
       - php80

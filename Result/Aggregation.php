@@ -28,45 +28,38 @@ class Aggregation implements IteratorAggregate, HttpTransportable
 {
     /**
      * @var string
-     *
-     * Name
      */
     private $name;
 
     /**
      * @var Counter[]
-     *
-     * Counters
      */
     private $counters = [];
 
     /**
      * @var int
-     *
-     * Application type
      */
     private $applicationType;
 
     /**
      * @var int
-     *
-     * Total elements
      */
     private $totalElements;
 
     /**
      * @var array
-     *
-     * Active elements
      */
     private $activeElements;
 
     /**
      * @var int
-     *
-     * Highest active level
      */
     private $highestActiveLevel = 0;
+
+    /**
+     * @var array
+     */
+    private $metadata;
 
     /**
      * Aggregation constructor.
@@ -75,12 +68,14 @@ class Aggregation implements IteratorAggregate, HttpTransportable
      * @param int    $applicationType
      * @param int    $totalElements
      * @param array  $activeElements
+     * @param array  $metadata
      */
     public function __construct(
         string $name,
         int $applicationType,
         int $totalElements,
-        array $activeElements
+        array $activeElements,
+        array $metadata = []
     ) {
         $this->name = $name;
         $this->applicationType = $applicationType;
@@ -89,6 +84,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             array_values($activeElements),
             array_values($activeElements)
         );
+        $this->metadata = $metadata;
     }
 
     /**
@@ -187,6 +183,14 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     public function getCounter(string $name): ? Counter
     {
         return $this->counters[$name] ?? null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
     }
 
     /**
@@ -310,6 +314,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             'highest_active_level' => 0 === $this->highestActiveLevel
                 ? null
                 : $this->highestActiveLevel,
+            'metadata' => $this->metadata
         ], function ($element) {
             return
             !(
@@ -350,6 +355,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
         }
 
         $aggregation->highestActiveLevel = $array['highest_active_level'] ?? 0;
+        $aggregation->metadata = $array['metadata'] ?? [];
 
         return $aggregation;
     }
