@@ -801,7 +801,7 @@ class Query implements HttpTransportable
      * @param string $field
      * @param array  $options
      * @param int    $applicationType
-     * @param string $rangeType
+     * @param string $filterType
      * @param array  $aggregationSort
      * @param int    $limit
      *
@@ -812,7 +812,7 @@ class Query implements HttpTransportable
         string $field,
         array $options,
         int $applicationType,
-        string $rangeType = Filter::TYPE_RANGE,
+        string $filterType = Filter::TYPE_RANGE,
         array $aggregationSort = Aggregation::SORT_BY_COUNT_DESC,
         int $limit = Aggregation::NO_LIMIT
     ): self {
@@ -824,7 +824,7 @@ class Query implements HttpTransportable
             $filterName,
             Item::getPathByField($field),
             $applicationType,
-            $rangeType,
+            $filterType,
             $options,
             $aggregationSort,
             $limit

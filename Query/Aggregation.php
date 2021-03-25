@@ -25,91 +25,65 @@ class Aggregation implements HttpTransportable
 {
     /**
      * @var array
-     *
-     * Sort aggregation by count asc
      */
     const SORT_BY_COUNT_ASC = ['_count', 'asc'];
 
     /**
      * @var array
-     *
-     * Sort aggregation by count desc
      */
     const SORT_BY_COUNT_DESC = ['_count', 'desc'];
 
     /**
      * @var array
-     *
-     * Sort aggregation by name asc
      */
     const SORT_BY_NAME_ASC = ['_term', 'asc'];
 
     /**
      * @var array
-     *
-     * Sort aggregation by name desc
      */
     const SORT_BY_NAME_DESC = ['_term', 'desc'];
 
     /**
      * @var int
-     *
-     * No limit
      */
     const NO_LIMIT = 0;
 
     /**
      * @var string
-     *
-     * Name
      */
     private $name;
 
     /**
      * @var string
-     *
-     * Field
      */
     private $field;
 
     /**
      * @var int
-     *
-     * Type
      */
     private $applicationType;
 
     /**
      * @var int
-     *
-     * Filter type
      */
     private $filterType;
 
     /**
      * @var string[]
-     *
-     * Subgroup
      */
     private $subgroup = [];
 
     /**
      * @var array
-     *
-     * Aggregation sort
      */
     private $sort;
 
     /**
      * @var int
-     *
-     * Limit
      */
     private $limit;
 
     /**
-     * Aggregation constructor.
-     *
      * @param string $name
      * @param string $field
      * @param int    $applicationType
