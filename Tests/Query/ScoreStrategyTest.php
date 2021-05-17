@@ -407,4 +407,28 @@ class ScoreStrategyTest extends TestCase
             $scoreStrategy->getScoreMode()
         );
     }
+
+    public function testWeightMultiFilter()
+    {
+        $scoreStrategy = ScoreStrategy::createWeightMultiFilterFunction(
+            20,
+            [],
+            true
+        );
+
+        $this->assertNull($scoreStrategy->getFilter());
+        $this->assertEmpty($scoreStrategy->getFilters());
+
+        $scoreStrategy = ScoreStrategy::createWeightMultiFilterFunction(
+            20,
+            [
+                Filter::create('1', ['2'], Filter::AT_LEAST_ONE, Filter::TYPE_FIELD),
+                Filter::create('2', ['2'], Filter::AT_LEAST_ONE, Filter::TYPE_FIELD),
+            ],
+            true
+        );
+
+        $this->assertNull($scoreStrategy->getFilter());
+        $this->assertCount(2, $scoreStrategy->getFilters());
+    }
 }

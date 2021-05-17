@@ -314,7 +314,7 @@ class Aggregation implements IteratorAggregate, HttpTransportable
             'highest_active_level' => 0 === $this->highestActiveLevel
                 ? null
                 : $this->highestActiveLevel,
-            'metadata' => $this->metadata
+            'metadata' => $this->metadata,
         ], function ($element) {
             return
             !(

@@ -184,6 +184,13 @@ class ScoreStrategy implements HttpTransportable
     private $filter;
 
     /**
+     * Filters.
+     *
+     * @var Filter[]
+     */
+    private $filters = [];
+
+    /**
      * @var float
      *
      * Weight
@@ -257,6 +264,14 @@ class ScoreStrategy implements HttpTransportable
     }
 
     /**
+     * @return Filter[]
+     */
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    /**
      * Create empty.
      *
      * @return ScoreStrategy
@@ -267,8 +282,6 @@ class ScoreStrategy implements HttpTransportable
     }
 
     /**
-     * Create default field scoring.
-     *
      * @param string $field
      * @param float  $factor
      * @param float  $missing
@@ -302,8 +315,6 @@ class ScoreStrategy implements HttpTransportable
     }
 
     /**
-     * Create custom function scoring.
-     *
      * @param string $function
      * @param float  $weight
      * @param Filter $filter
@@ -328,8 +339,6 @@ class ScoreStrategy implements HttpTransportable
     }
 
     /**
-     * Create custom function scoring.
-     *
      * @param float  $weight
      * @param Filter $filter
      * @param bool   $matchMainQuery
@@ -345,6 +354,29 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->type = 'weight';
         $scoreStrategy->weight = $weight;
         $scoreStrategy->filter = self::fixFilterFieldPath($filter);
+        $scoreStrategy->configuration['match_main_query'] = $matchMainQuery;
+
+        return $scoreStrategy;
+    }
+
+    /**
+     * @param float    $weight
+     * @param Filter[] $filters
+     * @param bool     $matchMainQuery
+     *
+     * @return ScoreStrategy
+     */
+    public static function createWeightMultiFilterFunction(
+        float $weight = self::DEFAULT_WEIGHT,
+        array $filters = [],
+        bool $matchMainQuery = true
+    ): ScoreStrategy {
+        $scoreStrategy = self::createDefault();
+        $scoreStrategy->type = 'weight';
+        $scoreStrategy->weight = $weight;
+        $scoreStrategy->filters = array_map(function (Filter $filter) {
+            return self::fixFilterFieldPath($filter);
+        }, $filters);
         $scoreStrategy->configuration['match_main_query'] = $matchMainQuery;
 
         return $scoreStrategy;
@@ -427,6 +459,9 @@ class ScoreStrategy implements HttpTransportable
                     ->filter
                     ->toArray()
                 : null),
+            'filters' => array_map(function (Filter $filter) {
+                return $filter->toArray();
+            }, $this->filters),
         ];
     }
 
@@ -447,6 +482,10 @@ class ScoreStrategy implements HttpTransportable
         $scoreStrategy->filter = is_array($array['filter'])
             ? Filter::createFromArray($array['filter'])
             : null;
+
+        $scoreStrategy->filters = array_map(function (array $filterAsArray) {
+            return Filter::createFromArray($filterAsArray);
+        }, $array['filters'] ?? []);
 
         return $scoreStrategy;
     }

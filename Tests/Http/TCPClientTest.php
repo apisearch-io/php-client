@@ -19,6 +19,7 @@ use Apisearch\Exception\ConnectionException;
 use Apisearch\Http\HttpAdapter;
 use Apisearch\Http\RetryMap;
 use Apisearch\Http\TCPClient;
+use Apisearch\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -27,6 +28,8 @@ use Prophecy\Argument;
  */
 class TCPClientTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * Test n query retries.
      */
