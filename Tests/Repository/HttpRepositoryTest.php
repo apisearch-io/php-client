@@ -23,6 +23,7 @@ use Apisearch\Model\TokenUUID;
 use Apisearch\Query\Query;
 use Apisearch\Repository\HttpRepository;
 use Apisearch\Repository\RepositoryReference;
+use Apisearch\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -31,6 +32,8 @@ use Prophecy\Argument;
  */
 class HttpRepositoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * Test add, delete and query items by UUID.
      */
