@@ -148,11 +148,11 @@ class TransformableRepository extends Repository
     {
         return empty($result->getSubresults())
             ? Result::create(
-                $result->getQueryUUID(),
+                $result->getQuery(),
                 $result->getTotalItems(),
                 $result->getTotalHits(),
                 $result->getAggregations(),
-                $result->getSuggests(),
+                $result->getSuggestions(),
                 $this
                     ->transformer
                     ->fromItems(
