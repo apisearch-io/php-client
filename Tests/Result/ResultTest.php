@@ -17,6 +17,7 @@ namespace Apisearch\Tests\Result;
 
 use Apisearch\Model\Item;
 use Apisearch\Model\ItemUUID;
+use Apisearch\Query\Query;
 use Apisearch\Result\Aggregation;
 use Apisearch\Result\Aggregations;
 use Apisearch\Result\Result;
@@ -34,7 +35,7 @@ class ResultTest extends TestCase
     public function testToArray()
     {
         $result = new Result(
-            '123',
+            Query::createMatchAll()->identifyWith('123'),
             2, 1
         );
         $resultArray = $result->toArray();
@@ -48,7 +49,7 @@ class ResultTest extends TestCase
         $this->assertEquals(2, $resultArray['total_items']);
         $this->assertCount(0, $result->getItems());
         $this->assertNull($result->getFirstItem());
-        $this->assertCount(0, $result->getSuggests());
+        $this->assertCount(0, $result->getSuggestions());
         $this->assertNull($result->getAggregations());
         $this->assertEquals($resultArray, Result::createFromArray($resultArray)->toArray());
     }
@@ -59,7 +60,7 @@ class ResultTest extends TestCase
     public function testItems()
     {
         $result = new Result(
-            '123',
+            Query::createMatchAll()->identifyWith('123'),
             2, 1
         );
         $result->addItem(Item::create(ItemUUID::createByComposedUUID('1~product')));
@@ -77,7 +78,7 @@ class ResultTest extends TestCase
     public function testAggregations()
     {
         $result = new Result(
-            '123',
+            Query::createMatchAll()->identifyWith('123'),
             2, 1
         );
         $aggregations = new Aggregations(2);
@@ -101,13 +102,51 @@ class ResultTest extends TestCase
     public function testSuggests()
     {
         $result = new Result(
-            '123',
+            Query::createMatchAll()->identifyWith('123'),
             2, 1
         );
-        $result->addSuggest('hola');
+        $result->addSuggestion('hola');
         $resultArray = $result->toArray();
-        $this->assertCount(1, $result->getSuggests());
+        $this->assertCount(1, $result->getSuggestions());
         $this->assertCount(1, $resultArray['suggests']);
+
+        $result->addSuggestion('hola2');
+        $this->assertCount(2, $result->getSuggestions());
+
+        $result = new Result(
+            Query::createMatchAll()->identifyWith('123'),
+            2, 1
+        );
+        $resultAsArray = $result->toArray();
+        $newResult = Result::createFromArray($resultAsArray);
+
+        $this->assertEquals([], $result->getSuggestions());
+        $this->assertArrayNotHasKey('suggests', $resultAsArray);
+        $this->assertEquals([], $newResult->getSuggestions());
+    }
+
+    public function testAutocomplete()
+    {
+        $result = new Result(
+            Query::createMatchAll()->identifyWith('123'),
+            2, 1
+        );
+
+        $result->setAutocomplete('hola');
+        $resultAsArray = $result->toArray();
+        $newResult = Result::createFromArray($resultAsArray);
+
+        $this->assertEquals('hola', $result->getAutocomplete());
+        $this->assertEquals('hola', $resultAsArray['autocomplete']);
+        $this->assertEquals('hola', $newResult->getAutocomplete());
+
+        $result->setAutocomplete('');
+        $resultAsArray = $result->toArray();
+        $newResult = Result::createFromArray($resultAsArray);
+
+        $this->assertEquals('', $result->getAutocomplete());
+        $this->assertArrayNotHasKey('autocomplete', $resultAsArray);
+        $this->assertEquals('', $newResult->getAutocomplete());
     }
 
     /**
@@ -116,7 +155,7 @@ class ResultTest extends TestCase
     public function testGetItemsGroupedByType()
     {
         $result = new Result(
-            '123',
+            Query::createMatchAll()->identifyWith('123'),
             1, 1
         );
 
@@ -197,9 +236,9 @@ class ResultTest extends TestCase
     public function testMultiResult()
     {
         $result = Result::createMultiResult([
-            'res1' => Result::create('1', 10, 3, null, [], []),
-            'res2' => Result::create('2', 10, 4, null, [], []),
-            'res3' => Result::create('3', 10, 5, null, [], []),
+            'res1' => Result::create(Query::createMatchAll()->identifyWith('1'), 10, 3, null, [], []),
+            'res2' => Result::create(Query::createMatchAll()->identifyWith('2'), 10, 4, null, [], []),
+            'res3' => Result::create(Query::createMatchAll()->identifyWith('3'), 10, 5, null, [], []),
         ]);
 
         $this->assertCount(3, $result->getSubresults());
@@ -214,15 +253,15 @@ class ResultTest extends TestCase
      */
     public function testSuggest()
     {
-        $result = new Result('aa', 1, 1);
-        $result->addSuggest('str1');
+        $result = new Result(Query::createMatchAll()->identifyWith('aa'), 1, 1);
+        $result->addSuggestion('str1');
         $result->addSuggestion('str1');
         $result->addSuggestion('str2');
 
-        $this->assertEquals(['str1', 'str2'], $result->getSuggests());
-        $this->assertEquals($result->getSuggests(), $result->getSuggestions());
+        $this->assertEquals(['str1', 'str2'], $result->getSuggestions());
+        $this->assertEquals($result->getSuggestions(), $result->getSuggestions());
         $this->assertEquals(['str1', 'str2'], $result->toArray()['suggests']);
-        $this->assertEquals(['str1', 'str2'], Result::createFromArray($result->toArray())->getSuggests());
+        $this->assertEquals(['str1', 'str2'], Result::createFromArray($result->toArray())->getSuggestions());
         $this->assertEquals(['str1', 'str2'], Result::createFromArray($result->toArray())->getSuggestions());
     }
 }

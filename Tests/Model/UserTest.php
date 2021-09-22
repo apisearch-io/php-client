@@ -72,4 +72,11 @@ class UserTest extends TestCase
             [['attributes' => []]],
         ];
     }
+
+    public function testCreateById()
+    {
+        $user = User::createFromId('123');
+        $this->assertEquals('123', $user->getId());
+        $this->assertEquals([], $user->getAttributes());
+    }
 }

@@ -98,9 +98,23 @@ class User implements HttpTransportable
             throw InvalidFormatException::userFormatNotValid([]);
         }
 
-        return new self(
+        return self::createFromId(
             $array['id'],
             $array['attributes'] ?? []
+        );
+    }
+
+    /**
+     * @param string $id
+     * @param array  $attributes
+     *
+     * @return User
+     */
+    public static function createFromId(string $id, array $attributes = []): User
+    {
+        return new self(
+            $id,
+            $attributes
         );
     }
 }
