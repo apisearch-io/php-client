@@ -45,7 +45,7 @@ class QueryTest extends TestCase
         $queryArray = Query::createMatchAll()->toArray();
         $query = Query::createFromArray($queryArray);
 
-        $this->assertFalse($query->areSuggestionsEnabled());
+        $this->assertEquals(0, $query->getNumberOfSuggestions());
         $this->assertTrue($query->areAggregationsEnabled());
         $this->assertEquals('', $query->getQueryText());
         $this->assertEquals(Query::DEFAULT_PAGE, $query->getPage());
@@ -61,7 +61,7 @@ class QueryTest extends TestCase
         $query = Query::createFromArray($queryArray);
 
         $this->assertEquals([], $query->getFields());
-        $this->assertFalse($query->areSuggestionsEnabled());
+        $this->assertEquals(0, $query->getNumberOfSuggestions());
         $this->assertTrue($query->areAggregationsEnabled());
         $this->assertEquals('', $query->getQueryText());
         $this->assertEquals(Query::DEFAULT_PAGE, $query->getPage());
@@ -75,6 +75,7 @@ class QueryTest extends TestCase
         $this->assertNull($query->getUUID());
         $this->assertNull($query->getIndexUUID());
         $this->assertEquals([], $query->getsearchableFields());
+        $this->assertEquals(Query::QUERY_OPERATOR_OR, $query->getQueryOperator());
     }
 
     /**
@@ -155,6 +156,20 @@ class QueryTest extends TestCase
         $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
     }
 
+    public function testQueryTextWithTags()
+    {
+        $query = Query::create('<a>hola  </a>');
+        $this->assertEquals('hola', $query->getQueryText());
+
+        $query = Query::create('<pre>hola</pre><br>');
+        $this->assertEquals('hola', $query->getQueryText());
+
+        $query = Query::createFromArray([
+            'q' => '<a>hola  </a>',
+        ]);
+        $this->assertEquals('hola', $query->getQueryText());
+    }
+
     /**
      * Test metadata.
      */
@@ -168,6 +183,9 @@ class QueryTest extends TestCase
             'b' => ['b1', 'b2'],
         ], $query->getMetadata());
         $this->assertEquals($query, HttpHelper::emulateHttpTransport($query));
+        $this->assertNull($query->getMetadataValue('lolazo'));
+        $this->assertEquals('a1', $query->getMetadataValue('a'));
+        $this->assertEquals(['b1', 'b2'], $query->getMetadataValue('b'));
     }
 
     /**
@@ -243,5 +261,59 @@ class QueryTest extends TestCase
         $query->addScoreStrategy(ScoreStrategy::createDefault());
         $this->assertInstanceof(ScoreStrategies::class, $query->getScoreStrategies());
         $this->assertCount(1, $query->getScoreStrategies()->getScoreStrategies());
+    }
+
+    public function testSuggestions()
+    {
+        $query = Query::createMatchAll();
+        $query->setNumberOfSuggestions(10);
+        $queryAsArray = $query->toArray();
+        $newQuery = Query::createFromArray($queryAsArray);
+
+        $this->assertEquals(10, $query->getNumberOfSuggestions());
+        $this->assertEquals(10, $queryAsArray['number_of_suggestions']);
+        $this->assertEquals(10, $newQuery->getNumberOfSuggestions());
+    }
+
+    public function testAutocomplete()
+    {
+        $query = Query::createMatchAll();
+        $query->enableAutocomplete();
+        $queryAsArray = $query->toArray();
+        $newQuery = Query::createFromArray($queryAsArray);
+
+        $this->assertTrue($query->isAutocompleteEnabled());
+        $this->assertTrue($queryAsArray['autocomplete_enabled']);
+        $this->assertTrue($newQuery->isAutocompleteEnabled());
+    }
+
+    public function testQueryOperator()
+    {
+        $query = Query::createMatchAll()->setQueryOperator(Query::QUERY_OPERATOR_OR);
+        $queryAsArray = $query->toArray();
+        $newQuery = Query::createFromArray($queryAsArray);
+
+        $this->assertEquals(Query::QUERY_OPERATOR_OR, $query->getQueryOperator());
+        $this->assertEquals(Query::QUERY_OPERATOR_OR, $query->getQueryOperator());
+        $this->assertEquals(Query::QUERY_OPERATOR_OR, $newQuery->getQueryOperator());
+
+        $query = Query::createMatchAll()->setQueryOperator(Query::QUERY_OPERATOR_AND);
+        $queryAsArray = $query->toArray();
+        $newQuery = Query::createFromArray($queryAsArray);
+
+        $this->assertEquals(Query::QUERY_OPERATOR_AND, $query->getQueryOperator());
+        $this->assertEquals(Query::QUERY_OPERATOR_AND, $queryAsArray['query_operator']);
+        $this->assertEquals(Query::QUERY_OPERATOR_AND, $newQuery->getQueryOperator());
+    }
+
+    public function testSetQueryText()
+    {
+        $query = Query::createMatchAll()->setQueryText('lolazo');
+        $queryAsArray = $query->toArray();
+        $newQuery = Query::createFromArray($queryAsArray);
+
+        $this->assertEquals('lolazo', $query->getQueryText());
+        $this->assertEquals('lolazo', $queryAsArray['q']);
+        $this->assertEquals('lolazo', $newQuery->getQueryText());
     }
 }

@@ -76,7 +76,7 @@ class InMemoryRepository extends Repository
         );
 
         $items = $this->items[$this->getIndexKey()] ?? [];
-        $result = new Result($query->getUUID(), count($items), count($resultingItems));
+        $result = new Result($query, count($items), count($resultingItems));
         foreach ($resultingItems as $resultingItem) {
             $result->addItem($resultingItem);
         }

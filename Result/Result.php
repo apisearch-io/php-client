@@ -17,6 +17,7 @@ namespace Apisearch\Result;
 
 use Apisearch\Model\HttpTransportable;
 use Apisearch\Model\Item;
+use Apisearch\Query\Query;
 
 /**
  * Class Result.
@@ -25,73 +26,71 @@ class Result implements HttpTransportable
 {
     /**
      * @var string
-     *
-     * UUID
      */
     private $queryUUID;
 
     /**
+     * @var Query
+     */
+    private $query;
+
+    /**
      * @var Item[]
-     *
-     * Items
      */
     private $items = [];
 
     /**
+     * @var string|null
+     */
+    private $autocomplete = null;
+
+    /**
      * @var array
-     *
-     * Suggestions
      */
     private $suggestions = [];
 
     /**
      * @var Aggregations|null
-     *
-     * Aggregations
      */
     private $aggregations;
 
     /**
-     * Total items.
-     *
      * @var int
      */
     private $totalItems;
 
     /**
-     * Total hits.
-     *
      * @var int
      */
     private $totalHits;
 
     /**
-     * Items grouped by types cache.
-     *
      * @var array
      */
     private $itemsGroupedByTypeCache;
 
     /**
      * @var Result[]
-     *
-     * Subresults
      */
     private $subresults = [];
 
     /**
      * Result constructor.
      *
-     * @param string|null $queryUUID
-     * @param int         $totalItems
-     * @param int         $totalHits
+     * @param Query|null $query
+     * @param int        $totalItems
+     * @param int        $totalHits
      */
     public function __construct(
-        ?string $queryUUID,
+        ?Query $query,
         int $totalItems,
         int $totalHits
     ) {
-        $this->queryUUID = $queryUUID;
+        if ($query instanceof Query) {
+            $this->queryUUID = $query->getUUID();
+        }
+
+        $this->query = $query;
         $this->totalItems = $totalItems;
         $this->totalHits = $totalHits;
     }
@@ -99,7 +98,7 @@ class Result implements HttpTransportable
     /**
      * Create by.
      *
-     * @param string|null       $queryUUID
+     * @param Query|null        $query
      * @param int               $totalItems
      * @param int               $totalHits
      * @param Aggregations|null $aggregations
@@ -109,15 +108,16 @@ class Result implements HttpTransportable
      * @return Result
      */
     public static function create(
-        ?string $queryUUID,
+        ?Query $query,
         int $totalItems,
         int $totalHits,
         ? Aggregations $aggregations,
         array $suggestions,
-        array $items
+        array $items,
+        ? string $autocomplete = null
     ): self {
         $result = new self(
-            $queryUUID,
+            $query,
             $totalItems,
             $totalHits
         );
@@ -125,6 +125,7 @@ class Result implements HttpTransportable
         $result->aggregations = $aggregations;
         $result->suggestions = $suggestions;
         $result->items = $items;
+        $result->autocomplete = $autocomplete;
 
         return $result;
     }
@@ -296,18 +297,6 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Add suggest.
-     *
-     * @param string $suggestion
-     *
-     * @deprecated Use addSuggestion instead
-     */
-    public function addSuggest(string $suggestion)
-    {
-        $this->addSuggestion($suggestion);
-    }
-
-    /**
      * Add suggestion.
      *
      * @param string $suggestion
@@ -318,18 +307,6 @@ class Result implements HttpTransportable
     }
 
     /**
-     * Get suggests.
-     *
-     * @return string[]
-     *
-     * @deprecated Use getSuggestions instead
-     */
-    public function getSuggests(): array
-    {
-        return array_values($this->suggestions);
-    }
-
-    /**
      * Get suggestions.
      *
      * @return string[]
@@ -337,6 +314,32 @@ class Result implements HttpTransportable
     public function getSuggestions(): array
     {
         return array_values($this->suggestions);
+    }
+
+    /**
+     * @param string $autocomplete
+     */
+    public function setAutocomplete(string $autocomplete)
+    {
+        $this->autocomplete = $autocomplete;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAutocomplete(): ? string
+    {
+        return $this->autocomplete;
+    }
+
+    /**
+     * Get query.
+     *
+     * @return Query|null
+     */
+    public function getQuery(): ? Query
+    {
+        return $this->query;
     }
 
     /**
@@ -397,6 +400,9 @@ class Result implements HttpTransportable
                 ? $this->aggregations->toArray()
                 : null,
             'suggests' => array_keys($this->suggestions),
+            'autocomplete' => '' === $this->autocomplete
+                ? null
+                : $this->autocomplete,
             'subresults' => array_map(function (Result $result) {
                 return $result->toArray();
             }, $this->subresults),
@@ -419,7 +425,7 @@ class Result implements HttpTransportable
     public static function createFromArray(array $array): self
     {
         $result = self::create(
-            $array['query_uuid'] ?? '',
+            null,
             $array['total_items'] ?? 0,
             $array['total_hits'] ?? 0,
             isset($array['aggregations'])
@@ -430,9 +436,11 @@ class Result implements HttpTransportable
                 : [],
             array_map(function (array $item) {
                 return Item::createFromArray($item);
-            }, $array['items'] ?? [])
+            }, $array['items'] ?? []),
+            $array['autocomplete'] ?? null
         );
 
+        $result->queryUUID = $array['query_uuid'] ?? '';
         $result->subresults = array_filter(
             array_map(function (array $subresultAsArray) {
                 return Result::createFromArray($subresultAsArray);

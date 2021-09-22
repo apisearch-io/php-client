@@ -31,127 +31,106 @@ class Query implements HttpTransportable
 {
     /**
      * @var int
-     *
-     * Default page
      */
     const DEFAULT_PAGE = 1;
 
     /**
      * @var int
-     *
-     * Default size
      */
     const DEFAULT_SIZE = 10;
 
     /**
      * @var int
-     *
-     * Infinite size
      */
     const INFINITE_SIZE = 1000;
 
     /**
      * @var float
-     *
-     * No min score
      */
     const NO_MIN_SCORE = 0.0;
 
     /**
      * @var string
-     *
-     * UUID
+     */
+    const QUERY_OPERATOR_AND = 'and';
+
+    /**
+     * @var string
+     */
+    const QUERY_OPERATOR_OR = 'or';
+
+    /**
+     * @var string
      */
     private $UUID;
 
     /**
      * @var Coordinate
-     *
-     * Coordinate
      */
     private $coordinate;
 
     /**
      * @var string[]
-     *
-     * Fields
      */
     private $fields = [];
 
     /**
      * @var Filter[]
-     *
-     * Universe Filters
      */
     private $universeFilters = [];
 
     /**
      * @var Filter[]
-     *
-     * Filters
      */
     private $filters = [];
 
     /**
      * @var ItemUUID[]
-     *
-     * Items Promoted
      */
     private $itemsPromoted = [];
 
     /**
      * @var SortBy
-     *
-     * Sort by
      */
     private $sortBy;
 
     /**
      * @var Aggregation[]
-     *
-     * Aggregations
      */
     private $aggregations = [];
 
     /**
      * @var int
-     *
-     * Page
      */
     private $page;
 
     /**
      * @var int
-     *
-     * From
      */
     private $from;
 
     /**
      * @var int
-     *
-     * Size
      */
     private $size;
 
     /**
      * @var bool
-     *
-     * Results enabled
      */
     private $resultsEnabled = true;
 
     /**
-     * @var bool
-     *
-     * Suggestions enabled
+     * @var int
      */
-    private $suggestionsEnabled = false;
+    private $numberOfSuggestions = 0;
 
     /**
      * @var bool
-     *
-     * Aggregations enabled
+     */
+    private $autocompleteEnabled = false;
+
+    /**
+     * @var bool
      */
     private $aggregationsEnabled = true;
 
@@ -164,59 +143,48 @@ class Query implements HttpTransportable
 
     /**
      * @var string[]
-     *
-     * Searchable fields
      */
     private $searchableFields = [];
 
     /**
      * @var ScoreStrategies
-     *
-     * Score strategies
      */
     private $scoreStrategies;
 
     /**
      * @var float|string|array
-     *
-     * Fuzziness
      */
     private $fuzziness;
 
     /**
      * @var float
-     *
-     * Min score
      */
     private $minScore = self::NO_MIN_SCORE;
 
     /**
      * @var User
-     *
-     * User associated to query
      */
     private $user;
 
     /**
      * @var array
-     *
-     * Metadata
      */
     private $metadata = [];
 
     /**
      * @var Query[]
-     *
-     * Sub queries
      */
     private $subqueries = [];
 
     /**
      * @var IndexUUID
-     *
-     * Index UUID
      */
     private $indexUUID;
+
+    /**
+     * @var string|null
+     */
+    private $queryOperator = null;
 
     /**
      * Construct.
@@ -226,12 +194,7 @@ class Query implements HttpTransportable
     private function __construct(string $queryText)
     {
         $this->sortBy = SortBy::create();
-        $this->filters['_query'] = Filter::create(
-            '',
-            [$queryText],
-            0,
-            Filter::TYPE_QUERY
-        );
+        $this->setQueryText($queryText);
     }
 
     /**
@@ -275,6 +238,9 @@ class Query implements HttpTransportable
         int $page = self::DEFAULT_PAGE,
         int $size = self::DEFAULT_SIZE
     ): self {
+        $queryText = strip_tags($queryText);
+        $queryText = trim($queryText);
+
         $page = (int) (max(1, $page));
         $query = new static($queryText);
         $query->from = ($page - 1) * $size;
@@ -908,6 +874,23 @@ class Query implements HttpTransportable
     }
 
     /**
+     * @param string $queryText
+     *
+     * @return Query
+     */
+    public function setQueryText(string $queryText): Query
+    {
+        $this->filters['_query'] = Filter::create(
+            '',
+            [$queryText],
+            0,
+            Filter::TYPE_QUERY
+        );
+
+        return $this;
+    }
+
+    /**
      * Get universe filters.
      *
      * @return Filter[]
@@ -1011,8 +994,6 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Enable results.
-     *
      * @return Query
      */
     public function enableResults(): self
@@ -1023,8 +1004,6 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Disable results.
-     *
      * @return Query
      */
     public function disableResults(): self
@@ -1035,8 +1014,6 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Are results enabled.
-     *
      * @return bool
      */
     public function areResultsEnabled(): bool
@@ -1045,37 +1022,61 @@ class Query implements HttpTransportable
     }
 
     /**
-     * Enable suggestions.
+     * @param int $numberOfSuggestions
      *
      * @return Query
      */
-    public function enableSuggestions(): self
+    public function setNumberOfSuggestions(int $numberOfSuggestions): self
     {
-        $this->suggestionsEnabled = true;
+        $this->numberOfSuggestions = $numberOfSuggestions;
 
         return $this;
     }
 
     /**
-     * Disable suggestions.
-     *
      * @return Query
      */
     public function disableSuggestions(): self
     {
-        $this->suggestionsEnabled = false;
+        $this->numberOfSuggestions = 0;
 
         return $this;
     }
 
     /**
-     * Are suggestions enabled?
-     *
+     * @return int
+     */
+    public function getNumberOfSuggestions(): int
+    {
+        return $this->numberOfSuggestions;
+    }
+
+    /**
+     * @return Query
+     */
+    public function enableAutocomplete(): self
+    {
+        $this->autocompleteEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * @return Query
+     */
+    public function disableAutocomplete(): self
+    {
+        $this->autocompleteEnabled = false;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
-    public function areSuggestionsEnabled(): bool
+    public function isAutocompleteEnabled(): bool
     {
-        return $this->suggestionsEnabled;
+        return $this->autocompleteEnabled;
     }
 
     /**
@@ -1382,6 +1383,16 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Get metadata value.
+     *
+     * @return mixed|null
+     */
+    public function getMetadataValue(string $name)
+    {
+        return $this->metadata[$name] ?? null;
+    }
+
+    /**
      * Add subquery.
      *
      * @param string $name
@@ -1457,6 +1468,24 @@ class Query implements HttpTransportable
     }
 
     /**
+     * Set query operator.
+     */
+    public function setQueryOperator($queryOperator): Query
+    {
+        $this->queryOperator = $queryOperator;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getQueryOperator(): ?string
+    {
+        return $this->queryOperator ?? self::QUERY_OPERATOR_OR;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -1499,7 +1528,10 @@ class Query implements HttpTransportable
             'results_enabled' => $this->resultsEnabled
                 ? null
                 : false,
-            'suggestions_enabled' => $this->suggestionsEnabled ?: null,
+            'number_of_suggestions' => 0 === $this->numberOfSuggestions
+                ? null
+                : $this->numberOfSuggestions,
+            'autocomplete_enabled' => $this->autocompleteEnabled ?: null,
             'highlight_enabled' => $this->highlightEnabled ?: null,
             'aggregations_enabled' => $this->aggregationsEnabled
                 ? null
@@ -1527,6 +1559,9 @@ class Query implements HttpTransportable
             'index_uuid' => ($this->indexUUID instanceof IndexUUID)
                 ? $this->indexUUID->toArray()
                 : null,
+            'query_operator' => self::QUERY_OPERATOR_OR !== $this->queryOperator
+                ? $this->queryOperator
+                : null,
         ], function ($element) {
             return
             !(
@@ -1545,15 +1580,16 @@ class Query implements HttpTransportable
      */
     public static function createFromArray(array $array): self
     {
+        $queryText = $array['q'] ?? '';
         $query = isset($array['coordinate'])
             ? static::createLocated(
                 Coordinate::createFromArray($array['coordinate']),
-                $array['q'] ?? '',
+                $queryText,
                 (int) ($array['page'] ?? static::DEFAULT_PAGE),
                 (int) ($array['size'] ?? static::DEFAULT_SIZE)
             )
             : static::create(
-                $array['q'] ?? '',
+                $queryText,
                 (int) ($array['page'] ?? static::DEFAULT_PAGE),
                 (int) ($array['size'] ?? static::DEFAULT_SIZE)
             );
@@ -1576,7 +1612,8 @@ class Query implements HttpTransportable
             }, $array['universe_filters'] ?? [])
         );
         $query->resultsEnabled = $array['results_enabled'] ?? true;
-        $query->suggestionsEnabled = $array['suggestions_enabled'] ?? false;
+        $query->numberOfSuggestions = $array['number_of_suggestions'] ?? 0;
+        $query->autocompleteEnabled = $array['autocomplete_enabled'] ?? false;
         $query->aggregationsEnabled = $array['aggregations_enabled'] ?? true;
         $query->highlightEnabled = $array['highlight_enabled'] ?? false;
         $query->itemsPromoted = array_values(array_map(function (array $itemUUID) {
@@ -1603,6 +1640,9 @@ class Query implements HttpTransportable
         }
         if (isset($array['index_uuid'])) {
             $query->indexUUID = IndexUUID::createFromArray($array['index_uuid']);
+        }
+        if (isset($array['query_operator'])) {
+            $query->queryOperator = $array['query_operator'];
         }
 
         return $query;
