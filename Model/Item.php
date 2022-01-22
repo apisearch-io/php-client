@@ -113,13 +113,13 @@ class Item implements HttpTransportable, UUIDReference
     /**
      * Item constructor.
      *
-     * @param ItemUUID   $uuid
-     * @param Coordinate $coordinate
-     * @param array      $metadata
-     * @param array      $indexedMetadata
-     * @param array      $searchableMetadata
-     * @param array      $exactMatchingMetadata
-     * @param array      $suggest
+     * @param ItemUUID        $uuid
+     * @param Coordinate|null $coordinate
+     * @param array           $metadata
+     * @param array           $indexedMetadata
+     * @param array           $searchableMetadata
+     * @param array           $exactMatchingMetadata
+     * @param array           $suggest
      */
     private function __construct(
         ItemUUID $uuid,
@@ -710,5 +710,24 @@ class Item implements HttpTransportable, UUIDReference
     public function __get(string $name)
     {
         return $this->get($name);
+    }
+
+    /**
+     * @param callable $callable
+     *
+     * @return void
+     */
+    public function map(callable $callable)
+    {
+        $array = $callable($this->toArray());
+        $this->metadata = $array['metadata'] ?? [];
+        $this->indexedMetadata = $array['indexed_metadata'] ?? [];
+        $this->searchableMetadata = $array['searchable_metadata'] ?? [];
+        $this->exactMatchingMetadata = $array['exact_matching_metadata'] ?? [];
+        $this->suggest = $array['suggest'] ?? [];
+        $this->highlights = $array['highlights'] ?? [];
+        $this->promoted = isset($array['is_promoted']) && true === $array['is_promoted'];
+        $this->score = $array['score'] ?? null;
+        $this->coordinate = $array['coordinate'] ?? null;
     }
 }

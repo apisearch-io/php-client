@@ -486,4 +486,43 @@ class ItemTest extends TestCase
 
         $this->assertEquals(['uuid' => ['id' => 'A', 'type' => 'B']], $item->toArray());
     }
+
+    public function testMap()
+    {
+        $item = Item::createFromArray([
+            'uuid' => ['id' => 'A', 'type' => 'B'],
+            'metadata' => ['A' => 1],
+            'indexed_metadata' => ['B' => 2],
+            'searchable_metadata' => ['C' => 3],
+            'exact_matching_metadata' => ['D' => 4],
+            'suggest' => [5],
+            'highlights' => ['F' => 6],
+            'is_promoted' => true,
+            'coordinate' => ['lat' => 1, 'lon' => 2],
+        ]);
+
+        $item->map(function (array $map) {
+            $map['metadata']['A'] *= 2;
+            $map['indexed_metadata']['B'] *= 2;
+            $map['searchable_metadata']['C'] *= 2;
+            $map['exact_matching_metadata']['D'] *= 2;
+            $map['suggest'][0] *= 2;
+            $map['highlights']['F'] *= 2;
+            $map['is_promoted'] = false;
+            $map['score'] = 10;
+            $map['coordinate'] = null;
+
+            return $map;
+        });
+
+        $this->assertEquals(2, $item->getMetadata()['A']);
+        $this->assertEquals(4, $item->getIndexedMetadata()['B']);
+        $this->assertEquals(6, $item->getSearchableMetadata()['C']);
+        $this->assertEquals(8, $item->getExactMatchingMetadata()['D']);
+        $this->assertEquals(10, $item->getSuggest()[0]);
+        $this->assertEquals(12, $item->getHighlight('F'));
+        $this->assertFalse($item->isPromoted());
+        $this->assertEquals(10, $item->getScore());
+        $this->assertNull($item->getCoordinate());
+    }
 }
