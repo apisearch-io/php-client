@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace Apisearch\Tests\Query;
 
 use Apisearch\Model\IndexUUID;
+use Apisearch\Query\Aggregation;
+use Apisearch\Query\Filter;
 use Apisearch\Query\Query;
 use Apisearch\Query\ScoreStrategies;
 use Apisearch\Query\ScoreStrategy;
@@ -315,5 +317,17 @@ class QueryTest extends TestCase
         $this->assertEquals('lolazo', $query->getQueryText());
         $this->assertEquals('lolazo', $queryAsArray['q']);
         $this->assertEquals('lolazo', $newQuery->getQueryText());
+    }
+
+    public function testAggregationPromoted()
+    {
+        $query = Query::createMatchAll()
+            ->aggregateBy('field1', 'field1', Filter::AT_LEAST_ONE, Aggregation::SORT_BY_COUNT_ASC, 0, ['item1', 'item2'])
+            ->aggregateByRange('field2', 'field2', ['op1'], Filter::AT_LEAST_ONE, Filter::TYPE_RANGE, Aggregation::SORT_BY_COUNT_ASC, 0, ['item1', 'item3'])
+            ->aggregateByDateRange('field3', 'field3', ['op2'], Filter::AT_LEAST_ONE, Aggregation::SORT_BY_COUNT_ASC, 0, ['item4']);
+
+        $this->assertEquals(['item1', 'item2'], $query->getAggregation('field1')->getPromoted());
+        $this->assertEquals(['item1', 'item3'], $query->getAggregation('field2')->getPromoted());
+        $this->assertEquals(['item4'], $query->getAggregation('field3')->getPromoted());
     }
 }

@@ -83,14 +83,17 @@ class Aggregation implements HttpTransportable
      */
     private $limit;
 
+    private $promoted;
+
     /**
-     * @param string $name
-     * @param string $field
-     * @param int    $applicationType
-     * @param string $filterType
-     * @param array  $subgroup
-     * @param array  $sort
-     * @param int    $limit
+     * @param string   $name
+     * @param string   $field
+     * @param int      $applicationType
+     * @param string   $filterType
+     * @param array    $subgroup
+     * @param array    $sort
+     * @param int      $limit
+     * @param string[] $promoted
      */
     private function __construct(
         string $name,
@@ -99,7 +102,8 @@ class Aggregation implements HttpTransportable
         string $filterType,
         array $subgroup,
         array $sort,
-        int $limit
+        int $limit,
+        array $promoted
     ) {
         $this->name = $name;
         $this->field = $field;
@@ -108,6 +112,7 @@ class Aggregation implements HttpTransportable
         $this->subgroup = $subgroup;
         $this->sort = $sort;
         $this->limit = $limit;
+        $this->promoted = $promoted;
     }
 
     /**
@@ -181,15 +186,24 @@ class Aggregation implements HttpTransportable
     }
 
     /**
+     * @return string[]
+     */
+    public function getPromoted(): array
+    {
+        return $this->promoted;
+    }
+
+    /**
      * Create.
      *
-     * @param string $name
-     * @param string $field
-     * @param int    $applicationType
-     * @param string $filterType
-     * @param array  $subgroup
-     * @param array  $sort
-     * @param int    $limit
+     * @param string   $name
+     * @param string   $field
+     * @param int      $applicationType
+     * @param string   $filterType
+     * @param array    $subgroup
+     * @param array    $sort
+     * @param int      $limit
+     * @param string[] $promoted
      *
      * @return Aggregation
      */
@@ -200,7 +214,8 @@ class Aggregation implements HttpTransportable
         string $filterType,
         array $subgroup = [],
         array $sort = self::SORT_BY_COUNT_DESC,
-        int $limit = self::NO_LIMIT
+        int $limit = self::NO_LIMIT,
+        array $promoted = []
     ): self {
         return new self(
             $name,
@@ -209,7 +224,8 @@ class Aggregation implements HttpTransportable
             $filterType,
             $subgroup,
             $sort,
-            $limit
+            $limit,
+            $promoted
         );
     }
 
@@ -240,6 +256,9 @@ class Aggregation implements HttpTransportable
             'limit' => self::NO_LIMIT === $this->limit
                 ? null
                 : $this->limit,
+            'promoted' => $this->promoted === []
+                ? []
+                : $this->promoted,
         ], function ($element) {
             return
             !(
@@ -269,7 +288,8 @@ class Aggregation implements HttpTransportable
             $array['filter_type'] ?? Filter::TYPE_FIELD,
             $array['subgroup'] ?? [],
             $array['sort'] ?? self::SORT_BY_COUNT_DESC,
-            $array['limit'] ?? self::NO_LIMIT
+            $array['limit'] ?? self::NO_LIMIT,
+            $array['promoted'] ?? []
         );
     }
 }

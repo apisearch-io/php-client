@@ -47,6 +47,7 @@ class AggregationTest extends TestCase
         $this->assertEquals(['xxx'], $aggregation->getSubgroup());
         $this->assertEquals(Aggregation::SORT_BY_COUNT_ASC, $aggregation->getSort());
         $this->assertEquals(10, $aggregation->getLimit());
+        $this->assertEquals([], $aggregation->getPromoted());
     }
 
     /**
@@ -88,6 +89,7 @@ class AggregationTest extends TestCase
         $this->assertEquals([], $aggregation->getSubgroup());
         $this->assertEquals(Aggregation::SORT_BY_COUNT_DESC, $aggregation->getSort());
         $this->assertEquals(Aggregation::NO_LIMIT, $aggregation->getLimit());
+        $this->assertEquals([], $aggregation->getPromoted());
     }
 
     /**
@@ -103,6 +105,7 @@ class AggregationTest extends TestCase
             'subgroup' => ['xxx'],
             'sort' => Aggregation::SORT_BY_COUNT_ASC,
             'limit' => 10,
+            'promoted' => ['item1', 'item2'],
         ];
 
         $this->assertEquals(
@@ -124,6 +127,7 @@ class AggregationTest extends TestCase
             'subgroup' => [],
             'sort' => Aggregation::SORT_BY_COUNT_DESC,
             'limit' => 0,
+            'promoted' => [],
         ];
 
         $this->assertEquals(
@@ -158,5 +162,6 @@ class AggregationTest extends TestCase
         $this->assertEquals([], $aggregation->getSubgroup());
         $this->assertEquals(Aggregation::SORT_BY_COUNT_DESC, $aggregation->getSort());
         $this->assertEquals(Aggregation::NO_LIMIT, $aggregation->getLimit());
+        $this->assertEquals([], $aggregation->getPromoted());
     }
 }
