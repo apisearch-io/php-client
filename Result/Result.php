@@ -75,6 +75,11 @@ class Result implements HttpTransportable
     private $subresults = [];
 
     /**
+     * @var array
+     */
+    private $metadata;
+
+    /**
      * Result constructor.
      *
      * @param Query|null $query
@@ -114,7 +119,8 @@ class Result implements HttpTransportable
         ? Aggregations $aggregations,
         array $suggestions,
         array $items,
-        ? string $autocomplete = null
+        ? string $autocomplete = null,
+        array $metadata = []
     ): self {
         $result = new self(
             $query,
@@ -123,9 +129,10 @@ class Result implements HttpTransportable
         );
 
         $result->aggregations = $aggregations;
-        $result->suggestions = $suggestions;
+        $result->suggestions = array_combine($suggestions, $suggestions);
         $result->items = $items;
         $result->autocomplete = $autocomplete;
+        $result->metadata = $metadata;
 
         return $result;
     }
@@ -383,6 +390,43 @@ class Result implements HttpTransportable
     }
 
     /**
+     * Set metadata.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return Query
+     */
+    public function setMetadataValue(
+        string $name,
+               $value
+    ): self {
+        $this->metadata[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get metadata.
+     *
+     * @return array
+     */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * Get metadata value.
+     *
+     * @return mixed|null
+     */
+    public function getMetadataValue(string $name)
+    {
+        return $this->metadata[$name] ?? null;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -399,13 +443,14 @@ class Result implements HttpTransportable
             'aggregations' => $this->aggregations instanceof Aggregations
                 ? $this->aggregations->toArray()
                 : null,
-            'suggests' => array_keys($this->suggestions),
+            'suggests' => array_values($this->suggestions),
             'autocomplete' => '' === $this->autocomplete
                 ? null
                 : $this->autocomplete,
             'subresults' => array_map(function (Result $result) {
                 return $result->toArray();
             }, $this->subresults),
+            'metadata' => $this->metadata,
         ], function ($element) {
             return
             !(
@@ -437,7 +482,8 @@ class Result implements HttpTransportable
             array_map(function (array $item) {
                 return Item::createFromArray($item);
             }, $array['items'] ?? []),
-            $array['autocomplete'] ?? null
+            $array['autocomplete'] ?? null,
+            $array['metadata'] ?? []
         );
 
         $result->queryUUID = $array['query_uuid'] ?? '';
