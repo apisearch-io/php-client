@@ -263,5 +263,17 @@ class ResultTest extends TestCase
         $this->assertEquals(['str1', 'str2'], $result->toArray()['suggests']);
         $this->assertEquals(['str1', 'str2'], Result::createFromArray($result->toArray())->getSuggestions());
         $this->assertEquals(['str1', 'str2'], Result::createFromArray($result->toArray())->getSuggestions());
+
+        $this->assertEquals('sugg1', Result::create(
+            Query::createMatchAll()->identifyWith('sugg1'), 1, 1, null, [
+                'sugg1',
+            ], []
+        )->getSuggestions()[0]);
+
+        $this->assertEquals('sugg1', Result::create(
+            Query::createMatchAll()->identifyWith('sugg1'), 1, 1, null, [
+            'sugg1',
+        ], []
+        )->toArray()['suggests'][0]);
     }
 }
