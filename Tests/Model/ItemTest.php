@@ -525,4 +525,16 @@ class ItemTest extends TestCase
         $this->assertEquals(10, $item->getScore());
         $this->assertNull($item->getCoordinate());
     }
+
+    /**
+     * @return void
+     */
+    public function testPathByField()
+    {
+        $this->assertEquals('_id', Item::getPathByField('_id'));
+        $this->assertEquals('uuid.id', Item::getPathByField('id'));
+        $this->assertEquals('uuid.type', Item::getPathByField('type'));
+        $this->assertEquals('indexed_metadata.another_id', Item::getPathByField('another_id'));
+        $this->assertEquals('indexed_metadata._field', Item::getPathByField('_field'));
+    }
 }
