@@ -671,6 +671,10 @@ class Item implements HttpTransportable, UUIDReference
      */
     public static function getPathByField(string $field)
     {
+        if ('_id' === $field) {
+            return $field;
+        }
+
         return in_array($field, ['id', 'type'])
             ? 'uuid.'.$field
             : 'indexed_metadata.'.$field;
