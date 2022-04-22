@@ -732,6 +732,8 @@ class Item implements HttpTransportable, UUIDReference
         $this->highlights = $array['highlights'] ?? [];
         $this->promoted = isset($array['is_promoted']) && true === $array['is_promoted'];
         $this->score = $array['score'] ?? null;
-        $this->coordinate = $array['coordinate'] ?? null;
+        $this->coordinate = is_array($array['coordinate'] ?? null)
+            ? Coordinate::createFromArray($array['coordinate'])
+            : null;
     }
 }
