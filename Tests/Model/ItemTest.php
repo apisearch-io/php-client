@@ -524,6 +524,13 @@ class ItemTest extends TestCase
         $this->assertFalse($item->isPromoted());
         $this->assertEquals(10, $item->getScore());
         $this->assertNull($item->getCoordinate());
+
+        $item->map(function (array $map) {
+            $map['coordinate'] = ['lat' => 1, 'lon' => 2];
+
+            return $map;
+        });
+        $this->assertInstanceOf(Coordinate::class, $item->getCoordinate());
     }
 
     /**
