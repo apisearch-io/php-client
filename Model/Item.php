@@ -675,6 +675,10 @@ class Item implements HttpTransportable, UUIDReference
             return $field;
         }
 
+        if ('uuid' === $field) {
+            return '_id';
+        }
+
         if ('_id' === $field) {
             return $field;
         }
