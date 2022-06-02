@@ -145,4 +145,35 @@ class IndexTest extends TestCase
         $index = Index::createFromArray($index->toArray());
         $this->assertEquals('val1', $index->getMetadataValue('key1'));
     }
+
+    public function testWithFields()
+    {
+        $index = Index::createFromArray([
+            'uuid' => [
+                'id' => 'testId',
+            ],
+            'app_id' => [
+                'id' => 'testAppId',
+            ],
+        ]);
+
+        $this->assertEquals([], $index->getFields());
+
+        $index = Index::createFromArray([
+            'uuid' => [
+                'id' => 'testId',
+            ],
+            'app_id' => [
+                'id' => 'testAppId',
+            ],
+            'is_ok' => true,
+            'doc_count' => 10,
+            'size' => '1kb',
+            'fields' => ['f1', 'f2', 'f3'],
+        ]);
+
+        $this->assertEquals(['f1', 'f2', 'f3'], $index->getFields());
+        $index->withFields(['f4', 'f5']);
+        $this->assertEquals(['f4', 'f5'], $index->getFields());
+    }
 }

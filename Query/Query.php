@@ -257,11 +257,7 @@ class Query implements HttpTransportable
      */
     public static function createMatchAll(): self
     {
-        return static::create(
-            '',
-            self::DEFAULT_PAGE,
-            self::DEFAULT_SIZE
-        );
+        return static::create('');
     }
 
     /**
@@ -340,6 +336,16 @@ class Query implements HttpTransportable
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * @param int $size
+     *
+     * @return void
+     */
+    public function forceSize(int $size)
+    {
+        $this->size = $size;
     }
 
     /**
@@ -865,6 +871,23 @@ class Query implements HttpTransportable
     public function getAggregation(string $aggregationName): ? Aggregation
     {
         return $this->aggregations[$aggregationName] ?? null;
+    }
+
+    /**
+     * @param string $aggregationField
+     *
+     * @return void
+     */
+    public function deleteAggregationByField(string $aggregationField): void
+    {
+        $aggregationField = Item::getPathByField($aggregationField);
+        foreach ($this->aggregations as $key => $aggregation) {
+            if ($aggregation->getField() === $aggregationField) {
+                unset($this->aggregations[$key]);
+
+                return;
+            }
+        }
     }
 
     /**

@@ -77,7 +77,7 @@ class Index implements HttpTransportable
      *
      * @var string[]
      */
-    private $fields = [];
+    private $fields;
 
     /**
      * Metadata.
@@ -197,6 +197,16 @@ class Index implements HttpTransportable
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * @param array $fields
+     *
+     * @return void
+     */
+    public function withFields(array $fields)
+    {
+        $this->fields = $fields;
     }
 
     /**
