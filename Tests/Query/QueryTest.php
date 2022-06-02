@@ -330,4 +330,48 @@ class QueryTest extends TestCase
         $this->assertEquals(['item1', 'item3'], $query->getAggregation('field2')->getPromoted());
         $this->assertEquals(['item4'], $query->getAggregation('field3')->getPromoted());
     }
+
+    public function testDeleteAggregationByField()
+    {
+        $query = Query::createMatchAll()
+            ->aggregateBy('field1', 'field1', Filter::AT_LEAST_ONE, Aggregation::SORT_BY_COUNT_ASC)
+            ->aggregateBy('field2', 'field2', Filter::AT_LEAST_ONE, Aggregation::SORT_BY_COUNT_ASC);
+
+        $this->assertCount(2, $query->getAggregations());
+        $this->assertNotNull($query->getAggregation('field1'));
+        $this->assertNotNull($query->getAggregation('field2'));
+        $this->assertNull($query->getAggregation('field3'));
+
+        $query->deleteAggregationByField('field1');
+        $this->assertCount(1, $query->getAggregations());
+        $this->assertNull($query->getAggregation('field1'));
+        $this->assertNotNull($query->getAggregation('field2'));
+        $this->assertNull($query->getAggregation('field3'));
+
+        $query->deleteAggregationByField('field1');
+        $this->assertCount(1, $query->getAggregations());
+        $this->assertNull($query->getAggregation('field1'));
+        $this->assertNotNull($query->getAggregation('field2'));
+        $this->assertNull($query->getAggregation('field3'));
+
+        $query->deleteAggregationByField('field2');
+        $this->assertCount(0, $query->getAggregations());
+        $this->assertNull($query->getAggregation('field1'));
+        $this->assertNull($query->getAggregation('field2'));
+        $this->assertNull($query->getAggregation('field3'));
+
+        $query->deleteAggregationByField('field3');
+        $this->assertCount(0, $query->getAggregations());
+        $this->assertNull($query->getAggregation('field1'));
+        $this->assertNull($query->getAggregation('field2'));
+        $this->assertNull($query->getAggregation('field3'));
+    }
+
+    public function testForceSize()
+    {
+        $query = Query::create('x', 1, 10);
+        $this->assertEquals(10, $query->getSize());
+        $query->forceSize(7);
+        $this->assertEquals(7, $query->getSize());
+    }
 }
