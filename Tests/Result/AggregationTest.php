@@ -249,4 +249,22 @@ class AggregationTest extends TestCase
         $this->assertEquals(100, $aggregation->getTotalElements());
         $this->assertCount(1, $aggregation->getActiveElements());
     }
+
+    /**
+     * @return void
+     */
+    public function testWithMetadata()
+    {
+        $aggregation = Aggregation::createFromArray([
+            'name' => 'agg1',
+            'counters' => [],
+            'application_type' => Filter::MUST_ALL,
+            'active_elements' => ['1'],
+            'total_elements' => 100,
+            'metadata' => ['a' => 1, 'b' => 2],
+        ]);
+
+        $aggregation->withMetadata(['m']);
+        $this->assertEquals(['m'], $aggregation->getMetadata());
+    }
 }
