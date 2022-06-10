@@ -194,6 +194,16 @@ class Aggregation implements IteratorAggregate, HttpTransportable
     }
 
     /**
+     * @param array $metadata
+     *
+     * @return void
+     */
+    public function withMetadata(array $metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
      * Get all elements.
      *
      * @return Counter[]
