@@ -243,9 +243,9 @@ class Query implements HttpTransportable
 
         $page = (int) (max(1, $page));
         $query = new static($queryText);
-        $query->from = ($page - 1) * $size;
         $query->size = $size;
         $query->page = $page;
+        $query->calculateFrom();
 
         return $query;
     }
@@ -339,6 +339,15 @@ class Query implements HttpTransportable
     }
 
     /**
+     * @param int $page
+     */
+    public function forcePage(int $page): void
+    {
+        $this->page = $page;
+        $this->calculateFrom();
+    }
+
+    /**
      * @param int $size
      *
      * @return void
@@ -346,6 +355,15 @@ class Query implements HttpTransportable
     public function forceSize(int $size)
     {
         $this->size = $size;
+        $this->calculateFrom();
+    }
+
+    /**
+     * @return void
+     */
+    public function calculateFrom()
+    {
+        $this->from = ($this->page - 1) * $this->size;
     }
 
     /**

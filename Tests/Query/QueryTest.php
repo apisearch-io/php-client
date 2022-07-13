@@ -367,11 +367,22 @@ class QueryTest extends TestCase
         $this->assertNull($query->getAggregation('field3'));
     }
 
-    public function testForceSize()
+    public function testForceSizeAndPage()
     {
         $query = Query::create('x', 1, 10);
         $this->assertEquals(10, $query->getSize());
+        $this->assertEquals(0, $query->getFrom());
         $query->forceSize(7);
         $this->assertEquals(7, $query->getSize());
+        $this->assertEquals(0, $query->getFrom());
+
+        $query = Query::create('x', 2, 5);
+        $this->assertEquals(2, $query->getPage());
+        $this->assertEquals(5, $query->getSize());
+        $this->assertEquals(5, $query->getFrom());
+
+        $query->forcePage(3);
+        $this->assertEquals(3, $query->getPage());
+        $this->assertEquals(10, $query->getFrom());
     }
 }
