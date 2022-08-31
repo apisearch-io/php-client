@@ -275,5 +275,8 @@ class ResultTest extends TestCase
             'sugg1',
         ], []
         )->toArray()['suggests'][0]);
+
+        $result->setSuggestions(['sugg100']);
+        $this->assertEquals(['sugg100'], $result->getSuggestions());
     }
 }
