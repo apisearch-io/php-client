@@ -324,6 +324,14 @@ class Result implements HttpTransportable
     }
 
     /**
+     * @param array $suggestions
+     */
+    public function setSuggestions(array $suggestions)
+    {
+        $this->suggestions = $suggestions;
+    }
+
+    /**
      * @param string $autocomplete
      */
     public function setAutocomplete(string $autocomplete)
