@@ -354,17 +354,20 @@ class SortBy implements HttpTransportable
      *
      * @param string $function
      * @param string $order
+     * @param array  $params
      *
      * @return SortBy
      */
     public function byFunction(
         string $function,
-        string $order
+        string $order,
+        array $params = []
     ): SortBy {
         $this->sortsBy[] = [
             'type' => self::TYPE_FUNCTION,
             'function' => $function,
             'order' => $order,
+            'params' => $params,
         ];
 
         return $this;

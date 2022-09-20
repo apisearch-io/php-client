@@ -187,6 +187,11 @@ class Query implements HttpTransportable
     private $queryOperator = null;
 
     /**
+     * @var array
+     */
+    private $context = [];
+
+    /**
      * Construct.
      *
      * @param string $queryText
@@ -1536,6 +1541,26 @@ class Query implements HttpTransportable
     }
 
     /**
+     * @return array
+     */
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param array $context
+     *
+     * @return Query
+     */
+    public function setContext(array $context): Query
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -1612,6 +1637,7 @@ class Query implements HttpTransportable
             'query_operator' => self::QUERY_OPERATOR_OR !== $this->queryOperator
                 ? $this->queryOperator
                 : null,
+            'context' => $this->context,
         ], function ($element) {
             return
             !(
@@ -1694,6 +1720,8 @@ class Query implements HttpTransportable
         if (isset($array['query_operator'])) {
             $query->queryOperator = $array['query_operator'];
         }
+
+        $query->context = $array['context'] ?? [];
 
         return $query;
     }
