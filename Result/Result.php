@@ -80,6 +80,11 @@ class Result implements HttpTransportable
     private $metadata;
 
     /**
+     * @var array
+     */
+    private $context = [];
+
+    /**
      * Result constructor.
      *
      * @param Query|null $query
@@ -435,6 +440,26 @@ class Result implements HttpTransportable
     }
 
     /**
+     * @return array
+     */
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param array $context
+     *
+     * @return Result
+     */
+    public function setContext(array $context): Result
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    /**
      * To array.
      *
      * @return array
@@ -459,6 +484,7 @@ class Result implements HttpTransportable
                 return $result->toArray();
             }, $this->subresults),
             'metadata' => $this->metadata,
+            'context' => $this->context,
         ], function ($element) {
             return
             !(
@@ -500,6 +526,8 @@ class Result implements HttpTransportable
                 return Result::createFromArray($subresultAsArray);
             }, $array['subresults'] ?? [])
         );
+
+        $result->context = $array['context'] ?? [];
 
         return $result;
     }

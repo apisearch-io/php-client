@@ -385,4 +385,17 @@ class QueryTest extends TestCase
         $this->assertEquals(3, $query->getPage());
         $this->assertEquals(10, $query->getFrom());
     }
+
+    public function testContext()
+    {
+        $this->assertEmpty(Query::createMatchAll()->getContext());
+        $this->assertEmpty((Query::createMatchAll())->toArray()['context'] ?? []);
+        $query = Query::createMatchAll()->setContext(['context1']);
+        $queryAsArray = [
+            'context' => ['context1'],
+        ];
+        $this->assertEquals($queryAsArray, $query->toArray());
+        $this->assertEquals(['context1'], $query->getContext());
+        $this->assertEquals($queryAsArray, Query::createFromArray($query->toArray())->toArray());
+    }
 }

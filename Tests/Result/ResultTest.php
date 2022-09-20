@@ -279,4 +279,19 @@ class ResultTest extends TestCase
         $result->setSuggestions(['sugg100']);
         $this->assertEquals(['sugg100'], $result->getSuggestions());
     }
+
+    public function testContext()
+    {
+        $this->assertEmpty((new Result(Query::createMatchAll(), 0, 0))->getContext());
+        $this->assertEmpty((new Result(Query::createMatchAll(), 0, 0))->toArray()['context'] ?? []);
+        $result = (new Result(Query::createMatchAll(), 0, 0))->setContext(['context1']);
+        $resultAsArray = [
+            'total_items' => 0,
+            'total_hits' => 0,
+            'context' => ['context1'],
+        ];
+        $this->assertEquals($resultAsArray, $result->toArray());
+        $this->assertEquals(['context1'], $result->getContext());
+        $this->assertEquals(['context' => ['context1']], Query::createFromArray($result->toArray())->toArray());
+    }
 }

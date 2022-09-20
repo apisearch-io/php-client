@@ -387,4 +387,20 @@ class SortByTest extends TestCase
             HttpHelper::emulateHttpTransport($sortBy)
         );
     }
+
+    public function testByFunction()
+    {
+        $sortBy = SortBy::create()->byFunction('function 1', 'asc', ['val1', 'val2']);
+        $sortByAsArray = [
+            [
+                'type' => 'function',
+                'function' => 'function 1',
+                'order' => 'asc',
+                'params' => ['val1', 'val2'],
+            ],
+        ];
+
+        $this->assertEquals($sortByAsArray, $sortBy->toArray());
+        $this->assertEquals($sortByAsArray, SortBy::createFromArray($sortByAsArray)->toArray());
+    }
 }
