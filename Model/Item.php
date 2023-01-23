@@ -159,7 +159,7 @@ class Item implements HttpTransportable, UUIDReference
         array $exactMatchingMetadata = [],
         array $suggest = []
     ) {
-        return new self(
+        return new static(
             $uuid,
             null,
             $metadata,
@@ -192,7 +192,7 @@ class Item implements HttpTransportable, UUIDReference
         array $exactMatchingMetadata = [],
         array $suggest = []
     ) {
-        return new self(
+        return new static(
             $uuid,
             $coordinate,
             $metadata,
@@ -617,7 +617,7 @@ class Item implements HttpTransportable, UUIDReference
         }
 
         $item = isset($array['coordinate'])
-            ? self::createLocated(
+            ? static::createLocated(
                 ItemUUID::createFromArray($array['uuid']),
                 Coordinate::createFromArray($array['coordinate']),
                 $array['metadata'] ?? [],
@@ -626,7 +626,7 @@ class Item implements HttpTransportable, UUIDReference
                 $array['exact_matching_metadata'] ?? [],
                 $array['suggest'] ?? []
             )
-            : self::create(
+            : static::create(
                 ItemUUID::createFromArray($array['uuid']),
                 $array['metadata'] ?? [],
                 $array['indexed_metadata'] ?? [],
