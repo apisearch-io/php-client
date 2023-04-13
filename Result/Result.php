@@ -403,6 +403,16 @@ class Result implements HttpTransportable
     }
 
     /**
+     * @param array $subResults
+     *
+     * @return array
+     */
+    public function setSubResults(array $subResults)
+    {
+        $this->subresults = $subResults;
+    }
+
+    /**
      * Set metadata.
      *
      * @param string $name

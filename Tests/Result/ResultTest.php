@@ -246,6 +246,19 @@ class ResultTest extends TestCase
         $this->assertEquals(3, $subqueries['res1']->getTotalHits());
         $this->assertEquals(4, $subqueries['res2']->getTotalHits());
         $this->assertEquals(5, $subqueries['res3']->getTotalHits());
+
+        $result = Result::createFromArray([]);
+        $result->setSubResults([
+            'res1' => Result::create(Query::createMatchAll()->identifyWith('1'), 10, 3, null, [], []),
+            'res2' => Result::create(Query::createMatchAll()->identifyWith('2'), 10, 4, null, [], []),
+            'res3' => Result::create(Query::createMatchAll()->identifyWith('3'), 10, 5, null, [], []),
+        ]);
+
+        $this->assertCount(3, $result->getSubresults());
+        $subqueries = HttpHelper::emulateHttpTransport($result)->getSubresults();
+        $this->assertEquals(3, $subqueries['res1']->getTotalHits());
+        $this->assertEquals(4, $subqueries['res2']->getTotalHits());
+        $this->assertEquals(5, $subqueries['res3']->getTotalHits());
     }
 
     /**
