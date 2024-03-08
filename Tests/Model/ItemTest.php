@@ -545,5 +545,6 @@ class ItemTest extends TestCase
         $this->assertEquals('indexed_metadata.another_id', Item::getPathByField('another_id'));
         $this->assertEquals('indexed_metadata._field', Item::getPathByField('_field'));
         $this->assertEquals('indexed_metadata._field', Item::getPathByField('indexed_metadata._field'));
+        $this->assertEquals('_user.lol', Item::getPathByField('_user.lol'));
     }
 }
